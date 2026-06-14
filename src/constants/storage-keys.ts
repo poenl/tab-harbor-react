@@ -1,0 +1,18 @@
+export const STORAGE_KEYS = {
+  LANGUAGE_PREFERENCE: 'languagePreference',
+  THEME_PREFERENCES: 'themePreferences',
+  QUICK_SHORTCUTS: 'quickShortcuts',
+  TODOS: 'todos',
+  SESSION_GROUPS: 'sessionGroups',
+  GROUP_ORDER: 'groupOrder',
+  GROUP_TAB_ORDER: 'groupTabOrder',
+  GROUP_LABEL_OVERRIDES: 'groupLabelOverrides',
+  SAVED_TAB_SESSIONS: 'savedTabSessions',
+  SAVED_TAB_SESSION_COLLAPSED: 'savedTabSessionCollapsedState',
+  SAVED_TAB_SESSION_ORDER: 'savedTabSessionOrder',
+  DEFERRED_TRIGGER_POSITION: 'deferredTriggerPosition',
+  CHROME_TAB_GROUPS_ENABLED: 'chromeTabGroupsEnabled',
+  CHROME_TAB_GROUPS_META: 'chromeTabGroupsMeta',
+  IMPORTED_CHROME_SESSION_GROUPS: 'importedChromeSessionGroups',
+  HITOKOTO_CACHE: 'hitokotoCache',
+} as const;
