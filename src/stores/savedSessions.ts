@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { browser } from 'wxt/browser'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { SavedTabSession, SavedTabTab } from '@/types/session'
-import type { ThemePreferences } from '@/types/theme'
 
 function createSessionId(): string {
   const ts = Date.now().toString(36)
@@ -18,6 +17,7 @@ interface SavedSessionsStore {
   sessions: SavedTabSession[]
   collapsed: Record<string, boolean>
   ready: boolean
+  restoreMode: 'new-window' | 'current-window'
 
   load: () => Promise<void>
   addSession: (input: { name?: string; tabs: SavedTabTab[] }) => Promise<string>
@@ -27,21 +27,25 @@ interface SavedSessionsStore {
   toggleCollapse: (sessionId: string) => Promise<void>
   restoreSession: (id: string) => Promise<void>
   restoreTab: (sessionId: string, tabIndex: number) => Promise<void>
+  setRestoreMode: (mode: 'new-window' | 'current-window') => Promise<void>
 }
 
 export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
   sessions: [],
   collapsed: {},
   ready: false,
+  restoreMode: 'new-window',
 
   load: async () => {
     const result = await browser.storage.local.get([
       STORAGE_KEYS.SAVED_TAB_SESSIONS,
       STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED,
+      STORAGE_KEYS.RESTORE_MODE,
     ])
     set({
       sessions: (result[STORAGE_KEYS.SAVED_TAB_SESSIONS] as SavedTabSession[]) ?? [],
       collapsed: (result[STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED] as Record<string, boolean>) ?? {},
+      restoreMode: (result[STORAGE_KEYS.RESTORE_MODE] as 'new-window' | 'current-window') ?? 'new-window',
       ready: true,
     })
   },
@@ -90,25 +94,35 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
     set({ collapsed })
   },
 
+  setRestoreMode: async (mode) => {
+    await browser.storage.local.set({ [STORAGE_KEYS.RESTORE_MODE]: mode })
+    set({ restoreMode: mode })
+  },
+
   restoreSession: async (id) => {
     const session = get().sessions.find(s => s.id === id)
     if (!session || session.tabs.length === 0) return
 
-    const result = await browser.storage.local.get(STORAGE_KEYS.THEME_PREFERENCES)
-    const prefs = result[STORAGE_KEYS.THEME_PREFERENCES] as ThemePreferences | undefined
-    const restoreMode = prefs?.savedSessionRestoreMode ?? 'new-window'
+    const currentWindow = await browser.windows.getCurrent()
+    const winId = currentWindow.id
+    if (!winId) return
+
+    const restoreMode = get().restoreMode
+    const tabs = session.tabs
 
     if (restoreMode === 'new-window') {
-      const win = await browser.windows.create({ url: session.tabs[0].url })
-      const winId = win?.id
-      if (winId) {
-        for (let i = 1; i < session.tabs.length; i++) {
-          await browser.tabs.create({ url: session.tabs[i].url, windowId: winId })
-        }
+      // 此标签页：当前标签导航到第一个 URL，其余创建新标签
+      const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true })
+      if (activeTab?.id) {
+        await browser.tabs.update(activeTab.id, { url: tabs[0].url })
+      }
+      for (let i = 1; i < tabs.length; i++) {
+        await browser.tabs.create({ url: tabs[i].url, windowId: winId })
       }
     } else {
-      for (const tab of session.tabs) {
-        await browser.tabs.create({ url: tab.url })
+      // 新标签页：全部创建新标签
+      for (const tab of tabs) {
+        await browser.tabs.create({ url: tab.url, windowId: winId })
       }
     }
   },
@@ -117,7 +131,11 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
     const session = get().sessions.find(s => s.id === sessionId)
     const tab = session?.tabs[tabIndex]
     if (tab) {
-      await browser.tabs.create({ url: tab.url })
+      const currentWindow = await browser.windows.getCurrent()
+      const winId = currentWindow.id
+      if (winId) {
+        await browser.tabs.create({ url: tab.url, windowId: winId })
+      }
     }
   },
 }))

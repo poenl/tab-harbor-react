@@ -37,66 +37,40 @@ export function TabGroupList({
     return <EmptyState />
   }
 
-  // ── 选择模式：分离选中组和未选中组 ──
-  if (selectTarget) {
-    const selectedGroups = selectTarget === '*'
-      ? groups
-      : groups.filter(g => g.domain === selectTarget)
-
-    const remainingGroups = selectTarget === '*'
-      ? []
-      : groups.filter(g => g.domain !== selectTarget)
-
-    return (
-      <div className="flex flex-col gap-3">
-        {/* 选中组合并为一张选择卡片 */}
-        {selectedGroups.length > 0 && (
-          <DomainGroupCard
-            mode="select"
-            groups={selectedGroups}
-            selectedTabIds={selectedTabIds}
-            onToggleTab={onToggleTab}
-            onToggleGroup={onToggleGroup}
-            onSelectCancel={onSelectCancel}
-          />
-        )}
-
-        {/* 未选中组保持展示模式 */}
-        {remainingGroups.map((group) => (
-          <div key={group.domain} data-domain={group.domain}>
-            <DomainGroupCard
-              mode="view"
-              groups={[group]}
-              onCloseTab={onCloseTab}
-              onFocusTab={onFocusTab}
-              onSleepTab={onSleepTab}
-              onSaveTab={onSaveTab}
-              onSaveGroup={onSaveGroup}
-              sleepControlEnabled={sleepControlEnabled}
-            />
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  // ── 展示模式：普通列表 ──
   return (
     <div className="flex flex-col gap-3">
-      {groups.map((group) => (
-        <div key={group.domain} data-domain={group.domain}>
-          <DomainGroupCard
-            mode="view"
-            groups={[group]}
-            onCloseTab={onCloseTab}
-            onFocusTab={onFocusTab}
-            onSleepTab={onSleepTab}
-            onSaveTab={onSaveTab}
-            onSaveGroup={onSaveGroup}
-            sleepControlEnabled={sleepControlEnabled}
-          />
-        </div>
-      ))}
+      {selectTarget === '*' ? (
+        <DomainGroupCard
+          mode="select"
+          groups={groups}
+          selectedTabIds={selectedTabIds}
+          onToggleTab={onToggleTab}
+          onToggleGroup={onToggleGroup}
+          onSelectCancel={onSelectCancel}
+        />
+      ) : (
+        groups.map((group) => {
+          const isSelect = selectTarget === group.domain
+          return (
+            <div key={group.domain} data-domain={group.domain}>
+              <DomainGroupCard
+                mode={isSelect ? 'select' : 'view'}
+                groups={[group]}
+                onCloseTab={onCloseTab}
+                onFocusTab={onFocusTab}
+                onSleepTab={onSleepTab}
+                onSaveTab={onSaveTab}
+                onSaveGroup={onSaveGroup}
+                sleepControlEnabled={sleepControlEnabled}
+                selectedTabIds={selectedTabIds}
+                onToggleTab={onToggleTab}
+                onToggleGroup={onToggleGroup}
+                onSelectCancel={onSelectCancel}
+              />
+            </div>
+          )
+        })
+      )}
     </div>
   )
 }

@@ -1,36 +1,31 @@
 import { Settings } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from '@/i18n'
-import { browser } from 'wxt/browser'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
-import type { ThemePreferences } from '@/types/theme'
-import { DEFAULT_THEME_PREFERENCES } from '@/constants/themes'
+import { useSavedSessionsStore } from '@/stores/savedSessions'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function SavedSessionSettings() {
   const { t } = useTranslation()
+  const panelRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
-  const [prefs, setPrefs] = useState<ThemePreferences>(DEFAULT_THEME_PREFERENCES)
-  const [loaded, setLoaded] = useState(false)
+  const restoreMode = useSavedSessionsStore(s => s.restoreMode)
+  const setRestoreMode = useSavedSessionsStore(s => s.setRestoreMode)
+  const [navDisplayMode, setNavDisplayMode] = useState('name')
 
   useEffect(() => {
-    browser.storage.local.get(STORAGE_KEYS.THEME_PREFERENCES).then(result => {
-      const stored = result[STORAGE_KEYS.THEME_PREFERENCES] as ThemePreferences | undefined
-      if (stored) setPrefs(stored)
-      setLoaded(true)
-    })
-  }, [])
-
-  async function update(key: keyof ThemePreferences, value: string) {
-    const next = { ...prefs, [key]: value }
-    setPrefs(next)
-    await browser.storage.local.set({ [STORAGE_KEYS.THEME_PREFERENCES]: next })
-  }
-
-  if (!loaded) return null
+    if (!open) return
+    function handleClickOutside(e: MouseEvent) {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
 
   return (
     // ── 已保存页面设置 ──
-    <div className="relative">
+    <div className="relative" ref={panelRef}>
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 text-xs text-muted-foreground bg-none border-none cursor-pointer hover:text-foreground transition-colors duration-150"
@@ -44,26 +39,28 @@ export function SavedSessionSettings() {
           <div className="flex flex-col gap-3">
             <label className="flex flex-col gap-1">
               <span className="text-[11px] font-semibold text-muted-foreground">{t('savedSessionRestoreModeLabel')}</span>
-              <select
-                value={prefs.savedSessionRestoreMode}
-                onChange={e => update('savedSessionRestoreMode', e.target.value)}
-                className="text-xs bg-secondary text-foreground border border-border rounded-md px-2 py-1.5 outline-none"
-              >
-                <option value="new-window">{t('savedSessionRestoreModeNewWindow')}</option>
-                <option value="current-window">{t('savedSessionRestoreModeCurrentWindow')}</option>
-              </select>
+              <Select value={restoreMode} onValueChange={(v) => setRestoreMode(v as 'new-window' | 'current-window')}>
+                <SelectTrigger className="w-full bg-secondary text-xs h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new-window">{t('savedSessionRestoreModeNewWindow')}</SelectItem>
+                  <SelectItem value="current-window">{t('savedSessionRestoreModeCurrentWindow')}</SelectItem>
+                </SelectContent>
+              </Select>
             </label>
 
             <label className="flex flex-col gap-1">
               <span className="text-[11px] font-semibold text-muted-foreground">{t('savedSessionNavDisplayModeLabel')}</span>
-              <select
-                value={prefs.savedSessionNavDisplayMode}
-                onChange={e => update('savedSessionNavDisplayMode', e.target.value)}
-                className="text-xs bg-secondary text-foreground border border-border rounded-md px-2 py-1.5 outline-none"
-              >
-                <option value="icon">{t('savedSessionNavDisplayModeIcon')}</option>
-                <option value="name">{t('savedSessionNavDisplayModeName')}</option>
-              </select>
+              <Select value={navDisplayMode} onValueChange={setNavDisplayMode}>
+                <SelectTrigger className="w-full bg-secondary text-xs h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="icon">{t('savedSessionNavDisplayModeIcon')}</SelectItem>
+                  <SelectItem value="name">{t('savedSessionNavDisplayModeName')}</SelectItem>
+                </SelectContent>
+              </Select>
             </label>
           </div>
         </div>

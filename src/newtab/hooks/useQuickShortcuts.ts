@@ -103,7 +103,17 @@ export function useQuickShortcuts() {
     await save([...next, ...remaining])
   }, [shortcuts, save])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+
+    const listener = (changes: Record<string, { newValue?: unknown }>) => {
+      if (STORAGE_KEYS.QUICK_SHORTCUTS in changes) {
+        load()
+      }
+    }
+    browser.storage.local.onChanged.addListener(listener)
+    return () => browser.storage.local.onChanged.removeListener(listener)
+  }, [load])
 
   return { shortcuts, loading, add, update, remove, reorder }
 }
