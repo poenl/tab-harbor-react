@@ -7,16 +7,6 @@ function getHostname(url: string): string {
   }
 }
 
-function isStableIconUrl(url: string): boolean {
-  if (!url) return false
-  try {
-    const u = new URL(url)
-    return u.protocol === 'https:' || u.protocol === 'data:'
-  } catch {
-    return false
-  }
-}
-
 function getGoogleFaviconUrl(domain: string, size: number): string {
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=${size}`
 }

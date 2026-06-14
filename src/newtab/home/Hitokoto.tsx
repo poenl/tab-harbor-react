@@ -8,22 +8,15 @@ export function Hitokoto() {
   const attribution = from ? ` — ${from}` : ''
 
   return (
+    // ── 一言 ──
     <div
-      className="hitokoto mt-[14px] max-w-[520px] font-serif text-sm leading-relaxed tracking-[0.01em]"
-      style={{
-        fontFamily: "'Libre Caslon Display', serif",
-        color: 'color-mix(in srgb, var(--muted) 85%, var(--ink) 15%)',
-        fontStyle: 'italic',
-      }}
       aria-live="polite"
       role="note"
+      className="font-serif text-sm leading-[1.6] text-muted-foreground max-w-[520px]"
     >
-      <span>{entry.hitokoto}</span>
+      <span className="italic">{entry.hitokoto}</span>
       {attribution && (
-        <span
-          className="text-xs not-italic whitespace-nowrap"
-          style={{ color: 'var(--muted)' }}
-        >
+        <span className="text-xs text-muted-foreground not-italic whitespace-nowrap">
           {attribution}
         </span>
       )}

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { type OpenTab, type DomainGroup, normalizeTab, buildDomainGroups } from '@/newtab/utils/domain-grouping.ts'
+import { type DomainGroup, normalizeTab, buildDomainGroups } from '@/newtab/utils/domain-grouping.ts'
 
 export function useOpenTabs() {
-  const [tabs, setTabs] = useState<OpenTab[]>([])
   const [groups, setGroups] = useState<DomainGroup[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -10,11 +9,8 @@ export function useOpenTabs() {
     async function fetchTabs() {
       try {
         const result = await browser.tabs.query({})
-        const openTabs = result.map(normalizeTab)
-        setTabs(openTabs)
-        setGroups(buildDomainGroups(openTabs))
+        setGroups(buildDomainGroups(result.map(normalizeTab)))
       } catch {
-        setTabs([])
         setGroups([])
       } finally {
         setLoading(false)
@@ -31,5 +27,5 @@ export function useOpenTabs() {
     return () => browser.runtime.onMessage.removeListener(handler)
   }, [])
 
-  return { tabs, groups, loading }
+  return { groups, loading }
 }

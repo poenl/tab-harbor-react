@@ -12,11 +12,12 @@ export function Greeting() {
   const greeting = getGreeting()
 
   return (
-    <div className="header-title-row">
-      <h1 className="font-display text-[40px] leading-none -tracking-[0.02em] text-ink whitespace-nowrap">
+    // ── 问候语 + 日期 ──
+    <div>
+      <h1 className="font-serif text-[40px] font-normal tracking-[-0.02em] leading-none text-foreground whitespace-nowrap m-0">
         {t(GREETING_KEY[greeting] as any)}
       </h1>
-      <div className="font-sans text-[10px] font-semibold tracking-[0.18em] text-workspace-chip-text uppercase whitespace-nowrap leading-none translate-y-px">
+      <div className="text-[10px] font-semibold tracking-[0.18em] uppercase leading-none text-muted-foreground mt-[18px]">
         {getDateDisplay()}
       </div>
     </div>

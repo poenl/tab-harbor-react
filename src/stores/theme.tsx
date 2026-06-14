@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useCallback } from 'react'
 import type { ThemePaletteId, ThemePreferences } from '@/types/theme'
 import { useStorage } from '@/hooks/useStorage'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
-import { THEME_FAMILIES, DEFAULT_THEME_PREFERENCES, resolveTone } from '@/constants/themes'
+import { resolveTone, DEFAULT_THEME_PREFERENCES } from '@/constants/themes'
 import type { ReactNode } from 'react'
 
 interface ThemeContextValue {
@@ -15,13 +15,10 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function applyTheme(paletteId: ThemePaletteId, tone: 'light' | 'dark', surfaceOpacity?: number) {
-  const palette = THEME_FAMILIES[paletteId]
-  const vars = tone === 'dark' ? palette.dark : palette.light
   const root = document.documentElement
 
-  for (const [name, value] of Object.entries(vars)) {
-    root.style.setProperty(name, String(value))
-  }
+  root.classList.remove('theme-paper', 'theme-sage', 'theme-mist', 'theme-blush')
+  root.classList.add(`theme-${paletteId}`)
 
   root.classList.toggle('dark', tone === 'dark')
   document.body.classList.remove('theme-tone-light', 'theme-tone-dark')

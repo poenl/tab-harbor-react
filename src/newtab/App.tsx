@@ -1,14 +1,13 @@
+import { useState } from 'react'
 import { GroupNav } from './components/GroupNav.tsx'
-import { Greeting } from './components/Greeting.tsx'
-import { Hitokoto } from './components/Hitokoto.tsx'
-import { SearchBar } from './components/SearchBar.tsx'
-import { QuickShortcuts } from './components/QuickShortcuts.tsx'
-import { DomainGroupCard } from './components/DomainGroup.tsx'
-import { EmptyState } from './components/EmptyState.tsx'
+import { WorkspacePageSwitch } from './components/WorkspacePageSwitch.tsx'
+import { HomePage } from './home/index.tsx'
+import { SavedTabsPage } from './saved-tabs/index.tsx'
 import { useOpenTabs } from './hooks/useOpenTabs.ts'
 
 export default function App() {
   const { groups, loading } = useOpenTabs()
+  const [currentPage, setCurrentPage] = useState<'home' | 'saved-tabs'>('home')
 
   async function handleCloseTab(id: number) {
     try {
@@ -26,66 +25,23 @@ export default function App() {
   const totalTabs = groups.reduce((sum, g) => sum + g.tabs.length, 0)
 
   return (
-    <div className="container">
-      <GroupNav groups={groups} onNavigate={(domain) => {
-        document.getElementById(`group-${domain}`)?.scrollIntoView({ behavior: 'smooth' })
-      }} />
+    // ── 外层容器（1260px 居中） ──
+    <div className="max-w-[1260px] mx-auto px-8 py-10 pb-18 max-[960px]:px-5 max-[960px]:py-6 max-[960px]:pb-12">
 
-      <main className="workspace-page is-active" id="homePage">
-        <div className="dashboard-columns">
+      {/* ── 顶部导航栏：分组圆点 + 页面切换 ── */}
+      <div className="flex items-start gap-4 mb-[14px] flex-wrap min-h-10">
+        <GroupNav groups={groups} onNavigate={(domain) => {
+          document.querySelector(`[data-domain="${domain}"]`)?.scrollIntoView({ behavior: 'smooth' })
+        }} />
+        <WorkspacePageSwitch currentPage={currentPage} onPageChange={setCurrentPage} />
+      </div>
 
-          <section className="active-section" id="openTabsSection">
-            <div className="section-header">
-              <h2>Open Tabs</h2>
-              <div className="section-line" />
-              <div className="section-count">{totalTabs}</div>
-            </div>
-
-            {loading ? (
-              <div className="text-sm text-muted-text py-8 text-center">Loading...</div>
-            ) : groups.length === 0 ? (
-              <EmptyState />
-            ) : (
-              <div className="missions flex flex-col gap-3">
-                {groups.map((group) => (
-                  <div key={group.domain} id={`group-${group.domain}`}>
-                    <DomainGroupCard
-                      group={group}
-                      onCloseTab={handleCloseTab}
-                      onFocusTab={handleFocusTab}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          <header className="page-header">
-            <div className="header-left">
-              <Greeting />
-              <Hitokoto />
-              <SearchBar />
-              <QuickShortcuts />
-            </div>
-          </header>
-
-        </div>
-
-        <footer>
-          <div className="footer-stats">
-            <div className="stat">
-              <div className="stat-num">{totalTabs}</div>
-              <div className="stat-label">Open tabs</div>
-            </div>
-          </div>
-          <div className="last-refresh">
-            <span className="footer-credit">
-              <a className="footer-credit-link" href="https://github.com/V-IOLE-T/tab-harbor" target="_blank">Tab Harbor</a>
-              {' '}by{' '}
-              <a className="footer-credit-link" href="https://github.com/V-IOLE-T" target="_blank">OO</a>
-            </span>
-          </div>
-        </footer>
+      {/* ── 主体 ── */}
+      <main>
+        {currentPage === 'home'
+          ? <HomePage groups={groups} loading={loading} totalTabs={totalTabs} onCloseTab={handleCloseTab} onFocusTab={handleFocusTab} />
+          : <SavedTabsPage />
+        }
       </main>
     </div>
   )

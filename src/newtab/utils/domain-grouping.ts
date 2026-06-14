@@ -51,7 +51,7 @@ const FRIENDLY_DOMAINS: Record<string, string> = {
   'wikipedia.org': 'Wikipedia',
 }
 
-export function friendlyDomain(hostname: string): string {
+function friendlyDomain(hostname: string): string {
   if (!hostname) return ''
 
   if (FRIENDLY_DOMAINS[hostname]) return FRIENDLY_DOMAINS[hostname]
@@ -145,7 +145,7 @@ function getPrimaryDomain(hostname: string): string {
   return parts.slice(-2).join('.')
 }
 
-export function isRealTab(tab: OpenTab): boolean {
+function isRealTab(tab: OpenTab): boolean {
   const url = tab.url || ''
   return (
     !url.startsWith('chrome://') &&

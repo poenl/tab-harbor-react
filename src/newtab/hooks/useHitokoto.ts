@@ -6,7 +6,7 @@ const HITOKOTO_CACHE_LIMIT = 50
 const API_URL = 'https://v1.hitokoto.cn/'
 const FETCH_TIMEOUT = 3000
 
-export interface HitokotoEntry {
+interface HitokotoEntry {
   hitokoto: string
   from_who: string
   from: string
