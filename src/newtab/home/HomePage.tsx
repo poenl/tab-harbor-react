@@ -1,4 +1,22 @@
+import { useState } from 'react'
+import { useTranslation } from '@/i18n'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
+import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
+import { useTheme } from '@/stores/theme'
+import { useSavedSessionsStore } from '@/stores/savedSessions'
+import { toast } from 'sonner'
+import { Moon, Archive, X } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { SectionHeader } from './SectionHeader.tsx'
 import { TabGroupList } from './TabGroupList.tsx'
 import { Greeting } from './Greeting.tsx'
@@ -16,6 +34,101 @@ interface HomePageProps {
 }
 
 export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }: HomePageProps) {
+  const { t } = useTranslation()
+  const { preferences } = useTheme()
+  const { sleepControlEnabled } = preferences
+  const addSession = useSavedSessionsStore(s => s.addSession)
+
+  const [selectTarget, setSelectTarget] = useState<string | null>(null)
+  const [selectedTabIds, setSelectedTabIds] = useState<Set<number>>(new Set())
+
+  async function handleSleepAllTabs() {
+    const tabs = await browser.tabs.query({ currentWindow: true })
+    let count = 0
+    for (const tab of tabs) {
+      if (!tab.discarded && tab.id) {
+        try {
+          await browser.tabs.discard(tab.id)
+          count++
+        } catch {}
+      }
+    }
+    toast(t('toastTabsDiscarded', { count }))
+  }
+
+  async function handleSleepTab(id: number) {
+    try {
+      await browser.tabs.discard(id)
+      toast(t('toastTabDiscarded'))
+    } catch {
+      toast(t('toastTabDiscardFailed'))
+    }
+  }
+
+  async function handleSaveTab(tab: OpenTab) {
+    const tabData = [{ url: tab.url, title: tab.title, favIconUrl: tab.favIconUrl || undefined }]
+    const name = `Saved tabs ${new Date().toLocaleString()}`
+    await addSession({ name, tabs: tabData })
+    try {
+      await browser.tabs.remove(tab.id)
+      toast(t('toastSessionSaved', { count: 1 }))
+    } catch {}
+  }
+
+  // ── 选择模式 ──
+
+  function enterSelectMode(target: string) {
+    const scope = target === '*'
+      ? groups.flatMap(g => g.tabs.map(t => t.id))
+      : groups.filter(g => g.domain === target).flatMap(g => g.tabs.map(t => t.id))
+    setSelectTarget(target)
+    setSelectedTabIds(new Set(scope))
+  }
+
+  function exitSelectMode() {
+    setSelectTarget(null)
+    setSelectedTabIds(new Set())
+  }
+
+  function handleToggleTab(id: number) {
+    const next = new Set(selectedTabIds)
+    if (next.has(id)) {
+      next.delete(id)
+    } else {
+      next.add(id)
+    }
+    setSelectedTabIds(next)
+  }
+
+  function handleToggleGroup(domain: string) {
+    const groupIds = groups.filter(g => g.domain === domain).flatMap(g => g.tabs.map(t => t.id))
+    const allSelected = groupIds.every(id => selectedTabIds.has(id))
+    const next = new Set(selectedTabIds)
+    for (const id of groupIds) {
+      if (allSelected) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+    }
+    setSelectedTabIds(next)
+  }
+
+  function handleSaveCurrentWindow() {
+    enterSelectMode('*')
+  }
+
+  function handleSaveGroup(domain: string) {
+    enterSelectMode(domain)
+  }
+
+  async function handleCloseAllTabs() {
+    const tabs = await browser.tabs.query({ currentWindow: true })
+    const toClose = tabs.filter(t => !t.pinned && t.id).map(t => t.id!)
+    if (toClose.length > 0) { await browser.tabs.remove(toClose) }
+    toast(t('toastAllTabsClosed'))
+  }
+
   return (
     <>
       {/* ── 两列布局（左: 1.35fr = 标签列表 / 右: 0.95fr = 问候+搜索+快捷） ── */}
@@ -23,12 +136,68 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
 
         {/* ── 左栏：打开标签页 ── */}
         <section>
-          <SectionHeader title="Open Tabs" count={totalTabs} />
+          <SectionHeader
+            title={t('openTabsSectionTitle')}
+            count={totalTabs}
+            actions={(
+              <>
+                {sleepControlEnabled && (
+                  <button
+                    onClick={handleSleepAllTabs}
+                    title={t('sleepAllTabsButton')}
+                    aria-label={t('sleepAllTabsButton')}
+                    className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-foreground transition-all duration-150"
+                  >
+                    <Moon strokeWidth={1.8} className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={handleSaveCurrentWindow}
+                  title={t('saveSessionButton')}
+                  aria-label={t('saveSessionButton')}
+                  className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150"
+                >
+                  <Archive strokeWidth={1.8} className="w-4 h-4" />
+                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      title={t('closeAllTabsButton')}
+                      aria-label={t('closeAllTabsButton')}
+                      className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all duration-150"
+                    >
+                      <X strokeWidth={1.8} className="w-4 h-4" />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('closeAllTabsConfirmTitle')}</AlertDialogTitle>
+                      <AlertDialogDescription>{t('closeAllTabsConfirmDescription')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('cancelButton')}</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleCloseAllTabs}>{t('closeAllTabsConfirmAction')}</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
+          />
           <TabGroupList
             groups={groups}
             loading={loading}
             onCloseTab={onCloseTab}
             onFocusTab={onFocusTab}
+            onSleepTab={handleSleepTab}
+            onSaveTab={handleSaveTab}
+            onSaveGroup={handleSaveGroup}
+            sleepControlEnabled={sleepControlEnabled}
+
+            selectTarget={selectTarget}
+            selectedTabIds={selectedTabIds}
+            onToggleTab={handleToggleTab}
+            onToggleGroup={handleToggleGroup}
+            onSelectCancel={exitSelectMode}
           />
         </section>
 

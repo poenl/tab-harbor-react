@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from '@/i18n'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -63,6 +64,8 @@ function GroupIcon({ group }: { group: DomainGroup }) {
 }
 
 export function GroupNav({ groups, onNavigate }: GroupNavProps) {
+  const { t } = useTranslation()
+
   if (groups.length <= 1) return null
 
   return (
@@ -77,7 +80,7 @@ export function GroupNav({ groups, onNavigate }: GroupNavProps) {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => onNavigate?.(group.domain)}
-                  aria-label={`Jump to ${label}`}
+                  aria-label={t('jumpToLabel', { label })}
                   draggable={false}
                   className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
                 >

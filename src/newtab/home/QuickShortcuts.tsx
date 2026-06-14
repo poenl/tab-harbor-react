@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus, Pencil, X } from 'lucide-react'
+import { useTranslation } from '@/i18n'
 import type { QuickShortcut } from '@/types/shortcut'
 import { useQuickShortcuts, svgToDataUrl } from '../hooks/useQuickShortcuts'
 import { getIconSources, getFallbackLabel } from '../utils/icon-utils'
@@ -79,18 +80,20 @@ function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
 
 // ── 添加快捷卡片 ──
 function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
+  const { t } = useTranslation()
+
   return (
     <div>
       <button
         type="button"
         onClick={onAdd}
-        aria-label="Add quick tab"
+        aria-label={t('addQuickTab')}
         className="grid grid-rows-[40px_auto] justify-items-center content-start gap-1.5 w-full text-center cursor-pointer bg-none border-none p-0"
       >
         <span className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center ring-1 ring-inset ring-border">
           <Plus strokeWidth={1.8} aria-hidden="true" className="w-[22px] h-[22px] text-primary" />
         </span>
-        <span className="text-[11px] leading-[1.45] text-muted-foreground">Add link</span>
+        <span className="text-[11px] leading-[1.45] text-muted-foreground">{t('addLink')}</span>
       </button>
     </div>
   )
@@ -98,11 +101,13 @@ function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
 
 // ── 编辑按钮（hover 显示） ──
 function EditButton({ shortcutId, onEdit }: { shortcutId: string; onEdit: (id: string) => void }) {
+  const { t } = useTranslation()
+
   return (
     <button
       type="button"
       onClick={(e) => { e.stopPropagation(); onEdit(shortcutId) }}
-      aria-label="Edit quick tab"
+      aria-label={t('editQuickTab')}
       className="absolute -top-0.5 left-0 w-[18px] h-[18px] p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-primary hover:bg-secondary hover:text-primary"
     >
       <Pencil strokeWidth={1.8} aria-hidden="true" className="w-[9px] h-[9px]" />
@@ -112,11 +117,13 @@ function EditButton({ shortcutId, onEdit }: { shortcutId: string; onEdit: (id: s
 
 // ── 删除按钮（hover 显示） ──
 function RemoveButton({ shortcutId, onRemove }: { shortcutId: string; onRemove: (id: string) => void }) {
+  const { t } = useTranslation()
+
   return (
     <button
       type="button"
       onClick={(e) => { e.stopPropagation(); onRemove(shortcutId) }}
-      aria-label="Remove quick tab"
+      aria-label={t('removeQuickTab')}
       className="absolute -top-0.5 right-0 w-[18px] h-[18px] p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
     >
       <X strokeWidth={1.8} aria-hidden="true" className="w-[9px] h-[9px]" />
@@ -130,6 +137,7 @@ function ShortcutEditor({ shortcut, onSave, onCancel }: {
   onSave: (data: Partial<QuickShortcut>) => void
   onCancel: () => void
 }) {
+  const { t } = useTranslation()
   const [url, setUrl] = useState(shortcut?.url || '')
   const [label, setLabel] = useState(shortcut?.label || '')
 
@@ -144,13 +152,13 @@ function ShortcutEditor({ shortcut, onSave, onCancel }: {
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-sm font-semibold">
-              {shortcut?.id ? 'Edit shortcut' : 'Add shortcut'}
+              {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
             </DialogTitle>
           </DialogHeader>
 
           <div>
             <label>
-              <span>URL</span>
+              <span>{t('urlLabel')}</span>
               <Input
                 value={url}
                 onChange={e => setUrl(e.target.value)}
@@ -161,22 +169,22 @@ function ShortcutEditor({ shortcut, onSave, onCancel }: {
             </label>
 
             <label>
-              <span>Label</span>
+              <span>{t('labelLabel')}</span>
               <Input
                 value={label}
                 onChange={e => setLabel(e.target.value)}
                 type="text"
-                placeholder="Optional"
+                placeholder={t('optionalPlaceholder')}
               />
             </label>
           </div>
 
           <DialogFooter>
             <Button variant="ghost" type="button" onClick={onCancel}>
-              Cancel
+              {t('cancelButton')}
             </Button>
             <Button variant="secondary" type="submit">
-              Save
+              {t('saveButton')}
             </Button>
           </DialogFooter>
         </form>

@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 
 interface WorkspacePageSwitchProps {
   currentPage: 'home' | 'saved-tabs'
@@ -6,9 +7,11 @@ interface WorkspacePageSwitchProps {
 }
 
 export function WorkspacePageSwitch({ currentPage, onPageChange }: WorkspacePageSwitchProps) {
+  const { t } = useTranslation()
+
   return (
     // ── 页面切换（Home / Saved tabs） ──
-    <nav className="inline-flex items-center gap-3.5 pt-2" aria-label="Workspace pages">
+    <nav className="inline-flex items-center gap-3.5 pt-2" aria-label={t('workspacePagesAriaLabel')}>
       <button
         onClick={() => onPageChange('home')}
         className={cn(
@@ -18,7 +21,7 @@ export function WorkspacePageSwitch({ currentPage, onPageChange }: WorkspacePage
             : 'text-muted-foreground decoration-transparent hover:text-foreground'
         )}
       >
-        Home
+        {t('workspacePageHome')}
       </button>
       <button
         onClick={() => onPageChange('saved-tabs')}
@@ -29,7 +32,7 @@ export function WorkspacePageSwitch({ currentPage, onPageChange }: WorkspacePage
             : 'text-muted-foreground decoration-transparent hover:text-foreground'
         )}
       >
-        Saved tabs
+        {t('workspacePageSavedTabs')}
       </button>
     </nav>
   )

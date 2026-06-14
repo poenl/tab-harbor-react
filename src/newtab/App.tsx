@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { GroupNav } from './components/GroupNav.tsx'
 import { WorkspacePageSwitch } from './components/WorkspacePageSwitch.tsx'
+import { Toaster } from '@/components/ui/sonner'
 import { HomePage } from './home/index.tsx'
 import { SavedTabsPage } from './saved-tabs/index.tsx'
 import { useOpenTabs } from './hooks/useOpenTabs.ts'
@@ -43,6 +44,8 @@ export default function App() {
           : <SavedTabsPage />
         }
       </main>
+
+      <Toaster />
     </div>
   )
 }

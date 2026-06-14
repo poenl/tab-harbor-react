@@ -1,31 +1,38 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { type DomainGroup, normalizeTab, buildDomainGroups } from '@/newtab/utils/domain-grouping.ts'
 
 export function useOpenTabs() {
   const [groups, setGroups] = useState<DomainGroup[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchTabs() {
-      try {
-        const result = await browser.tabs.query({})
-        setGroups(buildDomainGroups(result.map(normalizeTab)))
-      } catch {
-        setGroups([])
-      } finally {
-        setLoading(false)
-      }
+  const fetchTabs = useCallback(async () => {
+    try {
+      const result = await browser.tabs.query({})
+      setGroups(buildDomainGroups(result.map(normalizeTab)))
+    } catch {
+      setGroups([])
+    } finally {
+      setLoading(false)
     }
-
-    fetchTabs()
-
-    const handler = (message: { action?: string }) => {
-      if (message.action === 'tabs-changed') fetchTabs()
-    }
-
-    browser.runtime.onMessage.addListener(handler)
-    return () => browser.runtime.onMessage.removeListener(handler)
   }, [])
 
-  return { groups, loading }
+  useEffect(() => {
+    fetchTabs()
+
+    browser.tabs.onCreated.addListener(fetchTabs)
+    browser.tabs.onRemoved.addListener(fetchTabs)
+    browser.tabs.onUpdated.addListener(fetchTabs)
+    browser.tabs.onAttached.addListener(fetchTabs)
+    browser.tabs.onDetached.addListener(fetchTabs)
+
+    return () => {
+      browser.tabs.onCreated.removeListener(fetchTabs)
+      browser.tabs.onRemoved.removeListener(fetchTabs)
+      browser.tabs.onUpdated.removeListener(fetchTabs)
+      browser.tabs.onAttached.removeListener(fetchTabs)
+      browser.tabs.onDetached.removeListener(fetchTabs)
+    }
+  }, [fetchTabs])
+
+  return { groups, loading, refresh: fetchTabs }
 }

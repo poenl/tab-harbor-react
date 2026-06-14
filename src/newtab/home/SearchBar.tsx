@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react'
 import { Search } from 'lucide-react'
+import { useTranslation } from '@/i18n'
 
 async function runDefaultSearch(query: string) {
   const text = query.trim()
@@ -15,6 +16,8 @@ async function runDefaultSearch(query: string) {
 }
 
 export function SearchBar() {
+  const { t } = useTranslation()
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = new FormData(e.currentTarget)
@@ -31,10 +34,10 @@ export function SearchBar() {
         <input
           name="q"
           type="search"
-          placeholder="Search with your default engine..."
+          placeholder={t('searchPlaceholder')}
           autoComplete="off"
           spellCheck={false}
-          aria-label="Search the web"
+          aria-label={t('searchAriaLabel')}
           className="flex-1 text-[15px] text-foreground bg-transparent border-none outline-none min-w-0 placeholder:text-muted-foreground/80"
         />
       </div>
