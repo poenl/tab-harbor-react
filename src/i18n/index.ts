@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import type { LanguageDetectorAsyncModule } from 'i18next'
-import { initReactI18next, useTranslation, Trans } from 'react-i18next'
+import { initReactI18next, useTranslation } from 'react-i18next'
 import { en } from './en'
 import { zhCN } from './zh-CN'
 
@@ -39,5 +39,5 @@ i18n.use(chromeStorageDetector).use(initReactI18next).init({
   interpolation: { escapeValue: false }
 })
 
-export { useTranslation, Trans }
+export { useTranslation }
 export default i18n
