@@ -4,7 +4,7 @@ import { getGreeting, getDateDisplay } from '@/newtab/utils/domain-grouping.ts'
 const GREETING_KEY: Record<string, string> = {
   'Good morning': 'greetingMorning',
   'Good afternoon': 'greetingAfternoon',
-  'Good evening': 'greetingEvening',
+  'Good evening': 'greetingEvening'
 }
 
 export function Greeting() {

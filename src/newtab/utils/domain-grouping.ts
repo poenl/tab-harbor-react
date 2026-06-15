@@ -48,7 +48,7 @@ const FRIENDLY_DOMAINS: Record<string, string> = {
   'codepen.io': 'CodePen',
   'codesandbox.io': 'CodeSandbox',
   'observablehq.com': 'Observable',
-  'wikipedia.org': 'Wikipedia',
+  'wikipedia.org': 'Wikipedia'
 }
 
 function friendlyDomain(hostname: string): string {
@@ -69,7 +69,10 @@ function friendlyDomain(hostname: string): string {
     .replace(/^www\./, '')
     .replace(/\.(co\.uk|co\.jp|com|org|net|io|co|ai|dev|app|so|me|xyz|info|us|uk)$/, '')
 
-  return clean.split('.').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ')
+  return clean
+    .split('.')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
 }
 
 export function getGreeting(): string {
@@ -79,8 +82,29 @@ export function getGreeting(): string {
   return 'Good evening'
 }
 
-const WEEKDAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'] as const
-const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'] as const
+const WEEKDAYS = [
+  'SUNDAY',
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY'
+] as const
+const MONTHS = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC'
+] as const
 
 export function getDateDisplay(): string {
   const d = new Date()
@@ -106,18 +130,20 @@ interface LandingPattern {
 }
 
 const LANDING_PAGE_PATTERNS: LandingPattern[] = [
-  { hostname: 'mail.google.com', test: (p, h) =>
-    !h.includes('#inbox/') && !h.includes('#sent/') && !h.includes('#search/') },
+  {
+    hostname: 'mail.google.com',
+    test: (p, h) => !h.includes('#inbox/') && !h.includes('#sent/') && !h.includes('#search/')
+  },
   { hostname: 'x.com', pathExact: ['/home'] },
   { hostname: 'www.linkedin.com', pathExact: ['/'] },
   { hostname: 'github.com', pathExact: ['/'] },
-  { hostname: 'www.youtube.com', pathExact: ['/'] },
+  { hostname: 'www.youtube.com', pathExact: ['/'] }
 ]
 
 function isLandingPage(url: string): boolean {
   try {
     const parsed = new URL(url)
-    return LANDING_PAGE_PATTERNS.some(p => {
+    return LANDING_PAGE_PATTERNS.some((p) => {
       const hostnameMatch = p.hostname
         ? parsed.hostname === p.hostname
         : p.hostnameEndsWith
@@ -164,13 +190,13 @@ export function normalizeTab(t: ChromeTab): OpenTab {
     favIconUrl: t.favIconUrl || '',
     windowId: t.windowId ?? 0,
     active: t.active ?? false,
-    discarded: t.discarded ?? false,
+    discarded: t.discarded ?? false
   }
 }
 
 export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   const seen = new Set<number>()
-  const realTabs = tabs.filter(t => {
+  const realTabs = tabs.filter((t) => {
     if (t.id == null || seen.has(t.id)) return false
     seen.add(t.id)
     return isRealTab(t)
@@ -206,10 +232,14 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   }
 
   if (landingTabs.length > 0) {
-    groupMap['__landing-pages__'] = { domain: '__landing-pages__', tabs: landingTabs, label: 'Landing Pages' }
+    groupMap['__landing-pages__'] = {
+      domain: '__landing-pages__',
+      tabs: landingTabs,
+      label: 'Landing Pages'
+    }
   }
 
-  const landingHostnames = new Set(LANDING_PAGE_PATTERNS.map(p => p.hostname).filter(Boolean))
+  const landingHostnames = new Set(LANDING_PAGE_PATTERNS.map((p) => p.hostname).filter(Boolean))
 
   const groups = Object.values(groupMap).sort((a, b) => {
     if (a.domain === '__landing-pages__') return -1

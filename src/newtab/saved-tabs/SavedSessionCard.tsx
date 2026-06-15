@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp, Trash2, RotateCcw } from 'lucide-react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from '@/i18n'
-import type { SavedTabSession } from '@/types/session'
+import type { SavedTabSession } from '@/stores/savedSessions'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { SavedSessionTabRow } from './SavedSessionTabRow.tsx'
 
@@ -24,7 +24,15 @@ interface SavedSessionCardProps {
 
 export function SavedSessionCard({ session }: SavedSessionCardProps) {
   const { t } = useTranslation()
-  const { collapsed, toggleCollapse, renameSession, removeSession, restoreSession, restoreTab, removeTabFromSession } = useSavedSessionsStore()
+  const {
+    collapsed,
+    toggleCollapse,
+    renameSession,
+    removeSession,
+    restoreSession,
+    restoreTab,
+    removeTabFromSession
+  } = useSavedSessionsStore()
   const isCollapsed = collapsed[session.id] ?? false
   const [renaming, setRenaming] = useState(false)
   const [nameInput, setNameInput] = useState(session.name)
@@ -39,7 +47,10 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter') handleRenameSubmit()
-    if (e.key === 'Escape') { setNameInput(session.name); setRenaming(false) }
+    if (e.key === 'Escape') {
+      setNameInput(session.name)
+      setRenaming(false)
+    }
   }
 
   return (
@@ -52,7 +63,7 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
             <input
               type="text"
               value={nameInput}
-              onChange={e => setNameInput(e.target.value)}
+              onChange={(e) => setNameInput(e.target.value)}
               onBlur={handleRenameSubmit}
               onKeyDown={handleKeyDown}
               autoFocus
@@ -69,7 +80,9 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
           )}
 
           <div className="text-[11px] text-muted-foreground mt-0.5">
-            {session.tabs.length} {t(session.tabs.length === 1 ? 'tabsWordSingular' : 'tabsWordPlural')} saved {formatRelativeTime(session.savedAt, t)}
+            {session.tabs.length}{' '}
+            {t(session.tabs.length === 1 ? 'tabsWordSingular' : 'tabsWordPlural')} saved{' '}
+            {formatRelativeTime(session.savedAt, t)}
           </div>
         </div>
 
@@ -79,7 +92,11 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
             className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-foreground transition-all duration-150"
             title={isCollapsed ? t('expand') || 'Expand' : t('collapse') || 'Collapse'}
           >
-            {isCollapsed ? <ChevronDown strokeWidth={1.8} className="w-4 h-4" /> : <ChevronUp strokeWidth={1.8} className="w-4 h-4" />}
+            {isCollapsed ? (
+              <ChevronDown strokeWidth={1.8} className="w-4 h-4" />
+            ) : (
+              <ChevronUp strokeWidth={1.8} className="w-4 h-4" />
+            )}
           </button>
 
           <button

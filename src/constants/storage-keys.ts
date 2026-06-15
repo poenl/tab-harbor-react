@@ -15,5 +15,5 @@ export const STORAGE_KEYS = {
   CHROME_TAB_GROUPS_META: 'chromeTabGroupsMeta',
   IMPORTED_CHROME_SESSION_GROUPS: 'importedChromeSessionGroups',
   HITOKOTO_CACHE: 'hitokotoCache',
-  RESTORE_MODE: 'restoreMode',
-} as const;
+  RESTORE_MODE: 'restoreMode'
+} as const

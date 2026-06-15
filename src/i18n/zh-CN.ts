@@ -1,4 +1,4 @@
-import type { TranslationKey } from './en';
+import type { TranslationKey } from './en'
 
 export const zhCN: Record<TranslationKey, string> = {
   emptyTitle: '标签页清零了。',
@@ -197,4 +197,7 @@ export const zhCN: Record<TranslationKey, string> = {
   shortcutSvgCode: 'SVG 代码',
   shortcutEmojiInput: 'Emoji',
   clearSelection: '清除',
-};
+  tabScopeLabel: '标签页范围',
+  tabScopeCurrentWindow: '当前窗口',
+  tabScopeAllWindows: '全部窗口'
+}

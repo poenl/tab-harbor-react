@@ -39,7 +39,7 @@ export function getFallbackLabel(label: string, url: string): string {
       .split(/[\s./:_-]+/)
       .filter(Boolean)
       .slice(0, 2)
-      .map(t => t[0]?.toUpperCase() || '')
+      .map((t) => t[0]?.toUpperCase() || '')
     const joined = tokens.join('')
     if (joined) return joined
   }

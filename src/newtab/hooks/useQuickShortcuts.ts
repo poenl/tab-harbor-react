@@ -1,12 +1,24 @@
 import { useEffect, useState, useCallback } from 'react'
-import type { QuickShortcut } from '@/types/shortcut'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
+
+export type ShortcutIconKind = '' | 'emoji' | 'svg' | 'image' | 'website'
+
+export interface QuickShortcut {
+  id: string
+  url: string
+  label: string
+  icon: string
+  iconKind: ShortcutIconKind
+}
 
 function generateId(): string {
   return `shortcut-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-function normalizeShortcutIcon(value: string): { icon: string; iconKind: QuickShortcut['iconKind'] } {
+function normalizeShortcutIcon(value: string): {
+  icon: string
+  iconKind: QuickShortcut['iconKind']
+} {
   const text = (value || '').trim()
   if (!text) return { icon: '', iconKind: '' }
 
@@ -51,7 +63,7 @@ function normalize(input: Partial<QuickShortcut>): QuickShortcut | null {
     url,
     label,
     icon,
-    iconKind,
+    iconKind
   }
 }
 
@@ -79,29 +91,41 @@ export function useQuickShortcuts() {
     setShortcuts(next)
   }, [])
 
-  const add = useCallback(async (partial: Partial<QuickShortcut>) => {
-    const entry = normalize({ ...partial, id: generateId() })
-    if (!entry) return
-    const next = [...shortcuts, entry]
-    await save(next)
-  }, [shortcuts, save])
+  const add = useCallback(
+    async (partial: Partial<QuickShortcut>) => {
+      const entry = normalize({ ...partial, id: generateId() })
+      if (!entry) return
+      const next = [...shortcuts, entry]
+      await save(next)
+    },
+    [shortcuts, save]
+  )
 
-  const update = useCallback(async (id: string, partial: Partial<QuickShortcut>) => {
-    const next = shortcuts.map(s => (s.id === id ? { ...s, ...partial } : s))
-    await save(next)
-  }, [shortcuts, save])
+  const update = useCallback(
+    async (id: string, partial: Partial<QuickShortcut>) => {
+      const next = shortcuts.map((s) => (s.id === id ? { ...s, ...partial } : s))
+      await save(next)
+    },
+    [shortcuts, save]
+  )
 
-  const remove = useCallback(async (id: string) => {
-    const next = shortcuts.filter(s => s.id !== id)
-    await save(next)
-  }, [shortcuts, save])
+  const remove = useCallback(
+    async (id: string) => {
+      const next = shortcuts.filter((s) => s.id !== id)
+      await save(next)
+    },
+    [shortcuts, save]
+  )
 
-  const reorder = useCallback(async (orderedIds: string[]) => {
-    const map = new Map(shortcuts.map(s => [s.id, s]))
-    const next = orderedIds.map(id => map.get(id)).filter(Boolean) as QuickShortcut[]
-    const remaining = shortcuts.filter(s => !orderedIds.includes(s.id))
-    await save([...next, ...remaining])
-  }, [shortcuts, save])
+  const reorder = useCallback(
+    async (orderedIds: string[]) => {
+      const map = new Map(shortcuts.map((s) => [s.id, s]))
+      const next = orderedIds.map((id) => map.get(id)).filter(Boolean) as QuickShortcut[]
+      const remaining = shortcuts.filter((s) => !orderedIds.includes(s.id))
+      await save([...next, ...remaining])
+    },
+    [shortcuts, save]
+  )
 
   useEffect(() => {
     load()

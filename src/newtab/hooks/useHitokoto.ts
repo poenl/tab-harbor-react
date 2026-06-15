@@ -20,7 +20,7 @@ function normalizeEntry(data: unknown): HitokotoEntry | null {
   return {
     hitokoto: text,
     from_who: String(obj.from_who || '').trim(),
-    from: String(obj.from || '').trim(),
+    from: String(obj.from || '').trim()
   }
 }
 
@@ -51,7 +51,7 @@ async function loadCache(): Promise<HitokotoEntry[]> {
 async function saveCache(entries: HitokotoEntry[]) {
   try {
     await browser.storage.local.set({
-      [HITOKOTO_CACHE_KEY]: entries.slice(0, HITOKOTO_CACHE_LIMIT),
+      [HITOKOTO_CACHE_KEY]: entries.slice(0, HITOKOTO_CACHE_LIMIT)
     })
   } catch {}
 }
@@ -59,7 +59,7 @@ async function saveCache(entries: HitokotoEntry[]) {
 async function addToCache(data: unknown): Promise<HitokotoEntry | null> {
   const entry = normalizeEntry(data)
   if (!entry) return null
-  const existing = (await loadCache()).filter(e => e.hitokoto !== entry.hitokoto)
+  const existing = (await loadCache()).filter((e) => e.hitokoto !== entry.hitokoto)
   await saveCache([entry, ...existing])
   return entry
 }
@@ -88,15 +88,17 @@ export function useHitokoto() {
 
     if (!fetchedRef.current) {
       fetchedRef.current = true
-      loadCache().then(cache => {
-        if (cache.length > 0) {
-          setEntry(cache[0])
-          setLoading(false)
-        }
-        refresh()
-      }).catch(() => {
-        refresh()
-      })
+      loadCache()
+        .then((cache) => {
+          if (cache.length > 0) {
+            setEntry(cache[0])
+            setLoading(false)
+          }
+          refresh()
+        })
+        .catch(() => {
+          refresh()
+        })
     }
   }, [enabled, refresh])
 

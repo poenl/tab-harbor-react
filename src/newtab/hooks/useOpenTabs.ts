@@ -1,20 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
-import { type DomainGroup, normalizeTab, buildDomainGroups } from '@/newtab/utils/domain-grouping.ts'
+import {
+  type DomainGroup,
+  normalizeTab,
+  buildDomainGroups
+} from '@/newtab/utils/domain-grouping.ts'
+import { useTheme } from '@/stores/theme'
 
 export function useOpenTabs() {
+  const { preferences } = useTheme()
   const [groups, setGroups] = useState<DomainGroup[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetchTabs = useCallback(async () => {
     try {
-      const result = await browser.tabs.query({})
+      const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
+      const result = await browser.tabs.query(query)
       setGroups(buildDomainGroups(result.map(normalizeTab)))
     } catch {
       setGroups([])
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [preferences.tabScope])
 
   useEffect(() => {
     fetchTabs()

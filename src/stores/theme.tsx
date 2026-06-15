@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useCallback } from 'react'
-import type { ThemePaletteId, ThemePreferences } from '@/types/theme'
+import type { ThemePaletteId, ThemePreferences } from '@/constants/preferences'
 import { useStorage } from '@/hooks/useStorage'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
-import { resolveTone, DEFAULT_THEME_PREFERENCES } from '@/constants/themes'
+import { resolveTone, DEFAULT_THEME_PREFERENCES } from '@/constants/preferences'
 import type { ReactNode } from 'react'
 
 interface ThemeContextValue {
@@ -27,15 +27,21 @@ function applyTheme(paletteId: ThemePaletteId, tone: 'light' | 'dark', surfaceOp
   if (surfaceOpacity != null) {
     root.style.setProperty('--custom-surface-opacity', `${surfaceOpacity}%`)
     root.style.setProperty('--custom-border-opacity', `${surfaceOpacity}%`)
-    root.style.setProperty('--custom-badge-opacity', `${Math.max(2, Math.round(surfaceOpacity / 3))}%`)
-    root.style.setProperty('--custom-fallback-opacity', `${Math.max(3, Math.round(surfaceOpacity / 2.5))}%`)
+    root.style.setProperty(
+      '--custom-badge-opacity',
+      `${Math.max(2, Math.round(surfaceOpacity / 3))}%`
+    )
+    root.style.setProperty(
+      '--custom-fallback-opacity',
+      `${Math.max(3, Math.round(surfaceOpacity / 2.5))}%`
+    )
   }
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [preferences, setPreferences, ready] = useStorage<ThemePreferences>(
     STORAGE_KEYS.THEME_PREFERENCES,
-    DEFAULT_THEME_PREFERENCES,
+    DEFAULT_THEME_PREFERENCES
   )
 
   const tone = resolveTone(preferences.mode)

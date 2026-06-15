@@ -60,7 +60,11 @@ function GroupIcon({ group }: { group: DomainGroup }) {
     }
   }
 
-  return <span className="w-5 h-5 rounded-full inline-flex items-center justify-center text-[9px] font-bold text-primary bg-secondary">{fallbackLabel.slice(0, 2)}</span>
+  return (
+    <span className="w-5 h-5 rounded-full inline-flex items-center justify-center text-[9px] font-bold text-primary bg-secondary">
+      {fallbackLabel.slice(0, 2)}
+    </span>
+  )
 }
 
 export function GroupNav({ groups, onNavigate }: GroupNavProps) {

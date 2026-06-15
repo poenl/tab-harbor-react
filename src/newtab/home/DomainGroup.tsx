@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
-import type { SavedTabSession } from '@/types/session'
+import type { SavedTabSession } from '@/stores/savedSessions'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge.tsx'
-import { Archive, X } from 'lucide-react'
+import { Moon, Archive, X } from 'lucide-react'
 import { TabChip } from './TabChip.tsx'
 
 const INITIAL_VISIBLE = 8
@@ -30,6 +30,7 @@ interface DomainGroupCardProps {
   onCloseTab?: (id: number) => void
   onFocusTab?: (id: number) => void
   onSleepTab?: (id: number) => void
+  onSleepGroup?: (domain: string) => void
   onSaveTab?: (tab: any) => void
   onSaveGroup?: (domain: string) => void
   sleepControlEnabled?: boolean
@@ -47,6 +48,7 @@ export function DomainGroupCard({
   onCloseTab,
   onFocusTab,
   onSleepTab,
+  onSleepGroup,
   onSaveTab,
   onSaveGroup,
   sleepControlEnabled,
@@ -162,11 +164,24 @@ export function DomainGroupCard({
               <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground m-0 flex-1 min-w-0 truncate">
                 {groupLabel}
               </h3>
+              {mode === 'view' &&
+                sleepControlEnabled &&
+                onSleepGroup &&
+                group.tabs.some((t) => !t.discarded && !t.active) && (
+                  <button
+                    onClick={() => onSleepGroup(group.domain)}
+                    title={t('sleepAllTabsButton')}
+                    aria-label={t('sleepAllTabsButton')}
+                    className="w-7 h-7 p-0 border border-border rounded-md bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150 shrink-0"
+                  >
+                    <Moon strokeWidth={1.8} className="w-3.5 h-3.5" />
+                  </button>
+                )}
               {mode === 'view' && onSaveGroup && (
                 <button
                   onClick={() => onSaveGroup(group.domain)}
                   title={t('saveGroupSession')}
-                  className="w-7 h-7 p-0 border border-border rounded-md bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center opacity-60 hover:opacity-100 hover:bg-secondary hover:text-primary transition-all duration-150 shrink-0"
+                  className="w-7 h-7 p-0 border border-border rounded-md bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150 shrink-0"
                 >
                   <Archive strokeWidth={1.8} className="w-3.5 h-3.5" />
                 </button>
@@ -254,10 +269,7 @@ export function DomainGroupCard({
               value={newSessionName}
               onChange={(e) => setNewSessionName(e.target.value)}
               placeholder={t('sessionPickerNewSessionNamePlaceholder')}
-              className={cn(
-                'w-full h-7',
-                footerMode !== 'new' && 'hidden'
-              )}
+              className={cn('w-full h-7', footerMode !== 'new' && 'hidden')}
             />
 
             <div className={cn('w-full', footerMode !== 'existing' && 'hidden')}>

@@ -55,8 +55,10 @@ export const en = {
   toastShortcutIconPasted: 'Shortcut icon pasted',
   toastSvgIconPasted: 'SVG icon pasted',
   toastClipboardNoImage: 'Clipboard does not contain an image or SVG',
-  toastClipboardUsePasteShortcut: 'Use Cmd/Ctrl+V inside the editor if direct clipboard access is unavailable',
-  toastClipboardTemporaryRef: 'This clipboard image is a temporary file reference. Use Cmd/Ctrl+V instead.',
+  toastClipboardUsePasteShortcut:
+    'Use Cmd/Ctrl+V inside the editor if direct clipboard access is unavailable',
+  toastClipboardTemporaryRef:
+    'This clipboard image is a temporary file reference. Use Cmd/Ctrl+V instead.',
   toastShortcutIconUpdated: 'Shortcut icon updated',
   toastCouldNotUseShortcutImage: 'Could not use shortcut image',
   toastCouldNotPasteShortcutImage: 'Could not paste shortcut image',
@@ -181,7 +183,8 @@ export const en = {
   expand: 'Expand',
   collapse: 'Collapse',
   closeAllTabsConfirmTitle: 'Close all tabs',
-  closeAllTabsConfirmDescription: 'Are you sure you want to close all open tabs? This action cannot be undone.',
+  closeAllTabsConfirmDescription:
+    'Are you sure you want to close all open tabs? This action cannot be undone.',
   closeAllTabsConfirmAction: 'Close all',
   addByUrlTitle: 'Add by URL',
   tabPickerTitle: 'Add open tabs',
@@ -196,6 +199,9 @@ export const en = {
   shortcutSvgCode: 'SVG code',
   shortcutEmojiInput: 'Emoji',
   clearSelection: 'Clear',
-} as const;
+  tabScopeLabel: 'Tab scope',
+  tabScopeCurrentWindow: 'Current window',
+  tabScopeAllWindows: 'All windows'
+} as const
 
-export type TranslationKey = keyof typeof en;
+export type TranslationKey = keyof typeof en

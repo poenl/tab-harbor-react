@@ -15,7 +15,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { SectionHeader } from './SectionHeader.tsx'
 import { TabGroupList } from './TabGroupList.tsx'
@@ -37,13 +37,14 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   const { t } = useTranslation()
   const { preferences } = useTheme()
   const { sleepControlEnabled } = preferences
-  const addSession = useSavedSessionsStore(s => s.addSession)
+  const addSession = useSavedSessionsStore((s) => s.addSession)
 
   const [selectTarget, setSelectTarget] = useState<string | null>(null)
   const [selectedTabIds, setSelectedTabIds] = useState<Set<number>>(new Set())
 
   async function handleSleepAllTabs() {
-    const tabs = await browser.tabs.query({ currentWindow: true })
+    const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
+    const tabs = await browser.tabs.query(query)
     let count = 0
     for (const tab of tabs) {
       if (!tab.discarded && tab.id) {
@@ -65,6 +66,22 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
     }
   }
 
+  async function handleSleepGroup(domain: string) {
+    const tabs = groups
+      .filter((g) => g.domain === domain)
+      .flatMap((g) => g.tabs.filter((t) => !t.discarded))
+    let count = 0
+    for (const tab of tabs) {
+      if (tab.id) {
+        try {
+          await browser.tabs.discard(tab.id)
+          count++
+        } catch {}
+      }
+    }
+    toast(t('toastTabsDiscarded', { count }))
+  }
+
   async function handleSaveTab(tab: OpenTab) {
     const tabData = [{ url: tab.url, title: tab.title, favIconUrl: tab.favIconUrl || undefined }]
     const name = `Saved tabs ${new Date().toLocaleString()}`
@@ -78,9 +95,10 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   // ── 选择模式 ──
 
   function enterSelectMode(target: string) {
-    const scope = target === '*'
-      ? groups.flatMap(g => g.tabs.map(t => t.id))
-      : groups.filter(g => g.domain === target).flatMap(g => g.tabs.map(t => t.id))
+    const scope =
+      target === '*'
+        ? groups.flatMap((g) => g.tabs.map((t) => t.id))
+        : groups.filter((g) => g.domain === target).flatMap((g) => g.tabs.map((t) => t.id))
     setSelectTarget(target)
     setSelectedTabIds(new Set(scope))
   }
@@ -101,8 +119,10 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   }
 
   function handleToggleGroup(domain: string) {
-    const groupIds = groups.filter(g => g.domain === domain).flatMap(g => g.tabs.map(t => t.id))
-    const allSelected = groupIds.every(id => selectedTabIds.has(id))
+    const groupIds = groups
+      .filter((g) => g.domain === domain)
+      .flatMap((g) => g.tabs.map((t) => t.id))
+    const allSelected = groupIds.every((id) => selectedTabIds.has(id))
     const next = new Set(selectedTabIds)
     for (const id of groupIds) {
       if (allSelected) {
@@ -123,9 +143,12 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   }
 
   async function handleCloseAllTabs() {
-    const tabs = await browser.tabs.query({ currentWindow: true })
-    const toClose = tabs.filter(t => !t.pinned && t.id).map(t => t.id!)
-    if (toClose.length > 0) { await browser.tabs.remove(toClose) }
+    const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
+    const tabs = await browser.tabs.query(query)
+    const toClose = tabs.filter((t) => !t.pinned && t.id).map((t) => t.id!)
+    if (toClose.length > 0) {
+      await browser.tabs.remove(toClose)
+    }
     toast(t('toastAllTabsClosed'))
   }
 
@@ -133,13 +156,12 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
     <>
       {/* ── 两列布局（左: 1.35fr = 标签列表 / 右: 0.95fr = 问候+搜索+快捷） ── */}
       <div className="grid grid-cols-[1.35fr_0.95fr] gap-8 items-start max-[960px]:grid-cols-1 max-[960px]:gap-5">
-
         {/* ── 左栏：打开标签页 ── */}
         <section>
           <SectionHeader
             title={t('openTabsSectionTitle')}
             count={totalTabs}
-            actions={(
+            actions={
               <>
                 {sleepControlEnabled && (
                   <button
@@ -172,16 +194,20 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t('closeAllTabsConfirmTitle')}</AlertDialogTitle>
-                      <AlertDialogDescription>{t('closeAllTabsConfirmDescription')}</AlertDialogDescription>
+                      <AlertDialogDescription>
+                        {t('closeAllTabsConfirmDescription')}
+                      </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>{t('cancelButton')}</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleCloseAllTabs}>{t('closeAllTabsConfirmAction')}</AlertDialogAction>
+                      <AlertDialogAction onClick={handleCloseAllTabs}>
+                        {t('closeAllTabsConfirmAction')}
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
               </>
-            )}
+            }
           />
           <TabGroupList
             groups={groups}
@@ -189,10 +215,10 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
             onCloseTab={onCloseTab}
             onFocusTab={onFocusTab}
             onSleepTab={handleSleepTab}
+            onSleepGroup={handleSleepGroup}
             onSaveTab={handleSaveTab}
             onSaveGroup={handleSaveGroup}
             sleepControlEnabled={sleepControlEnabled}
-
             selectTarget={selectTarget}
             selectedTabIds={selectedTabIds}
             onToggleTab={handleToggleTab}
@@ -210,7 +236,6 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
             <QuickShortcuts />
           </div>
         </header>
-
       </div>
 
       <Footer totalTabs={totalTabs} />

@@ -8,7 +8,7 @@ export default defineConfig({
   manifest: {
     name: 'Tab Harbor',
     permissions: ['tabs', 'storage', 'tabGroups'],
-    host_permissions: ['<all_urls>'],
+    host_permissions: ['<all_urls>']
   },
   vite: () => ({
     plugins: [tailwindcss()]

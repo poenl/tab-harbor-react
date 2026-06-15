@@ -9,6 +9,7 @@ interface TabGroupListProps {
   onCloseTab?: (id: number) => void
   onFocusTab?: (id: number) => void
   onSleepTab?: (id: number) => void
+  onSleepGroup?: (domain: string) => void
   onSaveTab?: (tab: any) => void
   onSaveGroup?: (domain: string) => void
   sleepControlEnabled?: boolean
@@ -23,9 +24,21 @@ interface TabGroupListProps {
 }
 
 export function TabGroupList({
-  groups, loading,
-  onCloseTab, onFocusTab, onSleepTab, onSaveTab, onSaveGroup, sleepControlEnabled,
-  selectedTabIds, selectTarget, onToggleTab, onToggleGroup, onSelectSave, onSelectCancel,
+  groups,
+  loading,
+  onCloseTab,
+  onFocusTab,
+  onSleepTab,
+  onSleepGroup,
+  onSaveTab,
+  onSaveGroup,
+  sleepControlEnabled,
+  selectedTabIds,
+  selectTarget,
+  onToggleTab,
+  onToggleGroup,
+  onSelectSave,
+  onSelectCancel
 }: TabGroupListProps) {
   const { t } = useTranslation()
 
@@ -59,6 +72,7 @@ export function TabGroupList({
                 onCloseTab={onCloseTab}
                 onFocusTab={onFocusTab}
                 onSleepTab={onSleepTab}
+                onSleepGroup={onSleepGroup}
                 onSaveTab={onSaveTab}
                 onSaveGroup={onSaveGroup}
                 sleepControlEnabled={sleepControlEnabled}

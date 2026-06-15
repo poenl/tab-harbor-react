@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
 import { useTranslation } from '@/i18n'
-import type { SavedTabTab } from '@/types/session'
+import type { SavedTabTab } from '@/stores/savedSessions'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { useState } from 'react'
 
@@ -48,7 +48,13 @@ function TabFavicon({ tab }: { tab: SavedTabTab }) {
   )
 }
 
-export function SavedSessionTabRow({ tab, sessionId, index, onRestoreTab, onDeleteTab }: SavedSessionTabRowProps) {
+export function SavedSessionTabRow({
+  tab,
+  sessionId,
+  index,
+  onRestoreTab,
+  onDeleteTab
+}: SavedSessionTabRowProps) {
   const { t } = useTranslation()
 
   return (

@@ -9,9 +9,7 @@ export function SavedSessionEmpty() {
       <p className="font-serif text-xl italic font-normal text-foreground m-0">
         {t('sessionPickerNoSavedSessions')}
       </p>
-      <p className="text-sm text-muted-foreground m-0">
-        {t('emptySessionSubtitle')}
-      </p>
+      <p className="text-sm text-muted-foreground m-0">{t('emptySessionSubtitle')}</p>
     </div>
   )
 }

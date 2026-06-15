@@ -1,7 +1,20 @@
 import { create } from 'zustand'
 import { browser } from 'wxt/browser'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
-import type { SavedTabSession, SavedTabTab } from '@/types/session'
+
+export interface SavedTabTab {
+  url: string
+  title: string
+  favIconUrl?: string
+}
+
+export interface SavedTabSession {
+  id: string
+  name: string
+  tabs: SavedTabTab[]
+  savedAt: string
+  source: 'manual' | 'current-window' | 'selected' | 'single-tab' | 'group'
+}
 
 function createSessionId(): string {
   const ts = Date.now().toString(36)
@@ -10,7 +23,11 @@ function createSessionId(): string {
 }
 
 function isRestorable(url: string): boolean {
-  return !url.startsWith('chrome://') && !url.startsWith('about:') && !url.startsWith('chrome-extension://')
+  return (
+    !url.startsWith('chrome://') &&
+    !url.startsWith('about:') &&
+    !url.startsWith('chrome-extension://')
+  )
 }
 
 interface SavedSessionsStore {
@@ -40,13 +57,15 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
     const result = await browser.storage.local.get([
       STORAGE_KEYS.SAVED_TAB_SESSIONS,
       STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED,
-      STORAGE_KEYS.RESTORE_MODE,
+      STORAGE_KEYS.RESTORE_MODE
     ])
     set({
       sessions: (result[STORAGE_KEYS.SAVED_TAB_SESSIONS] as SavedTabSession[]) ?? [],
-      collapsed: (result[STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED] as Record<string, boolean>) ?? {},
-      restoreMode: (result[STORAGE_KEYS.RESTORE_MODE] as 'new-window' | 'current-window') ?? 'new-window',
-      ready: true,
+      collapsed:
+        (result[STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED] as Record<string, boolean>) ?? {},
+      restoreMode:
+        (result[STORAGE_KEYS.RESTORE_MODE] as 'new-window' | 'current-window') ?? 'new-window',
+      ready: true
     })
   },
 
@@ -55,9 +74,9 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
     const session: SavedTabSession = {
       id,
       name: input.name || 'Saved tabs',
-      tabs: input.tabs.filter(t => isRestorable(t.url)),
+      tabs: input.tabs.filter((t) => isRestorable(t.url)),
       savedAt: new Date().toISOString(),
-      source: 'selected',
+      source: 'selected'
     }
     const sessions = [...get().sessions, session]
     await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
@@ -66,22 +85,20 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
   },
 
   removeSession: async (id) => {
-    const sessions = get().sessions.filter(s => s.id !== id)
+    const sessions = get().sessions.filter((s) => s.id !== id)
     await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
     set({ sessions })
   },
 
   renameSession: async (id, name) => {
-    const sessions = get().sessions.map(s => s.id === id ? { ...s, name } : s)
+    const sessions = get().sessions.map((s) => (s.id === id ? { ...s, name } : s))
     await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
     set({ sessions })
   },
 
   removeTabFromSession: async (sessionId, tabIndex) => {
-    const sessions = get().sessions.map(s =>
-      s.id === sessionId
-        ? { ...s, tabs: s.tabs.filter((_, i) => i !== tabIndex) }
-        : s
+    const sessions = get().sessions.map((s) =>
+      s.id === sessionId ? { ...s, tabs: s.tabs.filter((_, i) => i !== tabIndex) } : s
     )
     await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
     set({ sessions })
@@ -100,7 +117,7 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
   },
 
   restoreSession: async (id) => {
-    const session = get().sessions.find(s => s.id === id)
+    const session = get().sessions.find((s) => s.id === id)
     if (!session || session.tabs.length === 0) return
 
     const currentWindow = await browser.windows.getCurrent()
@@ -128,7 +145,7 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
   },
 
   restoreTab: async (sessionId, tabIndex) => {
-    const session = get().sessions.find(s => s.id === sessionId)
+    const session = get().sessions.find((s) => s.id === sessionId)
     const tab = session?.tabs[tabIndex]
     if (tab) {
       const currentWindow = await browser.windows.getCurrent()
@@ -137,5 +154,5 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
         await browser.tabs.create({ url: tab.url, windowId: winId })
       }
     }
-  },
+  }
 }))
