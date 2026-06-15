@@ -201,7 +201,9 @@ export const en = {
   clearSelection: 'Clear',
   tabScopeLabel: 'Tab scope',
   tabScopeCurrentWindow: 'Current window',
-  tabScopeAllWindows: 'All windows'
+  tabScopeAllWindows: 'All windows',
+  tabOutDupeBannerText: 'You have {{count}} Tab Harbor tabs open. Keep just this one?',
+  tabOutDupeBannerCloseExtras: 'Close extras'
 } as const
 
 export type TranslationKey = keyof typeof en

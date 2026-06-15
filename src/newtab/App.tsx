@@ -27,9 +27,9 @@ export default function App() {
 
   return (
     // ── 外层容器（1260px 居中） ──
-    <div className="max-w-[1260px] mx-auto px-8 py-10 pb-18 max-[960px]:px-5 max-[960px]:py-6 max-[960px]:pb-12">
+    <div className="max-w-315 mx-auto px-8 py-10 pb-18 max-[960px]:px-5 max-[960px]:py-6 max-[960px]:pb-12">
       {/* ── 顶部导航栏：分组圆点 + 页面切换 ── */}
-      <div className="flex items-start gap-4 mb-[14px] flex-wrap min-h-10">
+      <div className="flex items-start gap-4 mb-3.5 flex-wrap min-h-10">
         <GroupNav
           groups={groups}
           onNavigate={(domain) => {

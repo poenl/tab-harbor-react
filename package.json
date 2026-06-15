@@ -39,7 +39,13 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
+    "cz-conventional-changelog": "^3.3.0",
     "typescript": "^5.9.3",
     "wxt": "^0.20.26"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

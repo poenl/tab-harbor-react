@@ -21,6 +21,9 @@ interface TabChipProps {
   // Select mode
   selected?: boolean
   onToggle?: (id: number) => void
+
+  // Duplicate count
+  dupeCount?: number
 }
 
 // ── 网站图标（favicon → Google 代理 → 首字母） ──
@@ -32,7 +35,7 @@ function Favicon({ tab }: { tab: OpenTab }) {
       <img
         src={tab.favIconUrl}
         alt=""
-        className="w-3.5 h-3.5 rounded-[2px] shrink-0"
+        className="w-3.5 h-3.5 rounded-xs shrink-0"
         onError={() => setImgError(true)}
       />
     )
@@ -46,7 +49,7 @@ function Favicon({ tab }: { tab: OpenTab }) {
       <img
         src={src}
         alt=""
-        className="w-3.5 h-3.5 rounded-[2px] shrink-0"
+        className="w-3.5 h-3.5 rounded-xs shrink-0"
         onError={() => setImgError(true)}
       />
     )
@@ -69,7 +72,8 @@ export function TabChip({
   onSaveTab,
   sleepControlEnabled,
   selected,
-  onToggle
+  onToggle,
+  dupeCount
 }: TabChipProps) {
   const { t } = useTranslation()
   const showSleep = sleepControlEnabled && !tab.discarded && !tab.active
@@ -88,6 +92,11 @@ export function TabChip({
       <span className={cn('truncate flex-1', tab.discarded && 'text-muted-foreground/40')}>
         {tab.title || t('untitledTab')}
       </span>
+      {dupeCount && dupeCount > 1 && (
+        <span className="text-[10px] text-accent shrink-0 font-medium">
+          ({dupeCount}x)
+        </span>
+      )}
 
       {/* ── 操作按钮组（仅展示模式） ── */}
       {mode === 'view' && (
@@ -98,7 +107,7 @@ export function TabChip({
               title={t('discardTab')}
               variant="ghost"
               size="icon-sm"
-              className="text-muted-foreground  hover:bg-secondary/60 hover:text-primary"
+              className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
             >
               <Moon strokeWidth={1.8} />
             </Button>
@@ -109,7 +118,7 @@ export function TabChip({
               title={t('saveTabSession')}
               variant="ghost"
               size="icon-sm"
-              className="text-muted-foreground  hover:bg-secondary/60 hover:text-primary"
+              className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
             >
               <Archive strokeWidth={1.8} />
             </Button>
@@ -120,7 +129,7 @@ export function TabChip({
               title={t('closeThisTab')}
               variant="ghost"
               size="icon-sm"
-              className="text-muted-foreground  hover:bg-secondary/60 hover:text-primary"
+              className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
             >
               <X strokeWidth={1.8} />
             </Button>

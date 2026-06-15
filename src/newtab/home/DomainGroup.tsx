@@ -19,6 +19,7 @@ import {
 import { Badge } from '@/components/ui/badge.tsx'
 import { Moon, Archive, X } from 'lucide-react'
 import { TabChip } from './TabChip.tsx'
+import { playCloseSound } from '@/newtab/utils/sound'
 
 const INITIAL_VISIBLE = 8
 
@@ -131,6 +132,24 @@ export function DomainGroupCard({
     onSelectCancel
   ])
 
+  async function closeGroupDuplicates(urls: string[]) {
+    const currentWindow = await browser.windows.getCurrent()
+    const allTabs = await browser.tabs.query({ windowId: currentWindow.id })
+    const toClose: number[] = []
+    for (const url of urls) {
+      const matching = allTabs.filter(t => t.url === url)
+      if (matching.length <= 1) continue
+      const keep = matching.find(t => t.active) || matching[0]
+      for (const tab of matching) {
+        if (tab.id && tab.id !== keep.id) toClose.push(tab.id)
+      }
+    }
+    if (toClose.length === 0) return
+    await browser.tabs.remove(toClose)
+    playCloseSound()
+    toast(t('toastClosedDuplicatesKeptOne'))
+  }
+
   return (
     // ── 域名分组卡片（展示/选择共用同一套卡片样式） ──
     <div className="bg-card border border-border rounded-2xl p-[14px_16px] flex flex-col gap-2 shadow-[0_14px_28px_var(--tw-shadow-color)] shadow-primary/5 hover:shadow-[0_16px_30px_var(--tw-shadow-color)] hover:shadow-primary/10 hover:-translate-y-px transition-all duration-250">
@@ -151,40 +170,56 @@ export function DomainGroupCard({
 
       {visibleGroups.map((group, gi) => {
         const groupLabel = group.label || group.domain
+        const urlCounts: Record<string, number> = {}
+        for (const tab of group.tabs) urlCounts[tab.url] = (urlCounts[tab.url] || 0) + 1
+        const dupeEntries = Object.entries(urlCounts).filter(([, c]) => c > 1)
+        const hasDupes = dupeEntries.length > 0
+        const totalExtras = dupeEntries.reduce((s, [, c]) => s + c - 1, 0)
         return (
           <div key={group.domain}>
             {/* ── 卡片标题 + 标签计数（展示模式加组级保存，选择模式加 checkbox） ── */}
-            <div className="flex items-center gap-2 min-h-7">
+            <div className="flex items-center gap-2 min-h-7 mb-2">
               {mode === 'select' && (
                 <Checkbox
                   checked={getGroupState(group)}
                   onCheckedChange={() => onToggleGroup?.(group.domain)}
                 />
               )}
-              <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground m-0 flex-1 min-w-0 truncate">
-                {groupLabel}
-              </h3>
+              <span className="flex-1 min-w-0 truncate">
+                <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground m-0 inline">
+                  {groupLabel}
+                </h3>
+                {mode === 'view' && hasDupes && (
+                  <span className="inline-flex ml-2 text-[10px] font-semibold text-accent">
+                    {t('duplicatesCount', { count: totalExtras, suffix: totalExtras !== 1 ? 's' : '' })}
+                  </span>
+                )}
+              </span>
               {mode === 'view' &&
                 sleepControlEnabled &&
                 onSleepGroup &&
                 group.tabs.some((t) => !t.discarded && !t.active) && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
                     onClick={() => onSleepGroup(group.domain)}
                     title={t('sleepAllTabsButton')}
                     aria-label={t('sleepAllTabsButton')}
-                    className="w-7 h-7 p-0 border border-border rounded-md bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150 shrink-0"
+                    className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                   >
                     <Moon strokeWidth={1.8} className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                 )}
               {mode === 'view' && onSaveGroup && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() => onSaveGroup(group.domain)}
                   title={t('saveGroupSession')}
-                  className="w-7 h-7 p-0 border border-border rounded-md bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150 shrink-0"
+                  className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                 >
                   <Archive strokeWidth={1.8} className="w-3.5 h-3.5" />
-                </button>
+                </Button>
               )}
               {group.tabs.length > 1 && (
                 <Badge
@@ -215,6 +250,7 @@ export function DomainGroupCard({
                   sleepControlEnabled={sleepControlEnabled}
                   selected={selectedTabIds?.has(tab.id)}
                   onToggle={onToggleTab}
+                  dupeCount={urlCounts[tab.url]}
                 />
               ))}
             </div>
@@ -226,6 +262,16 @@ export function DomainGroupCard({
                 className="self-start text-[11px] text-primary bg-transparent border border-border rounded-md px-3 py-1 cursor-pointer hover:bg-secondary hover:border-primary transition-all duration-150"
               >
                 {t('moreCount', { count: group.tabs.length - INITIAL_VISIBLE })}
+              </button>
+            )}
+
+            {/* ── 关闭重复标签页（仅展示模式） ── */}
+            {mode === 'view' && hasDupes && (
+              <button
+                onClick={() => closeGroupDuplicates(dupeEntries.map(([url]) => url))}
+                className="self-start text-[11px] text-muted-foreground bg-card border border-border rounded-full px-3 py-1.5 cursor-pointer hover:text-accent hover:border-accent transition-all duration-150 mt-2"
+              >
+                {t('closedDuplicatesCount', { count: totalExtras, suffix: totalExtras !== 1 ? 's' : '' })}
               </button>
             )}
 
@@ -249,7 +295,7 @@ export function DomainGroupCard({
               variant="ghost"
               size="sm"
               onClick={() => setFooterMode('new')}
-              className={cn('h-[26px]', footerMode === 'new' && 'bg-card shadow-sm')}
+              className={cn('h-6.5', footerMode === 'new' && 'bg-card shadow-sm')}
             >
               {t('sessionPickerNewSession')}
             </Button>
@@ -258,13 +304,13 @@ export function DomainGroupCard({
               size="sm"
               onClick={() => setFooterMode('existing')}
               disabled={sessions.length === 0}
-              className={cn('h-[26px]', footerMode === 'existing' && 'bg-card shadow-sm')}
+              className={cn('h-6.5', footerMode === 'existing' && 'bg-card shadow-sm')}
             >
               {t('sessionPickerExistingSession')}
             </Button>
           </div>
 
-          <div className="h-7 w-[min(220px,28vw)] max-w-[220px]">
+          <div className="h-7 w-[min(220px,28vw)] max-w-55">
             <Input
               value={newSessionName}
               onChange={(e) => setNewSessionName(e.target.value)}

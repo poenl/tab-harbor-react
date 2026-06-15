@@ -5,6 +5,7 @@ import {
   buildDomainGroups
 } from '@/newtab/utils/domain-grouping.ts'
 import { useTheme } from '@/stores/theme'
+import { getTabQuery } from '@/utils/tabs'
 
 export function useOpenTabs() {
   const { preferences } = useTheme()
@@ -13,8 +14,7 @@ export function useOpenTabs() {
 
   const fetchTabs = useCallback(async () => {
     try {
-      const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
-      const result = await browser.tabs.query(query)
+      const result = await browser.tabs.query(getTabQuery(preferences.tabScope))
       setGroups(buildDomainGroups(result.map(normalizeTab)))
     } catch {
       setGroups([])

@@ -19,7 +19,6 @@ interface TabGroupListProps {
   selectTarget?: string | null
   onToggleTab?: (id: number) => void
   onToggleGroup?: (domain: string) => void
-  onSelectSave?: () => void
   onSelectCancel?: () => void
 }
 
@@ -37,7 +36,6 @@ export function TabGroupList({
   selectTarget,
   onToggleTab,
   onToggleGroup,
-  onSelectSave,
   onSelectCancel
 }: TabGroupListProps) {
   const { t } = useTranslation()

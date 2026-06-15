@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 
-export type ShortcutIconKind = '' | 'emoji' | 'svg' | 'image' | 'website'
+type ShortcutIconKind = '' | 'emoji' | 'svg' | 'image' | 'website'
 
 export interface QuickShortcut {
   id: string
@@ -117,16 +117,6 @@ export function useQuickShortcuts() {
     [shortcuts, save]
   )
 
-  const reorder = useCallback(
-    async (orderedIds: string[]) => {
-      const map = new Map(shortcuts.map((s) => [s.id, s]))
-      const next = orderedIds.map((id) => map.get(id)).filter(Boolean) as QuickShortcut[]
-      const remaining = shortcuts.filter((s) => !orderedIds.includes(s.id))
-      await save([...next, ...remaining])
-    },
-    [shortcuts, save]
-  )
-
   useEffect(() => {
     load()
 
@@ -139,7 +129,7 @@ export function useQuickShortcuts() {
     return () => browser.storage.local.onChanged.removeListener(listener)
   }, [load])
 
-  return { shortcuts, loading, add, update, remove, reorder }
+  return { shortcuts, loading, add, update, remove }
 }
 
 export function svgToDataUrl(svgText: string): string {

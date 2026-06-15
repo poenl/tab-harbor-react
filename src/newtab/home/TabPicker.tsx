@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from '@/i18n'
 import { useTheme } from '@/stores/theme'
+import { getTabQuery } from '@/utils/tabs'
 import { useQuickShortcuts } from '@/newtab/hooks/useQuickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { cn } from '@/lib/utils'
@@ -30,7 +31,7 @@ function TabFavicon({ tab }: { tab: BrowserTab }) {
       <img
         src={tab.favIconUrl}
         alt=""
-        className="w-3.5 h-3.5 rounded-[2px] shrink-0"
+        className="w-3.5 h-3.5 rounded-xs shrink-0"
         onError={() => setImgError(true)}
       />
     )
@@ -53,7 +54,7 @@ function TabRow({
   onToggle: (id: number) => void
 }) {
   return (
-    <label className="flex items-center gap-2 py-2 border-b border-border/50 text-[13px] leading-[1.4] last:border-b-0 hover:bg-secondary/50 rounded-md px-[16px] transition-colors duration-150 cursor-pointer">
+    <label className="flex items-center gap-2 py-2 border-b border-border/50 text-[13px] leading-[1.4] last:border-b-0 hover:bg-secondary/50 rounded-md px-4 transition-colors duration-150 cursor-pointer">
       <Checkbox checked={selected} onCheckedChange={() => onToggle(tab.id)} />
       <TabFavicon tab={tab} />
       <span className="flex-1 min-w-0 truncate text-foreground">{tab.title || tab.url}</span>
@@ -73,8 +74,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
 
   useEffect(() => {
     ;(async () => {
-      const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
-      const result = await browser.tabs.query(query)
+      const result = await browser.tabs.query(getTabQuery(preferences.tabScope))
       setTabs(
         result
           .filter(
@@ -172,7 +172,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           {mode === 'tabs' && (
             <>
-              <div className="px-[16px] py-2 border-b border-border/30 shrink-0">
+              <div className="px-4 py-2 border-b border-border/30 shrink-0">
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -199,7 +199,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
                 )}
               </div>
               {selectedIds.size > 0 && (
-                <div className="flex items-center gap-2 px-[16px] py-[11px] border-t border-border/50 bg-[color-mix(in_srgb,var(--card)_74%,var(--background)_26%)] shrink-0">
+                <div className="flex items-center gap-2 px-4 py-2.75 border-t border-border/50 bg-[color-mix(in_srgb,var(--card)_74%,var(--background)_26%)] shrink-0">
                   <span className="flex-1 text-xs text-muted-foreground">
                     {selectedIds.size} selected
                   </span>

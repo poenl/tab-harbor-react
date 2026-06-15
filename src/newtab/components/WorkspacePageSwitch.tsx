@@ -12,7 +12,7 @@ export function WorkspacePageSwitch({ currentPage, onPageChange }: WorkspacePage
   return (
     // ── 页面切换（Home / Saved tabs） ──
     <nav
-      className="inline-flex items-center gap-3.5 pt-2"
+      className="inline-flex items-center gap-3.5 pt-2 ml-auto"
       aria-label={t('workspacePagesAriaLabel')}
     >
       <button

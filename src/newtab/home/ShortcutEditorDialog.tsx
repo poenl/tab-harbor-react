@@ -267,20 +267,21 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
       onClick={onCancel}
     >
       <div
-        className="bg-card border border-border rounded-xl shadow-lg w-[380px] max-w-[90vw] max-h-[90vh] overflow-y-auto"
+        className="bg-card border border-border rounded-xl shadow-lg w-95 max-w-[90vw] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
           <div className="text-sm font-semibold text-foreground">
             {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
           </div>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon-xs"
             onClick={onCancel}
-            className="w-6 h-6 p-0 border-none rounded bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:text-foreground shrink-0"
+            className="text-muted-foreground hover:text-foreground"
           >
             <X strokeWidth={2} className="size-3.5" />
-          </button>
+          </Button>
         </div>
         <ShortcutEditorForm
           shortcut={shortcut}

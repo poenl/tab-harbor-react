@@ -8,6 +8,8 @@ import type {
   SavedSessionNavDisplayMode,
   TabScope
 } from '@/constants/preferences'
+import { toast } from 'sonner'
+import { closeDuplicateNewTabs } from '@/utils/close-duplicate-tabs'
 import {
   Select,
   SelectContent,
@@ -115,9 +117,13 @@ function OptionsPage() {
           <label className="flex items-center gap-3 cursor-pointer">
             <Checkbox
               checked={preferences.closeDuplicateNewTabsEnabled}
-              onCheckedChange={(v) =>
-                updatePreferences({ closeDuplicateNewTabsEnabled: v === true })
-              }
+              onCheckedChange={async (v) => {
+                await updatePreferences({ closeDuplicateNewTabsEnabled: v === true })
+                if (v === true) {
+                  const count = await closeDuplicateNewTabs()
+                  if (count > 0) toast(t('toastClosedDuplicatesKeptOne'))
+                }
+              }}
             />
             <span className="text-sm">{t('closeDuplicateNewTabsLabel')}</span>
           </label>

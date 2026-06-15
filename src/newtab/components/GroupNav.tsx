@@ -31,7 +31,7 @@ function GroupIcon({ group }: { group: DomainGroup }) {
         alt=""
         draggable={false}
         onError={() => setImgError(true)}
-        className="w-5 h-5 rounded-[2px] object-contain"
+        className="w-5 h-5 rounded-xs object-contain"
       />
     )
   }
@@ -54,7 +54,7 @@ function GroupIcon({ group }: { group: DomainGroup }) {
               setImgError(true)
             }
           }}
-          className="w-5 h-5 rounded-[2px] object-contain"
+          className="w-5 h-5 rounded-xs object-contain"
         />
       )
     }
@@ -70,7 +70,7 @@ function GroupIcon({ group }: { group: DomainGroup }) {
 export function GroupNav({ groups, onNavigate }: GroupNavProps) {
   const { t } = useTranslation()
 
-  if (groups.length <= 1) return null
+  if (!groups.length) return null
 
   return (
     // ── 分组导航圆点 ──

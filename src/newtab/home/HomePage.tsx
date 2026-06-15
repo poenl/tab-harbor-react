@@ -6,6 +6,7 @@ import { useTheme } from '@/stores/theme'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { toast } from 'sonner'
 import { Moon, Archive, X } from 'lucide-react'
+import { getTabQuery, discardTabs } from '@/utils/tabs'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import { SectionHeader } from './SectionHeader.tsx'
 import { TabGroupList } from './TabGroupList.tsx'
 import { Greeting } from './Greeting.tsx'
@@ -24,6 +26,7 @@ import { Hitokoto } from './Hitokoto.tsx'
 import { SearchBar } from './SearchBar.tsx'
 import { QuickShortcuts } from './QuickShortcuts.tsx'
 import { Footer } from './Footer.tsx'
+import { TabOutDupeBanner } from './TabOutDupeBanner.tsx'
 
 interface HomePageProps {
   groups: DomainGroup[]
@@ -43,17 +46,9 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   const [selectedTabIds, setSelectedTabIds] = useState<Set<number>>(new Set())
 
   async function handleSleepAllTabs() {
-    const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
-    const tabs = await browser.tabs.query(query)
-    let count = 0
-    for (const tab of tabs) {
-      if (!tab.discarded && tab.id) {
-        try {
-          await browser.tabs.discard(tab.id)
-          count++
-        } catch {}
-      }
-    }
+    const tabs = await browser.tabs.query(getTabQuery(preferences.tabScope))
+    const ids = tabs.filter((t) => !t.discarded && t.id).map((t) => t.id!)
+    const count = await discardTabs(ids)
     toast(t('toastTabsDiscarded', { count }))
   }
 
@@ -67,18 +62,11 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   }
 
   async function handleSleepGroup(domain: string) {
-    const tabs = groups
+    const ids = groups
       .filter((g) => g.domain === domain)
-      .flatMap((g) => g.tabs.filter((t) => !t.discarded))
-    let count = 0
-    for (const tab of tabs) {
-      if (tab.id) {
-        try {
-          await browser.tabs.discard(tab.id)
-          count++
-        } catch {}
-      }
-    }
+      .flatMap((g) => g.tabs.filter((t) => !t.discarded && t.id))
+      .map((t) => t.id!)
+    const count = await discardTabs(ids)
     toast(t('toastTabsDiscarded', { count }))
   }
 
@@ -143,8 +131,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   }
 
   async function handleCloseAllTabs() {
-    const query = preferences.tabScope === 'all-windows' ? {} : { currentWindow: true }
-    const tabs = await browser.tabs.query(query)
+    const tabs = await browser.tabs.query(getTabQuery(preferences.tabScope))
     const toClose = tabs.filter((t) => !t.pinned && t.id).map((t) => t.id!)
     if (toClose.length > 0) {
       await browser.tabs.remove(toClose)
@@ -154,6 +141,8 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
 
   return (
     <>
+      <TabOutDupeBanner />
+
       {/* ── 两列布局（左: 1.35fr = 标签列表 / 右: 0.95fr = 问候+搜索+快捷） ── */}
       <div className="grid grid-cols-[1.35fr_0.95fr] gap-8 items-start max-[960px]:grid-cols-1 max-[960px]:gap-5">
         {/* ── 左栏：打开标签页 ── */}
@@ -164,32 +153,38 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
             actions={
               <>
                 {sleepControlEnabled && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={handleSleepAllTabs}
                     title={t('sleepAllTabsButton')}
                     aria-label={t('sleepAllTabsButton')}
-                    className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-foreground transition-all duration-150"
+                    className="text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
                   >
                     <Moon strokeWidth={1.8} className="w-4 h-4" />
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={handleSaveCurrentWindow}
                   title={t('saveSessionButton')}
                   aria-label={t('saveSessionButton')}
-                  className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150"
+                  className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                 >
                   <Archive strokeWidth={1.8} className="w-4 h-4" />
-                </button>
+                </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       title={t('closeAllTabsButton')}
                       aria-label={t('closeAllTabsButton')}
-                      className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all duration-150"
+                      className="text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
                     >
                       <X strokeWidth={1.8} className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>

@@ -3,8 +3,7 @@ import type { LanguageDetectorAsyncModule } from 'i18next'
 import { initReactI18next, useTranslation } from 'react-i18next'
 import { en } from './en'
 import { zhCN } from './zh-CN'
-
-const LANG_KEY = 'languagePreference'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 function detectFromNavigator(): string {
   return (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-CN' : 'en'
@@ -20,9 +19,9 @@ const chromeStorageDetector: LanguageDetectorAsyncModule = {
       return
     }
     browser.storage.local
-      .get(LANG_KEY)
+      .get(STORAGE_KEYS.LANGUAGE_PREFERENCE)
       .then((result) => {
-        const pref = result[LANG_KEY] as string | undefined
+        const pref = result[STORAGE_KEYS.LANGUAGE_PREFERENCE] as string | undefined
         if (pref === 'en') return callback('en')
         if (pref === 'zh-CN') return callback('zh-CN')
         callback(detectFromNavigator())

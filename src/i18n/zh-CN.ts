@@ -199,5 +199,7 @@ export const zhCN: Record<TranslationKey, string> = {
   clearSelection: '清除',
   tabScopeLabel: '标签页范围',
   tabScopeCurrentWindow: '当前窗口',
-  tabScopeAllWindows: '全部窗口'
+  tabScopeAllWindows: '全部窗口',
+  tabOutDupeBannerText: '已打开 {{count}} 个 Tab Harbor 标签页，保留当前这个？',
+  tabOutDupeBannerCloseExtras: '关闭多余标签页'
 }
