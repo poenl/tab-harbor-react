@@ -51,6 +51,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyTheme(preferences.paletteId, tone, preferences.surfaceOpacity)
   }, [preferences.paletteId, tone, preferences.surfaceOpacity, ready])
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--font-scale', String(preferences.uiScale / 100))
+  }, [preferences.uiScale])
+
+  useEffect(() => {
+    if (preferences.customBackground) {
+      document.body.style.backgroundImage = `url(${preferences.customBackground})`
+      document.body.style.backgroundSize = 'cover'
+      document.body.style.backgroundPosition = 'center'
+      document.body.style.backgroundAttachment = 'fixed'
+    } else {
+      document.body.style.backgroundImage = ''
+      document.body.style.backgroundSize = ''
+      document.body.style.backgroundPosition = ''
+      document.body.style.backgroundAttachment = ''
+    }
+  }, [preferences.customBackground])
+
   const handleSystemChange = useCallback(() => {
     if (preferences.mode !== 'system') return
     const newTone = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'

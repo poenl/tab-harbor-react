@@ -7,6 +7,7 @@ import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { toast } from 'sonner'
 import { Moon, Archive, X } from 'lucide-react'
 import { getTabQuery, discardTabs } from '@/utils/tabs'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -153,39 +154,51 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
             actions={
               <>
                 {sleepControlEnabled && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleSleepAllTabs}
-                    title={t('sleepAllTabsButton')}
-                    aria-label={t('sleepAllTabsButton')}
-                    className="text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
-                  >
-                    <Moon strokeWidth={1.8} className="w-4 h-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleSleepAllTabs}
+                        aria-label={t('sleepAllTabsButton')}
+                        className="text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
+                      >
+                        <Moon strokeWidth={1.8} className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{t('sleepAllTabsButton')}</TooltipContent>
+                  </Tooltip>
                 )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleSaveCurrentWindow}
-                  title={t('saveSessionButton')}
-                  aria-label={t('saveSessionButton')}
-                  className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
-                >
-                  <Archive strokeWidth={1.8} className="w-4 h-4" />
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      title={t('closeAllTabsButton')}
-                      aria-label={t('closeAllTabsButton')}
-                      className="text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                      onClick={handleSaveCurrentWindow}
+                      aria-label={t('saveSessionButton')}
+                      className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                     >
-                      <X strokeWidth={1.8} className="w-4 h-4" />
+                      <Archive strokeWidth={1.8} className="w-4 h-4" />
                     </Button>
-                  </AlertDialogTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('saveSessionButton')}</TooltipContent>
+                </Tooltip>
+                <AlertDialog>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t('closeAllTabsButton')}
+                          className="text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                        >
+                          <X strokeWidth={1.8} className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{t('closeAllTabsButton')}</TooltipContent>
+                  </Tooltip>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t('closeAllTabsConfirmTitle')}</AlertDialogTitle>

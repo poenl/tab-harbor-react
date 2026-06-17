@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Pencil, X } from 'lucide-react'
 import { useTranslation } from '@/i18n'
+import { useTheme } from '@/stores/theme'
 import type { QuickShortcut } from '@/newtab/hooks/useQuickShortcuts'
 import { useQuickShortcuts, svgToDataUrl } from '../hooks/useQuickShortcuts'
 import { getIconSources, getFallbackLabel } from '../utils/icon-utils'
@@ -23,7 +24,7 @@ function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
         alt=""
         draggable={false}
         onError={() => setImgError(true)}
-        className="w-[22px] h-[22px] rounded-md object-contain"
+        className="w-5.5 h-5.5 rounded-md object-contain"
       />
     )
   }
@@ -35,7 +36,7 @@ function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
         alt=""
         draggable={false}
         onError={() => setImgError(true)}
-        className="w-[22px] h-[22px] rounded-md object-contain"
+        className="w-5.5 h-5.5 rounded-md object-contain"
       />
     )
   }
@@ -57,14 +58,14 @@ function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
               e.currentTarget.removeAttribute('data-fallback-src')
             } else setImgError(true)
           }}
-          className="w-[22px] h-[22px] rounded-md object-contain"
+          className="w-5.5 h-5.5 rounded-md object-contain"
         />
       )
     }
   }
 
   const fallbackText = getFallbackLabel(label, url)
-  return <span className="text-[13px] font-bold text-primary">{fallbackText}</span>
+  return <span className="text-sm font-bold text-primary">{fallbackText}</span>
 }
 
 // ── 添加快捷卡片 ──
@@ -76,12 +77,26 @@ function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
         type="button"
         onClick={onAdd}
         aria-label={t('addQuickTab')}
-        className="grid grid-rows-[40px_auto] justify-items-center content-start gap-1.5 w-full text-center cursor-pointer bg-none border-none p-0"
+        className="grid justify-items-center content-start w-full text-center cursor-pointer bg-none border-none p-0 hover:-translate-y-px transition-transform duration-300 ease-out"
+        style={
+          {
+            gridTemplateRows: `calc(40px * var(--shortcut-scale, 1)) auto`,
+            gap: `calc(6px * var(--shortcut-scale, 1))`
+          } as React.CSSProperties
+        }
       >
-        <span className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center ring-1 ring-inset ring-border">
-          <Plus strokeWidth={1.8} aria-hidden="true" className="w-[22px] h-[22px] text-primary" />
+        <span
+          className="rounded-xl bg-secondary flex items-center justify-center ring-1 ring-inset ring-border"
+          style={
+            {
+              width: `calc(40px * var(--shortcut-scale, 1))`,
+              height: `calc(40px * var(--shortcut-scale, 1))`
+            } as React.CSSProperties
+          }
+        >
+          <Plus strokeWidth={1.8} aria-hidden="true" className="w-5.5 h-5.5 text-primary" />
         </span>
-        <span className="text-[11px] leading-[1.45] text-muted-foreground">{t('addLink')}</span>
+        <span className="text-xs leading-[1.45] text-muted-foreground">{t('addLink')}</span>
       </button>
     </div>
   )
@@ -98,9 +113,9 @@ function EditButton({ shortcutId, onEdit }: { shortcutId: string; onEdit: (id: s
         onEdit(shortcutId)
       }}
       aria-label={t('editQuickTab')}
-      className="absolute -top-0.5 left-0 w-[18px] h-[18px] p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-primary hover:bg-secondary hover:text-primary"
+      className="absolute -top-0.5 left-0 w-4.5 h-4.5 p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-primary hover:bg-secondary hover:text-primary"
     >
-      <Pencil strokeWidth={1.8} aria-hidden="true" className="w-[9px] h-[9px]" />
+      <Pencil strokeWidth={1.8} aria-hidden="true" className="w-2.25 h-2.25" />
     </button>
   )
 }
@@ -122,15 +137,16 @@ function RemoveButton({
         onRemove(shortcutId)
       }}
       aria-label={t('removeQuickTab')}
-      className="absolute -top-0.5 right-0 w-[18px] h-[18px] p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+      className="absolute -top-0.5 right-0 w-4.5 h-4.5 p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
     >
-      <X strokeWidth={1.8} aria-hidden="true" className="w-[9px] h-[9px]" />
+      <X strokeWidth={1.8} aria-hidden="true" className="w-2.25 h-2.25" />
     </button>
   )
 }
 
 export function QuickShortcuts() {
   const { t } = useTranslation()
+  const { preferences } = useTheme()
   const { shortcuts, add, update, remove } = useQuickShortcuts()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [editor, setEditor] = useState<{
@@ -171,20 +187,44 @@ export function QuickShortcuts() {
   return (
     <>
       {/* ── 快捷链接网格 ── */}
-      <section>
-        <div className="grid grid-cols-[repeat(auto-fill,76px)] gap-3 gap-x-2.5 justify-start">
+      <section
+        style={{ '--shortcut-scale': preferences.shortcutScale / 100 } as React.CSSProperties}
+      >
+        <div
+          className="grid justify-start"
+          style={
+            {
+              gridTemplateColumns: `repeat(auto-fill,calc(76px * var(--shortcut-scale, 1)))`,
+              gap: `calc(12px * var(--shortcut-scale, 1))`,
+              columnGap: `calc(10px * var(--shortcut-scale, 1))`
+            } as React.CSSProperties
+          }
+        >
           {shortcuts.map((s) => (
             <div key={s.id} data-shortcut-id={s.id} className="relative group">
               <button
                 type="button"
                 onClick={() => handleOpen(s.url)}
                 aria-label={s.label || s.url}
-                className="grid grid-rows-[40px_auto] justify-items-center content-start gap-1.5 w-full text-center cursor-pointer bg-none border-none p-0 hover:-translate-y-px transition-transform duration-300 ease-out"
+                className="grid justify-items-center content-start gap-[calc(6px*var(--shortcut-scale,1))] w-full text-center cursor-pointer bg-none border-none p-0 hover:-translate-y-px transition-transform duration-300 ease-out"
+                style={
+                  {
+                    gridTemplateRows: `calc(40px * var(--shortcut-scale, 1)) auto`
+                  } as React.CSSProperties
+                }
               >
-                <span className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center group-hover:shadow-[0_4px_10px_var(--tw-shadow-color)] group-hover:shadow-primary/10 transition-shadow duration-200">
+                <span
+                  className="rounded-xl bg-secondary flex items-center justify-center group-hover:shadow-[0_4px_10px_var(--tw-shadow-color)] group-hover:shadow-primary/10 transition-shadow duration-200"
+                  style={
+                    {
+                      width: `calc(40px * var(--shortcut-scale, 1))`,
+                      height: `calc(40px * var(--shortcut-scale, 1))`
+                    } as React.CSSProperties
+                  }
+                >
                   <ShortcutIcon shortcut={s} />
                 </span>
-                <span className="text-[11px] leading-[1.45] text-foreground max-w-full overflow-hidden line-clamp-2">
+                <span className="text-xs leading-[1.45] text-foreground max-w-full overflow-hidden line-clamp-2">
                   {s.label || getFallbackLabel('', s.url)}
                 </span>
               </button>

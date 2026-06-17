@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 interface GroupNavProps {
   groups: DomainGroup[]
@@ -74,30 +74,28 @@ export function GroupNav({ groups, onNavigate }: GroupNavProps) {
 
   return (
     // ── 分组导航圆点 ──
-    <TooltipProvider>
-      <nav className="flex gap-2.5 flex-wrap flex-1 min-w-0">
-        {groups.map((group) => {
-          const label = group.label || group.domain
+    <nav className="flex gap-2.5 flex-wrap flex-1 min-w-0">
+      {groups.map((group) => {
+        const label = group.label || group.domain
 
-          return (
-            <Tooltip key={group.domain}>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => onNavigate?.(group.domain)}
-                  aria-label={t('jumpToLabel', { label })}
-                  draggable={false}
-                  className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
-                >
-                  <GroupIcon group={group} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top" sideOffset={8}>
-                {label}
-              </TooltipContent>
-            </Tooltip>
-          )
-        })}
-      </nav>
-    </TooltipProvider>
+        return (
+          <Tooltip key={group.domain}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => onNavigate?.(group.domain)}
+                aria-label={t('jumpToLabel', { label })}
+                draggable={false}
+                className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
+              >
+                <GroupIcon group={group} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" sideOffset={8}>
+              {label}
+            </TooltipContent>
+          </Tooltip>
+        )
+      })}
+    </nav>
   )
 }

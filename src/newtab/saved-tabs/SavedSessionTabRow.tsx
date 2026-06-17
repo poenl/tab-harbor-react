@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import { useTranslation } from '@/i18n'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { SavedTabTab } from '@/stores/savedSessions'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { useState } from 'react'
@@ -20,7 +21,7 @@ function TabFavicon({ tab }: { tab: SavedTabTab }) {
       <img
         src={tab.favIconUrl}
         alt=""
-        className="w-3.5 h-3.5 rounded-[2px] shrink-0"
+        className="w-3.5 h-3.5 rounded-xs shrink-0"
         onError={() => setImgError(true)}
       />
     )
@@ -34,7 +35,7 @@ function TabFavicon({ tab }: { tab: SavedTabTab }) {
       <img
         src={src}
         alt=""
-        className="w-3.5 h-3.5 rounded-[2px] shrink-0"
+        className="w-3.5 h-3.5 rounded-xs shrink-0"
         onError={() => setImgError(true)}
       />
     )
@@ -59,7 +60,7 @@ export function SavedSessionTabRow({
 
   return (
     // ── 已保存标签行 ──
-    <div className="flex items-center gap-2 py-1.5 border-b border-border/50 text-[13px] leading-[1.4] last:border-b-0">
+    <div className="flex items-center gap-2 py-1.5 border-b border-border/50 text-sm leading-[1.4] last:border-b-0">
       <button
         onClick={() => onRestoreTab(sessionId, index)}
         className="flex items-center gap-2 flex-1 min-w-0 text-left bg-none border-none p-0 cursor-pointer group"
@@ -70,13 +71,18 @@ export function SavedSessionTabRow({
         </span>
       </button>
 
-      <button
-        onClick={() => onDeleteTab(sessionId, index)}
-        className="w-6 h-6 p-0 border-none rounded bg-none text-muted-foreground/40 cursor-pointer shrink-0 flex items-center justify-center hover:text-destructive hover:bg-destructive/10 transition-all duration-150"
-        title={t('removeTabFromSession')}
-      >
-        <X strokeWidth={1.8} className="w-3 h-3" />
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => onDeleteTab(sessionId, index)}
+            className="w-6 h-6 p-0 border-none rounded bg-none text-muted-foreground/40 cursor-pointer shrink-0 flex items-center justify-center hover:text-destructive hover:bg-destructive/10 transition-all duration-150"
+            aria-label={t('removeTabFromSession')}
+          >
+            <X strokeWidth={1.8} className="w-3 h-3" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top">{t('removeTabFromSession')}</TooltipContent>
+      </Tooltip>
     </div>
   )
 }

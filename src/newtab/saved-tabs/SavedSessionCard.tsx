@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Trash2, RotateCcw } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { TFunction } from 'i18next'
 import { useTranslation } from '@/i18n'
 import type { SavedTabSession } from '@/stores/savedSessions'
@@ -67,19 +68,19 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
               onBlur={handleRenameSubmit}
               onKeyDown={handleKeyDown}
               autoFocus
-              className="text-[15px] font-semibold tracking-[-0.01em] text-foreground bg-transparent border-b border-primary/30 outline-none py-0.5"
+              className="text-base font-semibold tracking-[-0.01em] text-foreground bg-transparent border-b border-primary/30 outline-none py-0.5"
             />
           ) : (
             <button
               onClick={() => setRenaming(true)}
               title={t('clickToRename')}
-              className="text-[15px] font-semibold tracking-[-0.01em] text-foreground text-left bg-none border-none p-0 cursor-text hover:text-primary transition-colors duration-150 truncate"
+              className="text-base font-semibold tracking-[-0.01em] text-foreground text-left bg-none border-none p-0 cursor-text hover:text-primary transition-colors duration-150 truncate"
             >
               {session.name}
             </button>
           )}
 
-          <div className="text-[11px] text-muted-foreground mt-0.5">
+          <div className="text-xs text-muted-foreground mt-0.5">
             {session.tabs.length}{' '}
             {t(session.tabs.length === 1 ? 'tabsWordSingular' : 'tabsWordPlural')} saved{' '}
             {formatRelativeTime(session.savedAt, t)}
@@ -87,33 +88,50 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
         </div>
 
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => toggleCollapse(session.id)}
-            className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-foreground transition-all duration-150"
-            title={isCollapsed ? t('expand') || 'Expand' : t('collapse') || 'Collapse'}
-          >
-            {isCollapsed ? (
-              <ChevronDown strokeWidth={1.8} className="w-4 h-4" />
-            ) : (
-              <ChevronUp strokeWidth={1.8} className="w-4 h-4" />
-            )}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => toggleCollapse(session.id)}
+                className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-foreground transition-all duration-150"
+                aria-label={isCollapsed ? t('expand') || 'Expand' : t('collapse') || 'Collapse'}
+              >
+                {isCollapsed ? (
+                  <ChevronDown strokeWidth={1.8} className="w-4 h-4" />
+                ) : (
+                  <ChevronUp strokeWidth={1.8} className="w-4 h-4" />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              {isCollapsed ? t('expand') || 'Expand' : t('collapse') || 'Collapse'}
+            </TooltipContent>
+          </Tooltip>
 
-          <button
-            onClick={() => restoreSession(session.id)}
-            className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150"
-            title={t('restoreSessionTooltip')}
-          >
-            <RotateCcw strokeWidth={1.8} className="w-4 h-4" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => restoreSession(session.id)}
+                className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150"
+                aria-label={t('restoreSessionTooltip')}
+              >
+                <RotateCcw strokeWidth={1.8} className="w-4 h-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">{t('restoreSessionTooltip')}</TooltipContent>
+          </Tooltip>
 
-          <button
-            onClick={() => removeSession(session.id)}
-            className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all duration-150"
-            title={t('deleteSessionTooltip')}
-          >
-            <Trash2 strokeWidth={1.8} className="w-4 h-4" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => removeSession(session.id)}
+                className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all duration-150"
+                aria-label={t('deleteSessionTooltip')}
+              >
+                <Trash2 strokeWidth={1.8} className="w-4 h-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">{t('deleteSessionTooltip')}</TooltipContent>
+          </Tooltip>
         </div>
       </div>
 

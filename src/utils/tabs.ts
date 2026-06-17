@@ -1,9 +1,7 @@
 import { browser } from 'wxt/browser'
 import type { TabScope } from '@/constants/preferences'
 
-export function getTabQuery(
-  tabScope: TabScope
-): { currentWindow?: boolean } {
+export function getTabQuery(tabScope: TabScope): { currentWindow?: boolean } {
   return tabScope === 'all-windows' ? {} : { currentWindow: true }
 }
 

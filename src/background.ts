@@ -4,11 +4,10 @@ async function notifyTabHarborPages(eventMeta: Record<string, unknown> = {}) {
   try {
     const extensionUrl = browser.runtime.getURL('/newtab.html')
     const allTabs = await browser.tabs.query({})
-    const dashboardTabs = allTabs.filter(tab => {
+    const dashboardTabs = allTabs.filter((tab) => {
       if (!tab.url) return false
       return (
-        tab.url === extensionUrl ||
-        (tab.url === 'chrome://newtab/' && tab.title === 'Tab Harbor')
+        tab.url === extensionUrl || (tab.url === 'chrome://newtab/' && tab.title === 'Tab Harbor')
       )
     })
 
@@ -20,7 +19,7 @@ async function notifyTabHarborPages(eventMeta: Record<string, unknown> = {}) {
         await browser.tabs.sendMessage(tab.id, {
           action: 'tabs-changed',
           source: eventMeta.source || 'tabs.changed',
-          triggerTabId: eventMeta.triggerTabId ?? null,
+          triggerTabId: eventMeta.triggerTabId ?? null
         })
       } catch {}
     }
@@ -36,18 +35,18 @@ export default defineBackground(() => {
     browser.action.setBadgeText({ text: '' })
   })
 
-  browser.tabs.onCreated.addListener(tab => {
+  browser.tabs.onCreated.addListener((tab) => {
     browser.action.setBadgeText({ text: '' })
     notifyTabHarborPages({ source: 'tabs.onCreated', triggerTabId: tab?.id })
     closeDuplicateNewTabs()
   })
 
-  browser.tabs.onRemoved.addListener(tabId => {
+  browser.tabs.onRemoved.addListener((tabId) => {
     browser.action.setBadgeText({ text: '' })
     notifyTabHarborPages({ source: 'tabs.onRemoved', triggerTabId: tabId })
   })
 
-  browser.tabs.onUpdated.addListener(tabId => {
+  browser.tabs.onUpdated.addListener((tabId) => {
     browser.action.setBadgeText({ text: '' })
     notifyTabHarborPages({ source: 'tabs.onUpdated', triggerTabId: tabId })
   })

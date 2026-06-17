@@ -38,7 +38,7 @@ export function SearchBar() {
           autoComplete="off"
           spellCheck={false}
           aria-label={t('searchAriaLabel')}
-          className="flex-1 text-[15px] text-foreground bg-transparent border-none outline-none min-w-0 placeholder:text-muted-foreground/80"
+          className="flex-1 text-base text-foreground bg-transparent border-none outline-none min-w-0 placeholder:text-muted-foreground/80"
         />
       </div>
     </form>

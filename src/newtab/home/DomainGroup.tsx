@@ -17,6 +17,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge.tsx'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Moon, Archive, X } from 'lucide-react'
 import { TabChip } from './TabChip.tsx'
 import { playCloseSound } from '@/newtab/utils/sound'
@@ -137,9 +138,9 @@ export function DomainGroupCard({
     const allTabs = await browser.tabs.query({ windowId: currentWindow.id })
     const toClose: number[] = []
     for (const url of urls) {
-      const matching = allTabs.filter(t => t.url === url)
+      const matching = allTabs.filter((t) => t.url === url)
       if (matching.length <= 1) continue
-      const keep = matching.find(t => t.active) || matching[0]
+      const keep = matching.find((t) => t.active) || matching[0]
       for (const tab of matching) {
         if (tab.id && tab.id !== keep.id) toClose.push(tab.id)
       }
@@ -186,12 +187,15 @@ export function DomainGroupCard({
                 />
               )}
               <span className="flex-1 min-w-0 truncate">
-                <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground m-0 inline">
+                <h3 className="text-base font-semibold tracking-[-0.01em] text-foreground m-0 inline">
                   {groupLabel}
                 </h3>
                 {mode === 'view' && hasDupes && (
-                  <span className="inline-flex ml-2 text-[10px] font-semibold text-accent">
-                    {t('duplicatesCount', { count: totalExtras, suffix: totalExtras !== 1 ? 's' : '' })}
+                  <span className="inline-flex ml-2 text-xs font-semibold text-accent">
+                    {t('duplicatesCount', {
+                      count: totalExtras,
+                      suffix: totalExtras !== 1 ? 's' : ''
+                    })}
                   </span>
                 )}
               </span>
@@ -199,32 +203,41 @@ export function DomainGroupCard({
                 sleepControlEnabled &&
                 onSleepGroup &&
                 group.tabs.some((t) => !t.discarded && !t.active) && (
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => onSleepGroup(group.domain)}
-                    title={t('sleepAllTabsButton')}
-                    aria-label={t('sleepAllTabsButton')}
-                    className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
-                  >
-                    <Moon strokeWidth={1.8} className="w-3.5 h-3.5" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => onSleepGroup(group.domain)}
+                        aria-label={t('sleepAllTabsButton')}
+                        className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
+                      >
+                        <Moon strokeWidth={1.8} className="w-3.5 h-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{t('sleepAllTabsButton')}</TooltipContent>
+                  </Tooltip>
                 )}
               {mode === 'view' && onSaveGroup && (
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => onSaveGroup(group.domain)}
-                  title={t('saveGroupSession')}
-                  className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
-                >
-                  <Archive strokeWidth={1.8} className="w-3.5 h-3.5" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => onSaveGroup(group.domain)}
+                      aria-label={t('saveGroupSession')}
+                      className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
+                    >
+                      <Archive strokeWidth={1.8} className="w-3.5 h-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('saveGroupSession')}</TooltipContent>
+                </Tooltip>
               )}
               {group.tabs.length > 1 && (
                 <Badge
                   variant="secondary"
-                  className="ml-auto text-[10px] font-semibold rounded-[3px] shrink-0"
+                  className="ml-auto text-xs font-semibold rounded-[3px] shrink-0"
                 >
                   {group.tabs.length}
                 </Badge>
@@ -259,7 +272,7 @@ export function DomainGroupCard({
             {mode === 'view' && group.tabs.length > INITIAL_VISIBLE && !expanded && (
               <button
                 onClick={() => setExpanded(true)}
-                className="self-start text-[11px] text-primary bg-transparent border border-border rounded-md px-3 py-1 cursor-pointer hover:bg-secondary hover:border-primary transition-all duration-150"
+                className="self-start text-xs text-primary bg-transparent border border-border rounded-md px-3 py-1 cursor-pointer hover:bg-secondary hover:border-primary transition-all duration-150"
               >
                 {t('moreCount', { count: group.tabs.length - INITIAL_VISIBLE })}
               </button>
@@ -269,9 +282,12 @@ export function DomainGroupCard({
             {mode === 'view' && hasDupes && (
               <button
                 onClick={() => closeGroupDuplicates(dupeEntries.map(([url]) => url))}
-                className="self-start text-[11px] text-muted-foreground bg-card border border-border rounded-full px-3 py-1.5 cursor-pointer hover:text-accent hover:border-accent transition-all duration-150 mt-2"
+                className="self-start text-xs text-muted-foreground bg-card border border-border rounded-full px-3 py-1.5 cursor-pointer hover:text-accent hover:border-accent transition-all duration-150 mt-2"
               >
-                {t('closedDuplicatesCount', { count: totalExtras, suffix: totalExtras !== 1 ? 's' : '' })}
+                {t('closedDuplicatesCount', {
+                  count: totalExtras,
+                  suffix: totalExtras !== 1 ? 's' : ''
+                })}
               </button>
             )}
 

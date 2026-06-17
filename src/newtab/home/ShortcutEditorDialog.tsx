@@ -16,16 +16,17 @@ export interface ShortcutEditorData {
 interface ShortcutEditorFormProps {
   shortcut: Partial<QuickShortcut> | null
   onSave: (data: ShortcutEditorData) => void
-  onBack?: () => void
 }
 
-interface ShortcutEditorDialogProps extends ShortcutEditorFormProps {
+interface ShortcutEditorDialogProps {
+  shortcut: Partial<QuickShortcut> | null
+  onSave: (data: ShortcutEditorData) => void
   onCancel: () => void
 }
 
 const ICON_CHIPS = ['website', 'emoji', 'image', 'svg'] as const
 
-export function ShortcutEditorForm({ shortcut, onSave, onBack }: ShortcutEditorFormProps) {
+export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps) {
   const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -50,12 +51,9 @@ export function ShortcutEditorForm({ shortcut, onSave, onBack }: ShortcutEditorF
     } else if (iconKind === 'image' && iconData) {
       setImgSrc(iconData)
       setImgError(false)
-    } else if (iconKind === 'svg' && svgCode) {
-      const svg = svgCode.trim()
-      if (svg) {
-        setImgSrc(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`)
-        setImgError(false)
-      } else setImgSrc('')
+    } else if (iconKind === 'svg' && svgCode.trim()) {
+      setImgSrc(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgCode.trim())}`)
+      setImgError(false)
     } else setImgSrc('')
   }, [iconKind, url, iconData, svgCode])
 
@@ -114,142 +112,128 @@ export function ShortcutEditorForm({ shortcut, onSave, onBack }: ShortcutEditorF
     onSave({ url: url.trim(), label: label.trim(), icon: finalIcon, iconKind: finalKind })
   }
 
+  const labelClass = 'text-[10px] font-bold text-muted-foreground uppercase tracking-[0.16em]'
+
   return (
-    <form onSubmit={handleSubmit} className="p-3 space-y-2.5">
-      {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-[11px] font-semibold text-muted-foreground bg-none border-none p-0 cursor-pointer hover:text-foreground transition-colors"
-        >
-          ← Back
-        </button>
-      )}
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex-1 overflow-auto space-y-4 px-4 py-3">
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>{t('urlLabel')}</span>
+          <Input
+            value={url}
+            onChange={(e) => {
+              setUrl(e.target.value)
+              setImgError(false)
+            }}
+            type="url"
+            required
+            autoFocus
+            placeholder="https://example.com"
+            className="h-10 text-xs rounded-xl px-3"
+          />
+        </label>
 
-      <label className="block">
-        <span className="text-xs font-medium text-muted-foreground">{t('urlLabel')}</span>
-        <Input
-          value={url}
-          onChange={(e) => {
-            setUrl(e.target.value)
-            setImgError(false)
-          }}
-          type="url"
-          required
-          autoFocus
-          className="h-7 text-xs"
-        />
-      </label>
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>{t('labelLabel')}</span>
+          <Input
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            type="text"
+            placeholder={t('optionalPlaceholder')}
+            className="h-10 text-xs rounded-xl px-3"
+          />
+        </label>
 
-      <label className="block">
-        <span className="text-xs font-medium text-muted-foreground">{t('labelLabel')}</span>
-        <Input
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          type="text"
-          placeholder={t('optionalPlaceholder')}
-          className="h-7 text-xs"
-        />
-      </label>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl border border-border/40 bg-secondary/30 flex items-center justify-center shrink-0 overflow-hidden">
+              {iconKind === 'emoji' && emojiInput ? (
+                <span className="text-xl">{emojiInput.slice(0, 2)}</span>
+              ) : imgSrc && !imgError ? (
+                <img
+                  src={imgSrc}
+                  alt=""
+                  className="size-5.5 object-contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span className="size-5.5 rounded-full bg-accent/10 text-accent text-[11px] font-bold inline-flex items-center justify-center">
+                  {url ? getFallbackLabel(label, url).slice(0, 2) : 'A'}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center p-0.75 border border-border/50 rounded-xl bg-secondary/20 flex-1 min-w-0">
+              {ICON_CHIPS.map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  onClick={() => setIconKind(kind)}
+                  className={`text-[11px] font-semibold px-2.5 py-1.75 rounded-[9px] transition-colors flex-1 ${
+                    iconKind === kind
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {t(`shortcutIcon${kind.charAt(0).toUpperCase() + kind.slice(1)}` as any)}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div>
-        <div className="flex items-center gap-1.5 mb-1.5">
-          {ICON_CHIPS.map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              onClick={() =>
-                setIconKind(
-                  kind === 'website'
-                    ? 'website'
-                    : kind === 'emoji'
-                      ? 'emoji'
-                      : kind === 'image'
-                        ? 'image'
-                        : 'svg'
-                )
-              }
-              className={`text-[10px] font-semibold px-2 py-1 border border-border/60 rounded-md cursor-pointer transition-colors ${iconKind === kind ? 'bg-card text-foreground shadow-sm' : 'bg-transparent text-muted-foreground hover:text-foreground'}`}
-            >
-              {t(`shortcutIcon${kind.charAt(0).toUpperCase() + kind.slice(1)}` as any)}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2.5 p-2 bg-secondary/20 rounded-lg mb-1.5">
-          <div className="size-9 rounded-xl bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
-            {iconKind === 'emoji' && emojiInput ? (
-              <span className="text-base">{emojiInput.slice(0, 2)}</span>
-            ) : imgSrc && !imgError ? (
-              <img
-                src={imgSrc}
-                alt=""
-                className="size-5 object-contain"
-                onError={() => setImgError(true)}
+          <div>
+            {iconKind === 'emoji' && (
+              <Input
+                value={emojiInput}
+                onChange={(e) => setEmojiInput(e.target.value.slice(0, 4))}
+                placeholder={t('shortcutEmojiInput')}
+                className="h-10 text-xs rounded-xl px-3"
               />
-            ) : (
-              <span className="text-xs font-bold text-primary">
-                {url ? getFallbackLabel(label, url).slice(0, 2) : '?'}
-              </span>
+            )}
+            {iconKind === 'image' && (
+              <div className="flex flex-col gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  hidden
+                />
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs h-9 rounded-xl"
+                    >
+                      {t('shortcutUploadImage')}
+                    </Button>
+                  </div>
+                </div>
+                <span className="text-[11px] text-muted-foreground">{t('shortcutPasteImage')}</span>
+              </div>
+            )}
+            {iconKind === 'svg' && (
+              <textarea
+                value={svgCode}
+                onChange={(e) => setSvgCode(e.target.value)}
+                placeholder={t('shortcutSvgCode')}
+                rows={4}
+                className="w-full text-xs bg-card border border-border/50 rounded-xl px-3 py-2.5 text-foreground outline-none focus:border-primary/50 resize-none font-mono"
+              />
             )}
           </div>
-          <span className="text-[10px] text-muted-foreground truncate">
-            {label || url || t('shortcutIconPreview')}
-          </span>
         </div>
-
-        {iconKind === 'emoji' && (
-          <Input
-            value={emojiInput}
-            onChange={(e) => setEmojiInput(e.target.value.slice(0, 4))}
-            placeholder={t('shortcutEmojiInput')}
-            className="h-7 text-xs"
-          />
-        )}
-        {iconKind === 'image' && (
-          <div onPaste={handlePaste} className="space-y-1">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              hidden
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              className="text-xs h-7"
-            >
-              {t('shortcutUploadImage')}
-            </Button>
-            <p className="text-[9px] text-muted-foreground">{t('shortcutPasteImage')}</p>
-          </div>
-        )}
-        {iconKind === 'svg' && (
-          <textarea
-            value={svgCode}
-            onChange={(e) => setSvgCode(e.target.value)}
-            placeholder={t('shortcutSvgCode')}
-            rows={3}
-            className="w-full text-[10px] bg-card border border-border/60 rounded-md px-2 py-1 text-foreground outline-none focus:border-primary/50 resize-none font-mono"
-          />
-        )}
       </div>
 
-      <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/30">
-        {onBack && (
-          <Button variant="ghost" size="sm" type="button" onClick={onBack} className="text-xs h-7">
-            {t('cancelButton')}
-          </Button>
-        )}
+      <div className="flex justify-end px-4 py-3 border-t border-border/30 shrink-0">
         <Button
-          variant="secondary"
+          variant="default"
           size="sm"
           type="submit"
           disabled={!url.trim()}
-          className="text-xs h-7"
+          className="text-xs h-9 min-w-[9em] rounded-xl"
         >
           {t('saveButton')}
         </Button>
@@ -262,26 +246,23 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
   const { t } = useTranslation()
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20"
-      onClick={onCancel}
-    >
-      <div
-        className="bg-card border border-border rounded-xl shadow-lg w-95 max-w-[90vw] max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-          <div className="text-sm font-semibold text-foreground">
-            {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
+    <>
+      <div className="fixed inset-0 z-50 bg-foreground/8" onClick={onCancel} />
+      <div className="fixed bottom-6 right-22 z-50 w-90 bg-card border border-border rounded-[20px] shadow-[0_20px_42px_var(--tw-shadow-color)] shadow-accent/10 flex flex-col overflow-hidden max-w-[calc(100vw-32px)]">
+        <div className="shrink-0 px-4 pt-4 pb-2">
+          <div className="flex items-start justify-between gap-4">
+            <h2 className="font-serif text-2xl font-normal text-foreground leading-[1.05]">
+              {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
+            </h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onCancel}
+              className="text-muted-foreground hover:text-foreground rounded-full size-8"
+            >
+              <X strokeWidth={2} className="size-3.5" />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            onClick={onCancel}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <X strokeWidth={2} className="size-3.5" />
-          </Button>
         </div>
         <ShortcutEditorForm
           shortcut={shortcut}
@@ -291,6 +272,6 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
           }}
         />
       </div>
-    </div>
+    </>
   )
 }

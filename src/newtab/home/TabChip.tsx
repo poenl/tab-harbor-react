@@ -5,6 +5,7 @@ import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
 import { Moon, Archive, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 interface TabChipProps {
@@ -82,7 +83,7 @@ export function TabChip({
     // ── 标签行（展示/选择共用同一套样式） ──
     <div
       onClick={() => (mode === 'view' ? onFocus?.(tab.id) : onToggle?.(tab.id))}
-      className="flex items-center gap-2 py-2 min-h-11 border-b border-border/50 text-[13px] leading-[1.4] last:border-b-0 hover:bg-secondary/50 rounded-md -mx-2 px-2.5 transition-colors duration-150 cursor-pointer"
+      className="flex items-center gap-2 py-2 min-h-11 border-b border-border/50 text-sm leading-[1.4] last:border-b-0 hover:bg-secondary/50 rounded-md -mx-2 px-2.5 transition-colors duration-150 cursor-pointer"
     >
       {mode === 'select' && (
         <Checkbox checked={!!selected} onCheckedChange={() => onToggle?.(tab.id)} />
@@ -93,46 +94,59 @@ export function TabChip({
         {tab.title || t('untitledTab')}
       </span>
       {dupeCount && dupeCount > 1 && (
-        <span className="text-[10px] text-accent shrink-0 font-medium">
-          ({dupeCount}x)
-        </span>
+        <span className="text-xs text-accent shrink-0 font-medium">({dupeCount}x)</span>
       )}
 
       {/* ── 操作按钮组（仅展示模式） ── */}
       {mode === 'view' && (
         <div className="flex items-center gap-1 shrink-0">
           {showSleep && onSleepTab && (
-            <Button
-              onClick={() => onSleepTab(tab.id)}
-              title={t('discardTab')}
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
-            >
-              <Moon strokeWidth={1.8} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => onSleepTab(tab.id)}
+                  aria-label={t('discardTab')}
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
+                >
+                  <Moon strokeWidth={1.8} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{t('discardTab')}</TooltipContent>
+            </Tooltip>
           )}
           {onSaveTab && (
-            <Button
-              onClick={() => onSaveTab(tab)}
-              title={t('saveTabSession')}
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
-            >
-              <Archive strokeWidth={1.8} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => onSaveTab(tab)}
+                  aria-label={t('saveTabSession')}
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
+                >
+                  <Archive strokeWidth={1.8} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{t('saveTabSession')}</TooltipContent>
+            </Tooltip>
           )}
           {onClose && (
-            <Button
-              onClick={() => onClose(tab.id)}
-              title={t('closeThisTab')}
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
-            >
-              <X strokeWidth={1.8} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => onClose(tab.id)}
+                  aria-label={t('closeThisTab')}
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
+                >
+                  <X strokeWidth={1.8} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{t('closeThisTab')}</TooltipContent>
+            </Tooltip>
           )}
         </div>
       )}

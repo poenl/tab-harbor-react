@@ -31,13 +31,13 @@ export async function closeDuplicateNewTabs(): Promise<number> {
 
     const newTabUrls = getNewTabUrls()
     const allTabs = await browser.tabs.query({})
-    const blankTabs = allTabs.filter(tab => isNewTabBlank(tab, newTabUrls))
+    const blankTabs = allTabs.filter((tab) => isNewTabBlank(tab, newTabUrls))
 
     if (blankTabs.length <= 1) return 0
 
-    const activeTab = blankTabs.find(tab => tab.active)
+    const activeTab = blankTabs.find((tab) => tab.active)
     const toKeep = activeTab || blankTabs.reduce((a, b) => ((a.id ?? 0) > (b.id ?? 0) ? a : b))
-    const toClose = blankTabs.filter(tab => tab.id !== toKeep.id).map(tab => tab.id!)
+    const toClose = blankTabs.filter((tab) => tab.id !== toKeep.id).map((tab) => tab.id!)
 
     if (toClose.length > 0) await browser.tabs.remove(toClose)
     return toClose.length
