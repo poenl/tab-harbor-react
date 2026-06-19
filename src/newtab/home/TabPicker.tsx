@@ -188,7 +188,8 @@ export function TabPicker({ onClose }: TabPickerProps) {
       <div className="fixed inset-0 z-50 bg-foreground/6" onClick={onClose} />
 
       {/* ── 面板 ── */}
-      <div className="fixed bottom-6 right-6 z-50 w-80 h-[min(480px,calc(100vh-80px))] bg-card border border-border rounded-[18px] shadow-[0_20px_42px_var(--tw-shadow-color)] shadow-accent/10 flex flex-col overflow-hidden">
+      <div className="fixed bottom-6 right-6 z-50 w-80 h-[min(480px,calc(100vh-80px))] backdrop-blur-xl border border-border rounded-[18px] shadow-[0_20px_42px_var(--tw-shadow-color)] shadow-accent/10 flex flex-col overflow-hidden"
+        style={{ backgroundColor: 'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)' }}>
         {/* ── 头部 ── */}
         <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 shrink-0">
           <div className="tab-picker-view-switch flex gap-4" role="tablist">

@@ -56,7 +56,7 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
 
   return (
     // ── 已保存 session 卡片 ──
-    <article className="bg-card border border-border rounded-2xl p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] shadow-primary/5">
+    <article data-session-id={session.id} className="bg-card border border-border rounded-2xl p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] shadow-primary/5">
       {/* ── 卡片顶部：名称 + 摘要 + 操作按钮 ── */}
       <div className="flex items-center gap-2">
         <div className="flex flex-col flex-1 min-w-0">
@@ -68,16 +68,20 @@ export function SavedSessionCard({ session }: SavedSessionCardProps) {
               onBlur={handleRenameSubmit}
               onKeyDown={handleKeyDown}
               autoFocus
-              className="text-base font-semibold tracking-[-0.01em] text-foreground bg-transparent border-b border-primary/30 outline-none py-0.5"
+              className="text-base font-semibold tracking-[-0.01em] text-foreground bg-transparent border-b border-primary/30 outline-none py-0"
             />
           ) : (
-            <button
-              onClick={() => setRenaming(true)}
-              title={t('clickToRename')}
-              className="text-base font-semibold tracking-[-0.01em] text-foreground text-left bg-none border-none p-0 cursor-text hover:text-primary transition-colors duration-150 truncate"
-            >
-              {session.name}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setRenaming(true)}
+                  className="w-fit max-w-full text-base font-semibold tracking-[-0.01em] text-foreground text-left bg-none border-b border-transparent p-0 cursor-text hover:text-primary transition-colors duration-150 truncate"
+                >
+                  {session.name}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{t('clickToRename')}</TooltipContent>
+            </Tooltip>
           )}
 
           <div className="text-xs text-muted-foreground mt-0.5">

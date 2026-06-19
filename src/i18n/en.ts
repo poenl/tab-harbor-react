@@ -108,7 +108,7 @@ export const en = {
   deskBackdrop: 'Desk backdrop',
   uploadImage: 'Upload image',
   clearText: 'Clear',
-  surfaceDepth: 'Surface depth',
+  surfaceOpacity: 'Surface opacity',
   uiScaleLabel: 'Text size',
   shortcutScaleLabel: 'Shortcut size',
   hitokotoLabel: 'Hitokoto',

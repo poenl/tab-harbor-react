@@ -73,7 +73,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
 
   async function handleSaveTab(tab: OpenTab) {
     const tabData = [{ url: tab.url, title: tab.title, favIconUrl: tab.favIconUrl || undefined }]
-    const name = `Saved tabs ${new Date().toLocaleString()}`
+    const name = new Date().toLocaleString()
     await addSession({ name, tabs: tabData })
     try {
       await browser.tabs.remove(tab.id)

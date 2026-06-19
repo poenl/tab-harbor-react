@@ -6,6 +6,7 @@ import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { SectionHeader } from '@/newtab/home/SectionHeader.tsx'
 import { SavedSessionCard } from './SavedSessionCard.tsx'
 import { SavedSessionEmpty } from './SavedSessionEmpty.tsx'
+import { SessionSettingsDropdown } from './SessionSettingsDropdown.tsx'
 
 export function SavedTabsPage() {
   const { t } = useTranslation()
@@ -29,18 +30,34 @@ export function SavedTabsPage() {
 
   return (
     // ── 已保存标签页面 ──
-    <section>
-      <SectionHeader title={t('workspacePageSavedTabs')} count={sessions.length} />
+    <div className="grid grid-cols-[1.35fr_0.95fr] gap-8">
+      <div className="w-full min-w-0">
+        <SectionHeader
+          title={t('workspacePageSavedTabs')}
+          actions={
+            <div className="flex items-center gap-2.5 min-w-0">
+              <SessionSettingsDropdown />
+              {sessions.length > 0 && (
+                <span className="text-xs font-medium tracking-[0.02em] text-primary whitespace-nowrap">
+                  {sessions.length}{' '}
+                  {t(sessions.length === 1 ? 'sessionWordSingular' : 'sessionWordPlural')}
+                </span>
+              )}
+            </div>
+          }
+        />
 
-      {sessions.length === 0 ? (
-        <SavedSessionEmpty />
-      ) : (
-        <div className="flex flex-col gap-3">
-          {sessions.map((session) => (
-            <SavedSessionCard key={session.id} session={session} />
-          ))}
-        </div>
-      )}
-    </section>
+        {sessions.length === 0 ? (
+          <SavedSessionEmpty />
+        ) : (
+          <div className="flex flex-col gap-3">
+            {sessions.map((session) => (
+              <SavedSessionCard key={session.id} session={session} />
+            ))}
+          </div>
+        )}
+      </div>
+      <div aria-hidden="true" />
+    </div>
   )
 }

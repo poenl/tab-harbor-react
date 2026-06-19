@@ -25,7 +25,7 @@ export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {
   mode: 'system',
   paletteId: 'paper',
   customBackground: '',
-  surfaceOpacity: 14,
+  surfaceOpacity: 50,
   uiScale: 100,
   shortcutScale: 100,
   hitokotoEnabled: true,

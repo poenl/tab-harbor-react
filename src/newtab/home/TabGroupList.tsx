@@ -63,7 +63,7 @@ export function TabGroupList({
         groups.map((group) => {
           const isSelect = selectTarget === group.domain
           return (
-            <div key={group.domain} data-domain={group.domain}>
+            <div key={group.domain} data-domain={group.domain} className="rounded-2xl">
               <DomainGroupCard
                 mode={isSelect ? 'select' : 'view'}
                 groups={[group]}

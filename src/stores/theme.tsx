@@ -29,11 +29,11 @@ function applyTheme(paletteId: ThemePaletteId, tone: 'light' | 'dark', surfaceOp
     root.style.setProperty('--custom-border-opacity', `${surfaceOpacity}%`)
     root.style.setProperty(
       '--custom-badge-opacity',
-      `${Math.max(2, Math.round(surfaceOpacity / 3))}%`
+      `${Math.max(2, Math.round(surfaceOpacity / 5))}%`
     )
     root.style.setProperty(
       '--custom-fallback-opacity',
-      `${Math.max(3, Math.round(surfaceOpacity / 2.5))}%`
+      `${Math.max(3, Math.round(surfaceOpacity / 4))}%`
     )
   }
 }

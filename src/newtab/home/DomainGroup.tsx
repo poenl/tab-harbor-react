@@ -108,7 +108,7 @@ export function DomainGroupCard({
         toast(t('toastSessionTabsAdded', { count: newTabs.length, skipped }))
       }
     } else {
-      const name = newSessionName.trim() || `Saved tabs ${new Date().toLocaleString()}`
+      const name = newSessionName.trim() || new Date().toLocaleString()
       await addSession({ name, tabs: tabData })
       toast(t('toastSessionSaved', { count: selectedTabs.length }))
     }

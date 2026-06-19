@@ -73,7 +73,7 @@ export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
     const id = createSessionId()
     const session: SavedTabSession = {
       id,
-      name: input.name || 'Saved tabs',
+      name: input.name || new Date().toLocaleString(),
       tabs: input.tabs.filter((t) => isRestorable(t.url)),
       savedAt: new Date().toISOString(),
       source: 'selected'

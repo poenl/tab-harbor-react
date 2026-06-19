@@ -108,7 +108,7 @@ export const zhCN: Record<TranslationKey, string> = {
   deskBackdrop: '桌面背景',
   uploadImage: '上传图片',
   clearText: '清除',
-  surfaceDepth: '透明度',
+  surfaceOpacity: '不透明度',
   uiScaleLabel: '字体大小',
   shortcutScaleLabel: '快捷链接大小',
   hitokotoLabel: '一言',

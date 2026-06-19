@@ -1,7 +1,6 @@
 import { useTranslation } from '@/i18n'
 import { useTheme } from '@/stores/theme'
-import { useSavedSessionsStore } from '@/stores/savedSessions'
-import type { TabScope, SavedSessionNavDisplayMode } from '@/constants/preferences'
+import type { TabScope } from '@/constants/preferences'
 import { toast } from 'sonner'
 import { closeDuplicateNewTabs } from '@/utils/close-duplicate-tabs'
 import { InlineSelect, SectionDivider, ThemeLabel } from './AppearancePanel'
@@ -46,8 +45,6 @@ function ToggleSwitch({
 export function FeaturesPanel() {
   const { t } = useTranslation()
   const { preferences, updatePreferences } = useTheme()
-  const restoreMode = useSavedSessionsStore((s) => s.restoreMode)
-  const setRestoreMode = useSavedSessionsStore((s) => s.setRestoreMode)
 
   return (
     <div className="flex flex-col gap-0">
@@ -98,39 +95,7 @@ export function FeaturesPanel() {
         </div>
       </div>
 
-      {/* ── 会话 ── */}
-      <SectionDivider />
-      <div className="theme-menu-section space-y-3">
-        <ThemeLabel>{t('savedSessionSettings')}</ThemeLabel>
 
-        <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('savedSessionRestoreModeLabel')}</ThemeLabel>
-          <InlineSelect
-            options={[
-              { key: 'new-window', label: t('savedSessionRestoreModeNewWindow') },
-              { key: 'current-window', label: t('savedSessionRestoreModeCurrentWindow') }
-            ]}
-            value={restoreMode}
-            onChange={(v) => setRestoreMode(v as 'new-window' | 'current-window')}
-          />
-        </div>
-
-        <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('savedSessionNavDisplayModeLabel')}</ThemeLabel>
-          <InlineSelect
-            options={[
-              { key: 'icon', label: t('savedSessionNavDisplayModeIcon') },
-              { key: 'name', label: t('savedSessionNavDisplayModeName') }
-            ]}
-            value={preferences.savedSessionNavDisplayMode}
-            onChange={(v) =>
-              updatePreferences({
-                savedSessionNavDisplayMode: v as SavedSessionNavDisplayMode
-              })
-            }
-          />
-        </div>
-      </div>
     </div>
   )
 }

@@ -1,28 +1,34 @@
 import { useState } from 'react'
 import { useTranslation } from '@/i18n'
-import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
+export interface NavItem {
+  id: string
+  label: string
+  tabs: Array<{ url: string; favIconUrl?: string }>
+}
+
 interface GroupNavProps {
-  groups: DomainGroup[]
-  onNavigate?: (domain: string) => void
+  items: NavItem[]
+  onNavigate?: (id: string) => void
+  variant?: 'icon' | 'name'
 }
 
 // ── 圆点图标（网站图标 → 首字母） ──
-function GroupIcon({ group }: { group: DomainGroup }) {
-  const label = group.label || group.domain
+function GroupIcon({ item }: { item: NavItem }) {
+  const label = item.label
   const [imgError, setImgError] = useState(false)
 
   const preferredTab =
-    group.tabs.find((t) => {
+    item.tabs.find((t) => {
       const url = t.favIconUrl || ''
       return url.startsWith('https://') || url.startsWith('data:')
     }) ||
-    group.tabs.find((t) => t.url) ||
-    group.tabs[0]
+    item.tabs.find((t) => t.url) ||
+    item.tabs[0]
 
-  const fallbackLabel = getFallbackLabel(label, preferredTab?.url || group.domain)
+  const fallbackLabel = getFallbackLabel(label, preferredTab?.url || label)
 
   if (preferredTab?.favIconUrl && !imgError) {
     return (
@@ -67,28 +73,38 @@ function GroupIcon({ group }: { group: DomainGroup }) {
   )
 }
 
-export function GroupNav({ groups, onNavigate }: GroupNavProps) {
+export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps) {
   const { t } = useTranslation()
 
-  if (!groups.length) return null
+  if (!items.length) return null
 
   return (
     // ── 分组导航圆点 ──
     <nav className="flex gap-2.5 flex-wrap flex-1 min-w-0">
-      {groups.map((group) => {
-        const label = group.label || group.domain
+      {items.map((item) => {
+        const label = item.label
 
         return (
-          <Tooltip key={group.domain}>
+          <Tooltip key={item.id}>
             <TooltipTrigger asChild>
-              <button
-                onClick={() => onNavigate?.(group.domain)}
-                aria-label={t('jumpToLabel', { label })}
-                draggable={false}
-                className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
-              >
-                <GroupIcon group={group} />
-              </button>
+              {variant === 'name' ? (
+                <button
+                  onClick={() => onNavigate?.(item.id)}
+                  aria-label={t('jumpToLabel', { label })}
+                  className="inline-flex items-center max-w-32 h-10 px-1 bg-transparent border-none rounded-none text-xs font-medium text-muted-foreground underline decoration-transparent underline-offset-[0.32em] decoration-1 hover:text-foreground hover:decoration-accent/64 transition-all duration-150 cursor-pointer truncate"
+                >
+                  <span className="truncate">{label}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => onNavigate?.(item.id)}
+                  aria-label={t('jumpToLabel', { label })}
+                  draggable={false}
+                  className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
+                >
+                  <GroupIcon item={item} />
+                </button>
+              )}
             </TooltipTrigger>
             <TooltipContent side="top" sideOffset={8}>
               {label}
