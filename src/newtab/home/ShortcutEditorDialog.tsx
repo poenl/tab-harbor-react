@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from '@/i18n'
-import type { QuickShortcut } from '@/newtab/hooks/useQuickShortcuts'
+import type { QuickShortcut } from '@/stores/quickShortcuts'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -248,8 +248,13 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
   return (
     <>
       <div className="fixed inset-0 z-50 bg-foreground/8" onClick={onCancel} />
-      <div className="fixed bottom-6 right-22 z-50 w-90 backdrop-blur-xl border border-border rounded-[20px] shadow-[0_20px_42px_var(--tw-shadow-color)] shadow-accent/10 flex flex-col overflow-hidden max-w-[calc(100vw-32px)]"
-        style={{ backgroundColor: 'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)' }}>
+      <div
+        className="fixed bottom-6 right-22 z-50 w-90 backdrop-blur-xl border border-border rounded-[20px] shadow-[0_20px_42px_var(--tw-shadow-color)] shadow-accent/10 flex flex-col overflow-hidden max-w-[calc(100vw-32px)]"
+        style={{
+          backgroundColor:
+            'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
+        }}
+      >
         <div className="shrink-0 px-4 pt-4 pb-2">
           <div className="flex items-start justify-between gap-4">
             <h2 className="font-serif text-2xl font-normal text-foreground leading-[1.05]">

@@ -1,9 +1,10 @@
-import { X } from 'lucide-react'
+import { X, GripVertical } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { SavedTabTab } from '@/stores/savedSessions'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { useState } from 'react'
+import { Draggable } from '@hello-pangea/dnd'
 
 interface SavedSessionTabRowProps {
   tab: SavedTabTab
@@ -59,30 +60,45 @@ export function SavedSessionTabRow({
   const { t } = useTranslation()
 
   return (
-    // ── 已保存标签行 ──
-    <div className="flex items-center gap-2 py-1.5 border-b border-border/50 text-sm leading-[1.4] last:border-b-0">
-      <button
-        onClick={() => onRestoreTab(sessionId, index)}
-        className="flex items-center gap-2 flex-1 min-w-0 text-left bg-none border-none p-0 cursor-pointer group"
-      >
-        <TabFavicon tab={tab} />
-        <span className="truncate text-foreground group-hover:text-primary transition-colors duration-150">
-          {tab.title || tab.url}
-        </span>
-      </button>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            onClick={() => onDeleteTab(sessionId, index)}
-            className="w-6 h-6 p-0 border-none rounded bg-none text-muted-foreground/40 cursor-pointer shrink-0 flex items-center justify-center hover:text-destructive hover:bg-destructive/10 transition-all duration-150"
-            aria-label={t('removeTabFromSession')}
+    <Draggable draggableId={tab.url} index={index}>
+      {(provided) => (
+        // ── 已保存标签行 ──
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          style={provided.draggableProps.style as React.CSSProperties}
+          className="flex items-center gap-2 py-1.5 border-b border-border/50 text-sm leading-[1.4] last:border-b-0"
+        >
+          <span
+            {...provided.dragHandleProps}
+            className="inline-flex cursor-grab active:cursor-grabbing"
           >
-            <X strokeWidth={1.8} className="w-3 h-3" />
+            <GripVertical strokeWidth={1.8} className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+          </span>
+          <button
+            onClick={() => onRestoreTab(sessionId, index)}
+            className="flex items-center gap-2 flex-1 min-w-0 text-left bg-none border-none p-0 cursor-pointer group"
+          >
+            <TabFavicon tab={tab} />
+            <span className="truncate text-foreground group-hover:text-primary transition-colors duration-150">
+              {tab.title || tab.url}
+            </span>
           </button>
-        </TooltipTrigger>
-        <TooltipContent side="top">{t('removeTabFromSession')}</TooltipContent>
-      </Tooltip>
-    </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => onDeleteTab(sessionId, index)}
+                className="w-6 h-6 p-0 border-none rounded bg-none text-muted-foreground/40 cursor-pointer shrink-0 flex items-center justify-center hover:text-destructive hover:bg-destructive/10 transition-all duration-150"
+                aria-label={t('removeTabFromSession')}
+              >
+                <X strokeWidth={1.8} className="w-3 h-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">{t('removeTabFromSession')}</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+    </Draggable>
   )
 }

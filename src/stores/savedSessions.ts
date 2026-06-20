@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { browser } from 'wxt/browser'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export interface SavedTabTab {
   url: string
@@ -36,123 +37,131 @@ interface SavedSessionsStore {
   ready: boolean
   restoreMode: 'new-window' | 'current-window'
 
-  load: () => Promise<void>
-  addSession: (input: { name?: string; tabs: SavedTabTab[] }) => Promise<string>
-  removeSession: (id: string) => Promise<void>
-  renameSession: (id: string, name: string) => Promise<void>
-  removeTabFromSession: (sessionId: string, tabIndex: number) => Promise<void>
-  toggleCollapse: (sessionId: string) => Promise<void>
+  addSession: (input: { name?: string; tabs: SavedTabTab[] }) => string
+  removeSession: (id: string) => void
+  renameSession: (id: string, name: string) => void
+  removeTabFromSession: (sessionId: string, tabIndex: number) => void
+  toggleCollapse: (sessionId: string) => void
   restoreSession: (id: string) => Promise<void>
   restoreTab: (sessionId: string, tabIndex: number) => Promise<void>
-  setRestoreMode: (mode: 'new-window' | 'current-window') => Promise<void>
+  setRestoreMode: (mode: 'new-window' | 'current-window') => void
+  setSessions: (
+    updater: SavedTabSession[] | ((prev: SavedTabSession[]) => SavedTabSession[])
+  ) => void
 }
 
-export const useSavedSessionsStore = create<SavedSessionsStore>((set, get) => ({
-  sessions: [],
-  collapsed: {},
-  ready: false,
-  restoreMode: 'new-window',
+export const useSavedSessionsStore = create<SavedSessionsStore>()(
+  persist(
+    (set, get) => ({
+      sessions: [],
+      collapsed: {},
+      ready: false,
+      restoreMode: 'new-window',
 
-  load: async () => {
-    const result = await browser.storage.local.get([
-      STORAGE_KEYS.SAVED_TAB_SESSIONS,
-      STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED,
-      STORAGE_KEYS.RESTORE_MODE
-    ])
-    set({
-      sessions: (result[STORAGE_KEYS.SAVED_TAB_SESSIONS] as SavedTabSession[]) ?? [],
-      collapsed:
-        (result[STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED] as Record<string, boolean>) ?? {},
-      restoreMode:
-        (result[STORAGE_KEYS.RESTORE_MODE] as 'new-window' | 'current-window') ?? 'new-window',
-      ready: true
-    })
-  },
+      addSession: (input) => {
+        const id = createSessionId()
+        const session: SavedTabSession = {
+          id,
+          name: input.name || new Date().toLocaleString(),
+          tabs: input.tabs.filter((t) => isRestorable(t.url)),
+          savedAt: new Date().toISOString(),
+          source: 'selected'
+        }
+        set({ sessions: [...get().sessions, session] })
+        return id
+      },
 
-  addSession: async (input) => {
-    const id = createSessionId()
-    const session: SavedTabSession = {
-      id,
-      name: input.name || new Date().toLocaleString(),
-      tabs: input.tabs.filter((t) => isRestorable(t.url)),
-      savedAt: new Date().toISOString(),
-      source: 'selected'
+      removeSession: (id) => {
+        set({ sessions: get().sessions.filter((s) => s.id !== id) })
+      },
+
+      renameSession: (id, name) => {
+        set({ sessions: get().sessions.map((s) => (s.id === id ? { ...s, name } : s)) })
+      },
+
+      removeTabFromSession: (sessionId, tabIndex) => {
+        set({
+          sessions: get().sessions.map((s) =>
+            s.id === sessionId ? { ...s, tabs: s.tabs.filter((_, i) => i !== tabIndex) } : s
+          )
+        })
+      },
+
+      toggleCollapse: (sessionId) => {
+        set({ collapsed: { ...get().collapsed, [sessionId]: !get().collapsed[sessionId] } })
+      },
+
+      setRestoreMode: (mode) => {
+        set({ restoreMode: mode })
+      },
+
+      setSessions: (updater) => {
+        const next = typeof updater === 'function' ? updater(get().sessions) : updater
+        set({ sessions: next })
+      },
+
+      restoreSession: async (id) => {
+        const session = get().sessions.find((s) => s.id === id)
+        if (!session || session.tabs.length === 0) return
+
+        const currentWindow = await browser.windows.getCurrent()
+        const winId = currentWindow.id
+        if (!winId) return
+
+        const restoreMode = get().restoreMode
+        const tabs = session.tabs
+
+        if (restoreMode === 'new-window') {
+          const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true })
+          if (activeTab?.id) {
+            await browser.tabs.update(activeTab.id, { url: tabs[0].url })
+          }
+          for (let i = 1; i < tabs.length; i++) {
+            await browser.tabs.create({ url: tabs[i].url, windowId: winId })
+          }
+        } else {
+          for (const tab of tabs) {
+            await browser.tabs.create({ url: tab.url, windowId: winId })
+          }
+        }
+      },
+
+      restoreTab: async (sessionId, tabIndex) => {
+        const session = get().sessions.find((s) => s.id === sessionId)
+        const tab = session?.tabs[tabIndex]
+        if (tab) {
+          const currentWindow = await browser.windows.getCurrent()
+          const winId = currentWindow.id
+          if (winId) {
+            await browser.tabs.create({ url: tab.url, windowId: winId })
+          }
+        }
+      }
+    }),
+    {
+      name: STORAGE_KEYS.SAVED_TAB_SESSIONS,
+      storage: createJSONStorage(() => ({
+        getItem: async (name) => {
+          const result = await browser.storage.local.get(name)
+          const value = result[name]
+          if (value === undefined) return null
+          return typeof value === 'string' ? value : JSON.stringify(value)
+        },
+        setItem: async (name, value) => {
+          await browser.storage.local.set({ [name]: value })
+        },
+        removeItem: async (name) => {
+          await browser.storage.local.remove(name)
+        }
+      })),
+      partialize: (state) => ({
+        sessions: state.sessions,
+        collapsed: state.collapsed,
+        restoreMode: state.restoreMode
+      }),
+      onRehydrateStorage: () => () => {
+        useSavedSessionsStore.setState({ ready: true })
+      }
     }
-    const sessions = [...get().sessions, session]
-    await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
-    set({ sessions })
-    return id
-  },
-
-  removeSession: async (id) => {
-    const sessions = get().sessions.filter((s) => s.id !== id)
-    await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
-    set({ sessions })
-  },
-
-  renameSession: async (id, name) => {
-    const sessions = get().sessions.map((s) => (s.id === id ? { ...s, name } : s))
-    await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
-    set({ sessions })
-  },
-
-  removeTabFromSession: async (sessionId, tabIndex) => {
-    const sessions = get().sessions.map((s) =>
-      s.id === sessionId ? { ...s, tabs: s.tabs.filter((_, i) => i !== tabIndex) } : s
-    )
-    await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: sessions })
-    set({ sessions })
-  },
-
-  toggleCollapse: async (sessionId) => {
-    const collapsed = { ...get().collapsed }
-    collapsed[sessionId] = !collapsed[sessionId]
-    await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSION_COLLAPSED]: collapsed })
-    set({ collapsed })
-  },
-
-  setRestoreMode: async (mode) => {
-    await browser.storage.local.set({ [STORAGE_KEYS.RESTORE_MODE]: mode })
-    set({ restoreMode: mode })
-  },
-
-  restoreSession: async (id) => {
-    const session = get().sessions.find((s) => s.id === id)
-    if (!session || session.tabs.length === 0) return
-
-    const currentWindow = await browser.windows.getCurrent()
-    const winId = currentWindow.id
-    if (!winId) return
-
-    const restoreMode = get().restoreMode
-    const tabs = session.tabs
-
-    if (restoreMode === 'new-window') {
-      // 此标签页：当前标签导航到第一个 URL，其余创建新标签
-      const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true })
-      if (activeTab?.id) {
-        await browser.tabs.update(activeTab.id, { url: tabs[0].url })
-      }
-      for (let i = 1; i < tabs.length; i++) {
-        await browser.tabs.create({ url: tabs[i].url, windowId: winId })
-      }
-    } else {
-      // 新标签页：全部创建新标签
-      for (const tab of tabs) {
-        await browser.tabs.create({ url: tab.url, windowId: winId })
-      }
-    }
-  },
-
-  restoreTab: async (sessionId, tabIndex) => {
-    const session = get().sessions.find((s) => s.id === sessionId)
-    const tab = session?.tabs[tabIndex]
-    if (tab) {
-      const currentWindow = await browser.windows.getCurrent()
-      const winId = currentWindow.id
-      if (winId) {
-        await browser.tabs.create({ url: tab.url, windowId: winId })
-      }
-    }
-  }
-}))
+  )
+)

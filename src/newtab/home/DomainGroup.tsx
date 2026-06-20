@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from '@/i18n'
 import { toast } from 'sonner'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import type { SavedTabSession } from '@/stores/savedSessions'
 import { cn } from '@/lib/utils'
@@ -60,12 +59,8 @@ export function DomainGroupCard({
   onSelectCancel
 }: DomainGroupCardProps) {
   const { t } = useTranslation()
-  const { addSession, sessions, load } = useSavedSessionsStore()
+  const { addSession, sessions, setSessions } = useSavedSessionsStore()
   const [expanded, setExpanded] = useState(false)
-
-  useEffect(() => {
-    load()
-  }, [load])
 
   // ── 选择模式 footer 状态 ──
   const [footerMode, setFooterMode] = useState<'new' | 'existing'>('new')
@@ -101,10 +96,11 @@ export function DomainGroupCard({
         const existingUrls = new Set(session.tabs.map((t) => t.url))
         const newTabs = tabData.filter((t) => !existingUrls.has(t.url))
         const skipped = tabData.length - newTabs.length
-        const updated: SavedTabSession = { ...session, tabs: [...session.tabs, ...newTabs] }
-        const updatedSessions = sessions.map((s) => (s.id === targetSessionId ? updated : s))
-        await browser.storage.local.set({ [STORAGE_KEYS.SAVED_TAB_SESSIONS]: updatedSessions })
-        load()
+        setSessions(
+          sessions.map((s) =>
+            s.id === targetSessionId ? { ...s, tabs: [...s.tabs, ...newTabs] } : s
+          )
+        )
         toast(t('toastSessionTabsAdded', { count: newTabs.length, skipped }))
       }
     } else {
@@ -129,7 +125,7 @@ export function DomainGroupCard({
     targetSessionId,
     addSession,
     sessions,
-    load,
+    setSessions,
     onSelectCancel
   ])
 

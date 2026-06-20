@@ -49,7 +49,11 @@ export default function App() {
         <div className="flex items-start gap-4 mb-3.5 flex-wrap">
           {currentPage === 'home' ? (
             <GroupNav
-              items={groups.map((g) => ({ id: g.domain, label: g.label || g.domain, tabs: g.tabs }))}
+              items={groups.map((g) => ({
+                id: g.domain,
+                label: g.label || g.domain,
+                tabs: g.tabs
+              }))}
               onNavigate={(id) => scrollToAndHighlight(`[data-domain="${id}"]`)}
             />
           ) : (

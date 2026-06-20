@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Plus, Pencil, X } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { useTheme } from '@/stores/theme'
-import type { QuickShortcut } from '@/newtab/hooks/useQuickShortcuts'
-import { useQuickShortcuts, svgToDataUrl } from '../hooks/useQuickShortcuts'
+import type { QuickShortcut } from '@/stores/quickShortcuts'
+import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
+import { svgToDataUrl } from '@/utils/svg'
 import { getIconSources, getFallbackLabel } from '../utils/icon-utils'
 import { TabPicker } from './TabPicker.tsx'
 import { ShortcutEditorDialog } from './ShortcutEditorDialog.tsx'
@@ -147,7 +148,10 @@ function RemoveButton({
 export function QuickShortcuts() {
   const { t } = useTranslation()
   const { preferences } = useTheme()
-  const { shortcuts, add, update, remove } = useQuickShortcuts()
+  const shortcuts = useQuickShortcutsStore((s) => s.shortcuts)
+  const add = useQuickShortcutsStore((s) => s.add)
+  const update = useQuickShortcutsStore((s) => s.update)
+  const remove = useQuickShortcutsStore((s) => s.remove)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [editor, setEditor] = useState<{
     shortcut: Partial<QuickShortcut> | null

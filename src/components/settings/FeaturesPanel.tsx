@@ -94,8 +94,6 @@ export function FeaturesPanel() {
           />
         </div>
       </div>
-
-
     </div>
   )
 }

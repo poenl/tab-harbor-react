@@ -1,30 +1,53 @@
-import { useEffect } from 'react'
-import { browser } from 'wxt/browser'
 import { useTranslation } from '@/i18n'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { SectionHeader } from '@/newtab/home/SectionHeader.tsx'
 import { SavedSessionCard } from './SavedSessionCard.tsx'
 import { SavedSessionEmpty } from './SavedSessionEmpty.tsx'
 import { SessionSettingsDropdown } from './SessionSettingsDropdown.tsx'
+import { DragDropContext, Droppable, type DropResult } from '@hello-pangea/dnd'
 
 export function SavedTabsPage() {
   const { t } = useTranslation()
-  const { sessions, ready, load } = useSavedSessionsStore()
+  const { sessions, ready, setSessions } = useSavedSessionsStore()
 
-  useEffect(() => {
-    load()
-  }, [load])
+  function handleDragEnd(result: DropResult) {
+    const { source, destination, type } = result
+    if (!destination) return
+    if (source.index === destination.index && source.droppableId === destination.droppableId) return
 
-  useEffect(() => {
-    const listener = (changes: Record<string, { newValue?: unknown }>) => {
-      if (STORAGE_KEYS.SAVED_TAB_SESSIONS in changes) {
-        load()
-      }
+    if (type === 'SESSION') {
+      setSessions((prev) => {
+        const arr = [...prev]
+        const [removed] = arr.splice(source.index, 1)
+        arr.splice(destination.index, 0, removed)
+        return arr
+      })
+      return
     }
-    browser.storage.local.onChanged.addListener(listener)
-    return () => browser.storage.local.onChanged.removeListener(listener)
-  }, [load])
+
+    setSessions((prev) => {
+      const src = prev.find((s) => s.id === source.droppableId)
+      const tgt = prev.find((s) => s.id === destination.droppableId)
+      if (!src || !tgt) return prev
+
+      const srcTabs = [...src.tabs]
+      const [moved] = srcTabs.splice(source.index, 1)
+      if (!moved) return prev
+
+      if (source.droppableId === destination.droppableId) {
+        srcTabs.splice(destination.index, 0, moved)
+        return prev.map((s) => (s.id === source.droppableId ? { ...s, tabs: srcTabs } : s))
+      }
+
+      const tgtTabs = [...tgt.tabs]
+      tgtTabs.splice(destination.index, 0, moved)
+      return prev.map((s) => {
+        if (s.id === source.droppableId) return { ...s, tabs: srcTabs }
+        if (s.id === destination.droppableId) return { ...s, tabs: tgtTabs }
+        return s
+      })
+    })
+  }
 
   if (!ready) return null
 
@@ -51,9 +74,22 @@ export function SavedTabsPage() {
           <SavedSessionEmpty />
         ) : (
           <div className="flex flex-col gap-3">
-            {sessions.map((session) => (
-              <SavedSessionCard key={session.id} session={session} />
-            ))}
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="saved-sessions" type="SESSION">
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="flex flex-col gap-3"
+                  >
+                    {sessions.map((session, i) => (
+                      <SavedSessionCard key={session.id} session={session} index={i} />
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
         )}
       </div>

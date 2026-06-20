@@ -64,7 +64,11 @@ export function SettingsDropdown() {
               stroke="currentColor"
               className="size-4.5"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15m-12 4.5h9m-6 4.5h3" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.5 7.5h15m-12 4.5h9m-6 4.5h3"
+              />
               <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="16.5" cy="12" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="10.5" cy="16.5" r="1.5" fill="currentColor" stroke="none" />

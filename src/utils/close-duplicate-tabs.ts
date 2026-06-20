@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { useThemeStore } from '@/stores/theme'
 
 function getNewTabUrls() {
   return new Set([browser.runtime.getURL('/newtab.html')])
@@ -25,9 +25,8 @@ function isNewTabBlank(
 
 export async function closeDuplicateNewTabs(): Promise<number> {
   try {
-    const stored = await browser.storage.local.get(STORAGE_KEYS.THEME_PREFERENCES)
-    const prefs = stored[STORAGE_KEYS.THEME_PREFERENCES] as Record<string, unknown> | undefined
-    if (prefs?.closeDuplicateNewTabsEnabled !== true) return 0
+    const prefs = useThemeStore.getState().preferences
+    if (prefs.closeDuplicateNewTabsEnabled !== true) return 0
 
     const newTabUrls = getNewTabUrls()
     const allTabs = await browser.tabs.query({})

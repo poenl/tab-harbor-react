@@ -1,18 +1,55 @@
-import { createContext, useContext, useEffect, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import type { ThemePaletteId, ThemePreferences } from '@/constants/preferences'
-import { useStorage } from '@/hooks/useStorage'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { resolveTone, DEFAULT_THEME_PREFERENCES } from '@/constants/preferences'
 import type { ReactNode } from 'react'
+import { create } from 'zustand'
+import { browser } from 'wxt/browser'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
-interface ThemeContextValue {
+// ── Zustand persist store ──
+
+interface ThemeStore {
   preferences: ThemePreferences
-  updatePreferences: (partial: Partial<ThemePreferences>) => Promise<void>
-  resolvedTone: 'light' | 'dark'
   ready: boolean
+  updatePreferences: (partial: Partial<ThemePreferences>) => void
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+export const useThemeStore = create<ThemeStore>()(
+  persist(
+    (set) => ({
+      preferences: DEFAULT_THEME_PREFERENCES,
+      ready: false,
+
+      updatePreferences: (partial) => {
+        set((state) => ({ preferences: { ...state.preferences, ...partial } }))
+      }
+    }),
+    {
+      name: STORAGE_KEYS.THEME_PREFERENCES,
+      storage: createJSONStorage(() => ({
+        getItem: async (name) => {
+          const result = await browser.storage.local.get(name)
+          const value = result[name]
+          if (value === undefined) return null
+          return typeof value === 'string' ? value : JSON.stringify(value)
+        },
+        setItem: async (name, value) => {
+          await browser.storage.local.set({ [name]: value })
+        },
+        removeItem: async (name) => {
+          await browser.storage.local.remove(name)
+        }
+      })),
+      partialize: (state) => ({ preferences: state.preferences }),
+      onRehydrateStorage: () => () => {
+        useThemeStore.setState({ ready: true })
+      }
+    }
+  )
+)
+
+// ── Theme side effects provider ──
 
 function applyTheme(paletteId: ThemePaletteId, tone: 'light' | 'dark', surfaceOpacity?: number) {
   const root = document.documentElement
@@ -39,10 +76,8 @@ function applyTheme(paletteId: ThemePaletteId, tone: 'light' | 'dark', surfaceOp
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [preferences, setPreferences, ready] = useStorage<ThemePreferences>(
-    STORAGE_KEYS.THEME_PREFERENCES,
-    DEFAULT_THEME_PREFERENCES
-  )
+  const preferences = useThemeStore((s) => s.preferences)
+  const ready = useThemeStore((s) => s.ready)
 
   const tone = resolveTone(preferences.mode)
 
@@ -82,19 +117,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mq.removeEventListener('change', handleSystemChange)
   }, [preferences.mode, handleSystemChange])
 
-  const updatePreferences = async (partial: Partial<ThemePreferences>) => {
-    await setPreferences({ ...preferences, ...partial })
-  }
-
-  return (
-    <ThemeContext.Provider value={{ preferences, updatePreferences, resolvedTone: tone, ready }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return children
 }
 
-export function useTheme(): ThemeContextValue {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
-  return ctx
+// ── Public hook (replaces Context consumer) ──
+
+export function useTheme() {
+  const preferences = useThemeStore((s) => s.preferences)
+  const updatePreferences = useThemeStore((s) => s.updatePreferences)
+  const ready = useThemeStore((s) => s.ready)
+  const tone = resolveTone(preferences.mode)
+  return { preferences, updatePreferences, resolvedTone: tone, ready }
 }
