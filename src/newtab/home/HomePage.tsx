@@ -3,7 +3,6 @@ import { useTranslation } from '@/i18n'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
 import { useTheme } from '@/stores/theme'
-import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { toast } from 'sonner'
 import { Moon, Archive, X } from 'lucide-react'
 import { getTabQuery, discardTabs } from '@/utils/tabs'
@@ -41,8 +40,6 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
   const { t } = useTranslation()
   const { preferences } = useTheme()
   const { sleepControlEnabled } = preferences
-  const addSession = useSavedSessionsStore((s) => s.addSession)
-
   const [selectTarget, setSelectTarget] = useState<string | null>(null)
   const [selectedTabIds, setSelectedTabIds] = useState<Set<number>>(new Set())
 
@@ -71,23 +68,22 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
     toast(t('toastTabsDiscarded', { count }))
   }
 
-  async function handleSaveTab(tab: OpenTab) {
-    const tabData = [{ url: tab.url, title: tab.title, favIconUrl: tab.favIconUrl || undefined }]
-    const name = new Date().toLocaleString()
-    await addSession({ name, tabs: tabData })
-    try {
-      await browser.tabs.remove(tab.id)
-      toast(t('toastSessionSaved', { count: 1 }))
-    } catch {}
+  function handleSaveTab(tab: OpenTab) {
+    const group = groups.find((g) => g.tabs.some((t) => t.id === tab.id))
+    const domain = group?.domain
+    if (domain) {
+      enterSelectMode(domain, [tab.id])
+    }
   }
 
   // ── 选择模式 ──
 
-  function enterSelectMode(target: string) {
+  function enterSelectMode(target: string, initialTabIds?: number[]) {
     const scope =
-      target === '*'
+      initialTabIds ??
+      (target === '*'
         ? groups.flatMap((g) => g.tabs.map((t) => t.id))
-        : groups.filter((g) => g.domain === target).flatMap((g) => g.tabs.map((t) => t.id))
+        : groups.filter((g) => g.domain === target).flatMap((g) => g.tabs.map((t) => t.id)))
     setSelectTarget(target)
     setSelectedTabIds(new Set(scope))
   }
@@ -123,6 +119,12 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
     setSelectedTabIds(next)
   }
 
+  function handleSelectAll() {
+    const allIds = groups.flatMap((g) => g.tabs.map((t) => t.id))
+    const allSelected = allIds.every((id) => selectedTabIds.has(id))
+    setSelectedTabIds(new Set(allSelected ? [] : allIds))
+  }
+
   function handleSaveCurrentWindow() {
     enterSelectMode('*')
   }
@@ -147,7 +149,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
       {/* ── 两列布局（左: 1.35fr = 标签列表 / 右: 0.95fr = 问候+搜索+快捷） ── */}
       <div className="grid grid-cols-[1.35fr_0.95fr] gap-8 items-start max-[960px]:grid-cols-1 max-[960px]:gap-5">
         {/* ── 左栏：打开标签页 ── */}
-        <section>
+        <section className="min-w-0">
           <SectionHeader
             title={t('openTabsSectionTitle')}
             count={totalTabs}
@@ -232,6 +234,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
             onToggleTab={handleToggleTab}
             onToggleGroup={handleToggleGroup}
             onSelectCancel={exitSelectMode}
+            onSelectAll={handleSelectAll}
           />
         </section>
 

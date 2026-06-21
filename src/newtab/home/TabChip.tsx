@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
-import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
+import { getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
 import { Moon, Archive, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -27,28 +27,22 @@ interface TabChipProps {
   dupeCount?: number
 }
 
-// ── 网站图标（favicon → Google 代理 → 首字母） ──
+// ── 网站图标（favicon → 首字母） ──
+function isLocalhost(url: string) {
+  try {
+    return new URL(url).hostname === 'localhost'
+  } catch {
+    return false
+  }
+}
+
 function Favicon({ tab }: { tab: OpenTab }) {
   const [imgError, setImgError] = useState(false)
 
-  if (tab.favIconUrl && !imgError) {
+  if (tab.favIconUrl && !imgError && !isLocalhost(tab.favIconUrl)) {
     return (
       <img
         src={tab.favIconUrl}
-        alt=""
-        className="w-3.5 h-3.5 rounded-xs shrink-0"
-        onError={() => setImgError(true)}
-      />
-    )
-  }
-
-  const sources = getIconSources(tab.url, 32)
-  const src = sources[0]
-
-  if (src && !imgError) {
-    return (
-      <img
-        src={src}
         alt=""
         className="w-3.5 h-3.5 rounded-xs shrink-0"
         onError={() => setImgError(true)}
@@ -80,22 +74,25 @@ export function TabChip({
   const showSleep = sleepControlEnabled && !tab.discarded && !tab.active
 
   return (
-    // ── 标签行（展示/选择共用同一套样式） ──
-    <div
-      onClick={() => (mode === 'view' ? onFocus?.(tab.id) : onToggle?.(tab.id))}
-      className="flex items-center gap-2 py-2 min-h-11 border-b border-border/50 text-sm leading-[1.4] last:border-b-0 hover:bg-secondary/50 rounded-md -mx-2 px-2.5 transition-colors duration-150 cursor-pointer"
-    >
-      {mode === 'select' && (
-        <Checkbox checked={!!selected} onCheckedChange={() => onToggle?.(tab.id)} />
-      )}
-      <Favicon tab={tab} />
+    // ── 标签行（外层容器，无点击事件） ──
+    <div className="flex items-center gap-2 py-2 min-h-11 border-b border-border/50 text-sm leading-[1.4] last:border-b-0 rounded-md -mx-2 px-2.5 transition-colors duration-150 overflow-hidden hover:bg-secondary/50">
+      {/* ── 文案区域（绑定跳转/勾选事件） ── */}
+      <div
+        onClick={() => (mode === 'view' ? onFocus?.(tab.id) : onToggle?.(tab.id))}
+        className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden cursor-pointer rounded-md -my-1 py-1"
+      >
+        {mode === 'select' && (
+          <Checkbox checked={!!selected} onCheckedChange={() => onToggle?.(tab.id)} />
+        )}
+        <Favicon tab={tab} />
 
-      <span className={cn('truncate flex-1', tab.discarded && 'text-muted-foreground/40')}>
-        {tab.title || t('untitledTab')}
-      </span>
-      {dupeCount && dupeCount > 1 && (
-        <span className="text-xs text-accent shrink-0 font-medium">({dupeCount}x)</span>
-      )}
+        <span className={cn('truncate flex-1', tab.discarded && 'text-muted-foreground/40')}>
+          {tab.title || t('untitledTab')}
+        </span>
+        {dupeCount && dupeCount > 1 && (
+          <span className="text-xs text-accent shrink-0 font-medium">({dupeCount}x)</span>
+        )}
+      </div>
 
       {/* ── 操作按钮组（仅展示模式） ── */}
       {mode === 'view' && (

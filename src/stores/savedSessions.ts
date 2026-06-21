@@ -17,7 +17,7 @@ export interface SavedTabSession {
   source: 'manual' | 'current-window' | 'selected' | 'single-tab' | 'group'
 }
 
-function createSessionId(): string {
+export function createSessionId(): string {
   const ts = Date.now().toString(36)
   const rand = Math.random().toString(36).slice(2, 8)
   return `tab-session-${ts}-${rand}`
@@ -41,7 +41,7 @@ interface SavedSessionsStore {
   removeSession: (id: string) => void
   renameSession: (id: string, name: string) => void
   removeTabFromSession: (sessionId: string, tabIndex: number) => void
-  toggleCollapse: (sessionId: string) => void
+  toggleCollapse: (sessionId: string, isCollapsed?: boolean) => void
   restoreSession: (id: string) => Promise<void>
   restoreTab: (sessionId: string, tabIndex: number) => Promise<void>
   setRestoreMode: (mode: 'new-window' | 'current-window') => void
@@ -87,8 +87,10 @@ export const useSavedSessionsStore = create<SavedSessionsStore>()(
         })
       },
 
-      toggleCollapse: (sessionId) => {
-        set({ collapsed: { ...get().collapsed, [sessionId]: !get().collapsed[sessionId] } })
+      toggleCollapse: (sessionId, isCollapsed) => {
+        set({
+          collapsed: { ...get().collapsed, [sessionId]: isCollapsed || !get().collapsed[sessionId] }
+        })
       },
 
       setRestoreMode: (mode) => {
@@ -165,3 +167,10 @@ export const useSavedSessionsStore = create<SavedSessionsStore>()(
     }
   )
 )
+
+useSavedSessionsStore.subscribe((state) => {
+  const cleaned = state.sessions.filter((s) => s.tabs.length > 0)
+  if (cleaned.length !== state.sessions.length) {
+    useSavedSessionsStore.setState({ sessions: cleaned })
+  }
+})

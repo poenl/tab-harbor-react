@@ -41,6 +41,8 @@ interface DomainGroupCardProps {
   onToggleTab?: (id: number) => void
   onToggleGroup?: (domain: string) => void
   onSelectCancel?: () => void
+  showSelectAll?: boolean
+  onSelectAll?: () => void
 }
 
 export function DomainGroupCard({
@@ -56,7 +58,9 @@ export function DomainGroupCard({
   selectedTabIds,
   onToggleTab,
   onToggleGroup,
-  onSelectCancel
+  onSelectCancel,
+  showSelectAll,
+  onSelectAll
 }: DomainGroupCardProps) {
   const { t } = useTranslation()
   const { addSession, sessions, setSessions } = useSavedSessionsStore()
@@ -153,7 +157,21 @@ export function DomainGroupCard({
       {/* ── 选择模式头部 ── */}
       {mode === 'select' && (
         <div className="flex items-start justify-between gap-3 border-b border-border/50 pb-3">
-          <div className="text-sm font-semibold text-foreground">{t('sessionPickerTitle')}</div>
+          <div className="flex items-center gap-2">
+            {showSelectAll && (
+              <Checkbox
+                checked={
+                  selectedCount === allIds.length && allIds.length > 0
+                    ? true
+                    : selectedCount === 0
+                      ? false
+                      : 'indeterminate'
+                }
+                onCheckedChange={onSelectAll}
+              />
+            )}
+            <div className="text-sm font-semibold text-foreground">{t('sessionPickerTitle')}</div>
+          </div>
           <Button
             variant="ghost"
             size="icon"

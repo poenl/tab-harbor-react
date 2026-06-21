@@ -2,7 +2,7 @@ import { X, GripVertical } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { SavedTabTab } from '@/stores/savedSessions'
-import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
+import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 
@@ -14,8 +14,11 @@ interface SavedSessionTabRowProps {
   onDeleteTab: (sessionId: string, index: number) => void
 }
 
+const failedFavicons = new Set<string>()
+
 function TabFavicon({ tab }: { tab: SavedTabTab }) {
-  const [imgError, setImgError] = useState(false)
+  const initialError = tab.favIconUrl ? failedFavicons.has(tab.favIconUrl) : true
+  const [imgError, setImgError] = useState(initialError)
 
   if (tab.favIconUrl && !imgError) {
     return (
@@ -23,21 +26,10 @@ function TabFavicon({ tab }: { tab: SavedTabTab }) {
         src={tab.favIconUrl}
         alt=""
         className="w-3.5 h-3.5 rounded-xs shrink-0"
-        onError={() => setImgError(true)}
-      />
-    )
-  }
-
-  const sources = getIconSources(tab.url, 32)
-  const src = sources[0]
-
-  if (src && !imgError) {
-    return (
-      <img
-        src={src}
-        alt=""
-        className="w-3.5 h-3.5 rounded-xs shrink-0"
-        onError={() => setImgError(true)}
+        onError={() => {
+          failedFavicons.add(tab.favIconUrl!)
+          setImgError(true)
+        }}
       />
     )
   }
@@ -61,12 +53,15 @@ export function SavedSessionTabRow({
 
   return (
     <Draggable draggableId={tab.url} index={index}>
-      {(provided) => (
+      {(provided, snapshot) => (
         // ── 已保存标签行 ──
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          style={provided.draggableProps.style as React.CSSProperties}
+          style={{
+            ...(provided.draggableProps.style as React.CSSProperties),
+            ...(snapshot.isDropAnimating ? { transitionDuration: '0.001s' } : {})
+          }}
           className="flex items-center gap-2 py-1.5 border-b border-border/50 text-sm leading-[1.4] last:border-b-0"
         >
           <span

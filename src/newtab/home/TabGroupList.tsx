@@ -20,6 +20,7 @@ interface TabGroupListProps {
   onToggleTab?: (id: number) => void
   onToggleGroup?: (domain: string) => void
   onSelectCancel?: () => void
+  onSelectAll?: () => void
 }
 
 export function TabGroupList({
@@ -36,7 +37,8 @@ export function TabGroupList({
   selectTarget,
   onToggleTab,
   onToggleGroup,
-  onSelectCancel
+  onSelectCancel,
+  onSelectAll
 }: TabGroupListProps) {
   const { t } = useTranslation()
 
@@ -58,6 +60,8 @@ export function TabGroupList({
           onToggleTab={onToggleTab}
           onToggleGroup={onToggleGroup}
           onSelectCancel={onSelectCancel}
+          showSelectAll
+          onSelectAll={onSelectAll}
         />
       ) : (
         groups.map((group) => {
@@ -78,6 +82,7 @@ export function TabGroupList({
                 onToggleTab={onToggleTab}
                 onToggleGroup={onToggleGroup}
                 onSelectCancel={onSelectCancel}
+                onSelectAll={onSelectAll}
               />
             </div>
           )

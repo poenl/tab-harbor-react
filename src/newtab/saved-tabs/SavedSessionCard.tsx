@@ -57,7 +57,7 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
   }
 
   return (
-    <Draggable draggableId={`session-${session.id}`} index={index}>
+    <Draggable draggableId={session.id} index={index}>
       {(provided) => (
         // ── 已保存 session 卡片 ──
         <article

@@ -1,18 +1,67 @@
+import { useState } from 'react'
 import { useTranslation } from '@/i18n'
-import { useSavedSessionsStore } from '@/stores/savedSessions'
+import { createSessionId, useSavedSessionsStore } from '@/stores/savedSessions'
 import { SectionHeader } from '@/newtab/home/SectionHeader.tsx'
 import { SavedSessionCard } from './SavedSessionCard.tsx'
 import { SavedSessionEmpty } from './SavedSessionEmpty.tsx'
 import { SessionSettingsDropdown } from './SessionSettingsDropdown.tsx'
-import { DragDropContext, Droppable, type DropResult } from '@hello-pangea/dnd'
+import {
+  BeforeCapture,
+  DragDropContext,
+  DragUpdate,
+  Droppable,
+  type DropResult
+} from '@hello-pangea/dnd'
 
 export function SavedTabsPage() {
   const { t } = useTranslation()
-  const { sessions, ready, setSessions } = useSavedSessionsStore()
+  const { sessions, ready, setSessions, toggleCollapse } = useSavedSessionsStore()
+  const [isDraggingOutside, setIsDraggingOutside] = useState(false)
+
+  function handleBeforeCapture(before: BeforeCapture) {
+    toggleCollapse(before.draggableId, true)
+  }
+
+  function handleDragUpdate(rupdate: DragUpdate) {
+    setIsDraggingOutside(rupdate.destination === null && rupdate.type === 'TAB')
+  }
 
   function handleDragEnd(result: DropResult) {
+    toggleCollapse(result.draggableId, false)
+    setIsDraggingOutside(false)
+
     const { source, destination, type } = result
-    if (!destination) return
+
+    if (!destination) {
+      if (type === 'TAB') {
+        setSessions((prev) => {
+          const srcIdx = prev.findIndex((s) => s.id === source.droppableId)
+          if (srcIdx === -1) return prev
+          const src = prev[srcIdx]
+          const srcTabs = [...src.tabs]
+          const [movedTab] = srcTabs.splice(source.index, 1)
+          if (!movedTab) return prev
+
+          const filtered =
+            srcTabs.length === 0
+              ? prev.filter((s) => s.id !== source.droppableId)
+              : prev.map((s) => (s.id === source.droppableId ? { ...s, tabs: srcTabs } : s))
+
+          return [
+            ...filtered,
+            {
+              id: createSessionId(),
+              name: movedTab.title || movedTab.url,
+              tabs: [movedTab],
+              savedAt: new Date().toISOString(),
+              source: 'manual'
+            }
+          ]
+        })
+      }
+      return
+    }
+
     if (source.index === destination.index && source.droppableId === destination.droppableId) return
 
     if (type === 'SESSION') {
@@ -74,7 +123,11 @@ export function SavedTabsPage() {
           <SavedSessionEmpty />
         ) : (
           <div className="flex flex-col gap-3">
-            <DragDropContext onDragEnd={handleDragEnd}>
+            <DragDropContext
+              onDragEnd={handleDragEnd}
+              onBeforeCapture={handleBeforeCapture}
+              onDragUpdate={handleDragUpdate}
+            >
               <Droppable droppableId="saved-sessions" type="SESSION">
                 {(provided) => (
                   <div
@@ -90,6 +143,13 @@ export function SavedTabsPage() {
                 )}
               </Droppable>
             </DragDropContext>
+
+            {isDraggingOutside && (
+              // ── 拖拽至外部提示区域 ──
+              <div className="border-2 border-dashed border-primary/30 rounded-xl py-8 text-center text-sm text-muted-foreground transition-all">
+                放开以创建新会话
+              </div>
+            )}
           </div>
         )}
       </div>

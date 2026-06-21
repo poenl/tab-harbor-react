@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from '@/i18n'
-import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
+import { getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 export interface NavItem {
@@ -16,6 +16,14 @@ interface GroupNavProps {
 }
 
 // ── 圆点图标（网站图标 → 首字母） ──
+function isLocalhost(url: string) {
+  try {
+    return new URL(url).hostname === 'localhost'
+  } catch {
+    return false
+  }
+}
+
 function GroupIcon({ item }: { item: NavItem }) {
   const label = item.label
   const [imgError, setImgError] = useState(false)
@@ -30,7 +38,7 @@ function GroupIcon({ item }: { item: NavItem }) {
 
   const fallbackLabel = getFallbackLabel(label, preferredTab?.url || label)
 
-  if (preferredTab?.favIconUrl && !imgError) {
+  if (preferredTab?.favIconUrl && !imgError && !isLocalhost(preferredTab.favIconUrl)) {
     return (
       <img
         src={preferredTab.favIconUrl}
@@ -40,30 +48,6 @@ function GroupIcon({ item }: { item: NavItem }) {
         className="w-5 h-5 rounded-xs object-contain"
       />
     )
-  }
-
-  if (preferredTab?.url && !imgError) {
-    const sources = getIconSources(preferredTab.url, 32)
-    if (sources[0]) {
-      return (
-        <img
-          src={sources[0]}
-          alt=""
-          draggable={false}
-          data-fallback-src={sources[1]}
-          onError={(e) => {
-            const fallback = (e.currentTarget as HTMLImageElement).getAttribute('data-fallback-src')
-            if (fallback) {
-              e.currentTarget.src = fallback
-              e.currentTarget.removeAttribute('data-fallback-src')
-            } else {
-              setImgError(true)
-            }
-          }}
-          className="w-5 h-5 rounded-xs object-contain"
-        />
-      )
-    }
   }
 
   return (
