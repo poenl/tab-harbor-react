@@ -4,6 +4,7 @@ import type { QuickShortcut } from '@/stores/quickShortcuts'
 import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { X } from 'lucide-react'
 
 export interface ShortcutEditorData {
@@ -215,12 +216,12 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
               </div>
             )}
             {iconKind === 'svg' && (
-              <textarea
+              <Textarea
                 value={svgCode}
                 onChange={(e) => setSvgCode(e.target.value)}
                 placeholder={t('shortcutSvgCode')}
                 rows={4}
-                className="w-full text-xs bg-card border border-border/50 rounded-xl px-3 py-2.5 text-foreground outline-none focus:border-primary/50 resize-none font-mono"
+                className="w-full text-xs bg-card border-border/50 rounded-xl px-3 py-2.5 text-foreground outline-none focus:border-primary/50 resize-none font-mono shadow-none focus-visible:ring-0 focus-visible:border-primary/50 min-h-0"
               />
             )}
           </div>

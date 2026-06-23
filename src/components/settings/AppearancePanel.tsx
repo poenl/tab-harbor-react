@@ -5,13 +5,9 @@ import { THEME_PALETTES } from '@/constants/preferences'
 import type { ThemePaletteId, ThemeMode } from '@/constants/preferences'
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
-
-export function SectionDivider() {
-  return (
-    <div className="border-t border-[color-mix(in_srgb,var(--accent)_18%,transparent)] mt-3.5 pt-3.5" />
-  )
-}
+import { Separator } from '@/components/ui/separator'
 
 export function InlineSelect({
   options,
@@ -38,14 +34,6 @@ export function InlineSelect({
         </button>
       ))}
     </div>
-  )
-}
-
-export function ThemeLabel({ children }: { children: string }) {
-  return (
-    <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
-      {children}
-    </span>
   )
 }
 
@@ -111,7 +99,9 @@ export function AppearancePanel() {
       {/* ── 外观模式 ── */}
       <div className="theme-menu-section">
         <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('appearanceMode')}</ThemeLabel>
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+            {t('appearanceMode')}
+          </Label>
           <InlineSelect
             options={[
               { key: 'system', label: t('themeModeSystem') },
@@ -126,9 +116,11 @@ export function AppearancePanel() {
 
       {/* ── 桌面配色 ── */}
       <div className="theme-menu-section">
-        <SectionDivider />
+        <Separator className="my-3.5" />
 
-        <ThemeLabel>{t('deskPalette')}</ThemeLabel>
+        <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          {t('deskPalette')}
+        </Label>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(128px,1fr))] gap-2">
           {(Object.entries(THEME_PALETTES) as [ThemePaletteId, { name: string }][]).map(
             ([id, palette]) => (
@@ -147,9 +139,11 @@ export function AppearancePanel() {
 
       {/* ── 桌面背景 ── */}
       <div className="theme-menu-section">
-        <SectionDivider />
+        <Separator className="my-3.5" />
 
-        <ThemeLabel>{t('deskBackdrop')}</ThemeLabel>
+        <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          {t('deskBackdrop')}
+        </Label>
         <div className="flex gap-2.5">
           <Button
             variant="secondary"
@@ -187,10 +181,12 @@ export function AppearancePanel() {
 
       {/* ── 语言 ── */}
       <div className="theme-menu-section">
-        <SectionDivider />
+        <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('languageLabel')}</ThemeLabel>
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+            {t('languageLabel')}
+          </Label>
           <div className="flex flex-1 justify-end flex-wrap gap-[10px_14px]">
             {[
               { key: 'auto', label: t('languageAuto') },
@@ -219,10 +215,12 @@ export function AppearancePanel() {
 
       {/* ── 透明度 ── */}
       <div className="theme-menu-section">
-        <SectionDivider />
+        <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('surfaceOpacity')}</ThemeLabel>
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+            {t('surfaceOpacity')}
+          </Label>
           <div className="flex items-center gap-2 flex-1 justify-end">
             <Slider
               value={[preferences.surfaceOpacity]}
@@ -243,10 +241,12 @@ export function AppearancePanel() {
 
       {/* ── 文字大小 ── */}
       <div className="theme-menu-section">
-        <SectionDivider />
+        <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('uiScaleLabel')}</ThemeLabel>
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+            {t('uiScaleLabel')}
+          </Label>
           <div className="flex items-center gap-2 flex-1 justify-end">
             <Slider
               value={[preferences.uiScale]}
@@ -267,10 +267,12 @@ export function AppearancePanel() {
 
       {/* ── 快捷键大小 ── */}
       <div className="theme-menu-section">
-        <SectionDivider />
+        <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('shortcutScaleLabel')}</ThemeLabel>
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+            {t('shortcutScaleLabel')}
+          </Label>
           <div className="flex items-center gap-2 flex-1 justify-end">
             <Slider
               value={[preferences.shortcutScale]}

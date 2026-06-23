@@ -203,7 +203,13 @@ export const en = {
   tabScopeCurrentWindow: 'Current window',
   tabScopeAllWindows: 'All windows',
   tabOutDupeBannerText: 'You have {{count}} Tab Harbor tabs open. Keep just this one?',
-  tabOutDupeBannerCloseExtras: 'Close extras'
+  tabOutDupeBannerCloseExtras: 'Close extras',
+  bookmarksBarLabel: 'Bookmarks bar',
+  bookmarksBarSizeLabel: 'Bar size',
+  bookmarksBarSizeCompact: 'Compact',
+  bookmarksBarSizeNormal: 'Normal',
+  bookmarksBarSizeLarge: 'Large',
+  bookmarkOpenModeLabel: 'Open bookmarks'
 } as const
 
 export type TranslationKey = keyof typeof en

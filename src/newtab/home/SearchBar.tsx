@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react'
 import { Search } from 'lucide-react'
 import { useTranslation } from '@/i18n'
+import { Input } from '@/components/ui/input'
 
 async function runDefaultSearch(query: string) {
   const text = query.trim()
@@ -31,14 +32,14 @@ export function SearchBar() {
       {/* ── 圆角外壳（聚焦时高亮边框 + 阴影） ── */}
       <div className="flex items-center gap-2.5 w-full min-h-12 px-3.5 rounded-full border border-border bg-card transition-all duration-200 focus-within:border-ring focus-within:shadow-[0_14px_28px_var(--tw-shadow-color)] focus-within:shadow-primary/15">
         <Search strokeWidth={1.8} className="w-4 h-4 text-primary shrink-0" />
-        <input
+        <Input
           name="q"
           type="search"
           placeholder={t('searchPlaceholder')}
           autoComplete="off"
           spellCheck={false}
           aria-label={t('searchAriaLabel')}
-          className="flex-1 text-base text-foreground bg-transparent border-none outline-none min-w-0 placeholder:text-muted-foreground/80"
+          className="flex-1 text-base text-foreground bg-transparent border-none outline-none min-w-0 placeholder:text-muted-foreground/80 shadow-none focus-visible:ring-0"
         />
       </div>
     </form>

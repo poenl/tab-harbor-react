@@ -42,6 +42,14 @@ export const useThemeStore = create<ThemeStore>()(
         }
       })),
       partialize: (state) => ({ preferences: state.preferences }),
+      merge: (persisted: unknown, current: ThemeStore) => {
+        const p = persisted as Partial<ThemeStore> | undefined
+        return {
+          ...current,
+          ...p,
+          preferences: { ...current.preferences, ...p?.preferences }
+        }
+      },
       onRehydrateStorage: () => () => {
         useThemeStore.setState({ ready: true })
       }

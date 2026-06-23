@@ -1,46 +1,12 @@
 import { useTranslation } from '@/i18n'
 import { useTheme } from '@/stores/theme'
-import type { TabScope } from '@/constants/preferences'
+import type { TabScope, BookmarksBarSize, BookmarkOpenMode } from '@/constants/preferences'
 import { toast } from 'sonner'
 import { closeDuplicateNewTabs } from '@/utils/close-duplicate-tabs'
-import { InlineSelect, SectionDivider, ThemeLabel } from './AppearancePanel'
-
-function ToggleSwitch({
-  pressed,
-  onToggle,
-  label
-}: {
-  pressed: boolean
-  onToggle: () => void
-  label: string
-}) {
-  return (
-    <div className="theme-menu-section">
-      <label className="flex items-center gap-2.5 cursor-pointer select-none">
-        <button
-          type="button"
-          role="switch"
-          aria-checked={pressed}
-          onClick={onToggle}
-          className={`relative w-9 h-5 rounded-full border transition-all duration-200 shrink-0 p-0 ${
-            pressed
-              ? 'bg-accent border-transparent'
-              : 'bg-[color-mix(in_srgb,var(--border)_40%,var(--muted)_60%)] border-[color-mix(in_srgb,var(--border)_40%,transparent)]'
-          }`}
-        >
-          <span
-            className={`absolute top-[1.5px] left-[1.5px] size-4 rounded-full bg-card shadow-sm transition-transform duration-200 ease-out ${
-              pressed ? 'translate-x-4' : ''
-            }`}
-          />
-        </button>
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
-          {label}
-        </span>
-      </label>
-    </div>
-  )
-}
+import { InlineSelect } from './AppearancePanel'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
 
 export function FeaturesPanel() {
   const { t } = useTranslation()
@@ -48,42 +14,64 @@ export function FeaturesPanel() {
 
   return (
     <div className="flex flex-col gap-0">
-      <ToggleSwitch
-        pressed={preferences.hitokotoEnabled}
-        onToggle={() => updatePreferences({ hitokotoEnabled: !preferences.hitokotoEnabled })}
-        label={t('hitokotoLabel')}
-      />
+      <div className="theme-menu-section">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <Switch
+            checked={preferences.hitokotoEnabled}
+            onCheckedChange={() =>
+              updatePreferences({ hitokotoEnabled: !preferences.hitokotoEnabled })
+            }
+          />
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+            {t('hitokotoLabel')}
+          </span>
+        </label>
+      </div>
 
-      <SectionDivider />
+      <Separator className="my-3.5" />
 
-      <ToggleSwitch
-        pressed={preferences.sleepControlEnabled}
-        onToggle={() =>
-          updatePreferences({ sleepControlEnabled: !preferences.sleepControlEnabled })
-        }
-        label={t('sleepControlLabel')}
-      />
+      <div className="theme-menu-section">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <Switch
+            checked={preferences.sleepControlEnabled}
+            onCheckedChange={() =>
+              updatePreferences({ sleepControlEnabled: !preferences.sleepControlEnabled })
+            }
+          />
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+            {t('sleepControlLabel')}
+          </span>
+        </label>
+      </div>
 
-      <SectionDivider />
+      <Separator className="my-3.5" />
 
-      <ToggleSwitch
-        pressed={preferences.closeDuplicateNewTabsEnabled}
-        onToggle={async () => {
-          const next = !preferences.closeDuplicateNewTabsEnabled
-          await updatePreferences({ closeDuplicateNewTabsEnabled: next })
-          if (next) {
-            const count = await closeDuplicateNewTabs()
-            if (count > 0) toast(t('toastClosedDuplicatesKeptOne'))
-          }
-        }}
-        label={t('closeDuplicateNewTabsLabel')}
-      />
+      <div className="theme-menu-section">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <Switch
+            checked={preferences.closeDuplicateNewTabsEnabled}
+            onCheckedChange={async () => {
+              const next = !preferences.closeDuplicateNewTabsEnabled
+              await updatePreferences({ closeDuplicateNewTabsEnabled: next })
+              if (next) {
+                const count = await closeDuplicateNewTabs()
+                if (count > 0) toast(t('toastClosedDuplicatesKeptOne'))
+              }
+            }}
+          />
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+            {t('closeDuplicateNewTabsLabel')}
+          </span>
+        </label>
+      </div>
 
-      <SectionDivider />
+      <Separator className="my-3.5" />
 
       <div className="theme-menu-section">
         <div className="flex items-center justify-between gap-2.5">
-          <ThemeLabel>{t('tabScopeLabel')}</ThemeLabel>
+          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+            {t('tabScopeLabel')}
+          </Label>
           <InlineSelect
             options={[
               { key: 'current-window', label: t('tabScopeCurrentWindow') },
@@ -93,6 +81,57 @@ export function FeaturesPanel() {
             onChange={(v) => updatePreferences({ tabScope: v as TabScope })}
           />
         </div>
+      </div>
+
+      <Separator className="my-3.5" />
+
+      <div className="flex flex-col gap-2.5">
+        <div className="theme-menu-section">
+          <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <Switch
+              checked={preferences.bookmarksBarEnabled}
+              onCheckedChange={() =>
+                updatePreferences({ bookmarksBarEnabled: !preferences.bookmarksBarEnabled })
+              }
+            />
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+              {t('bookmarksBarLabel')}
+            </span>
+          </label>
+        </div>
+
+        {preferences.bookmarksBarEnabled && (
+          <div className="theme-menu-section">
+            <div className="flex items-center justify-between gap-2.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+                {t('bookmarksBarSizeLabel')}
+              </Label>
+              <InlineSelect
+                options={[
+                  { key: 'compact', label: t('bookmarksBarSizeCompact') },
+                  { key: 'normal', label: t('bookmarksBarSizeNormal') },
+                  { key: 'large', label: t('bookmarksBarSizeLarge') }
+                ]}
+                value={preferences.bookmarksBarSize}
+                onChange={(v) => updatePreferences({ bookmarksBarSize: v as BookmarksBarSize })}
+              />
+            </div>
+            <Separator className="my-3.5" />
+            <div className="flex items-center justify-between gap-2.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+                {t('bookmarkOpenModeLabel')}
+              </Label>
+              <InlineSelect
+                options={[
+                  { key: 'new-tab', label: t('savedSessionRestoreModeCurrentWindow') },
+                  { key: 'current-tab', label: t('savedSessionRestoreModeNewWindow') }
+                ]}
+                value={preferences.bookmarkOpenMode}
+                onChange={(v) => updatePreferences({ bookmarkOpenMode: v as BookmarkOpenMode })}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

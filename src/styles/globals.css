@@ -378,3 +378,29 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+/* 自定义类 */
+@layer utilities {
+  /* 背景模糊 */
+  .blur-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    background: color-mix(
+      in srgb,
+      var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6),
+      transparent
+    );
+
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+
+    pointer-events: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

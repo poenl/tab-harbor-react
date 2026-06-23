@@ -4,7 +4,6 @@ import { useTheme } from '@/stores/theme'
 import { getTabQuery } from '@/utils/tabs'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ShortcutEditorForm } from './ShortcutEditorDialog.tsx'
@@ -231,11 +230,11 @@ export function TabPicker({ onClose }: TabPickerProps) {
               {/* ── 搜索栏 ── */}
               <div className="flex items-center gap-2 px-3.5 pb-2.5 shrink-0">
                 <Search strokeWidth={1.8} className="size-3.5 text-muted-foreground shrink-0" />
-                <input
+                <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={t('tabPickerSearchPlaceholder')}
-                  className="flex-1 border-none bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+                  className="flex-1 border-none bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground shadow-none focus-visible:ring-0 h-auto p-0"
                 />
               </div>
 

@@ -6,6 +6,10 @@ export type SavedSessionNavDisplayMode = 'icon' | 'name'
 
 export type TabScope = 'current-window' | 'all-windows'
 
+export type BookmarksBarSize = 'compact' | 'normal' | 'large'
+
+export type BookmarkOpenMode = 'new-tab' | 'current-tab'
+
 export interface ThemePreferences {
   mode: ThemeMode
   paletteId: ThemePaletteId
@@ -19,6 +23,9 @@ export interface ThemePreferences {
   savedSessionRestoreMode: 'current-window' | 'new-window'
   savedSessionNavDisplayMode: SavedSessionNavDisplayMode
   tabScope: TabScope
+  bookmarksBarEnabled: boolean
+  bookmarksBarSize: BookmarksBarSize
+  bookmarkOpenMode: BookmarkOpenMode
 }
 
 export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {
@@ -33,7 +40,10 @@ export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {
   closeDuplicateNewTabsEnabled: false,
   savedSessionRestoreMode: 'new-window',
   savedSessionNavDisplayMode: 'name',
-  tabScope: 'current-window'
+  tabScope: 'current-window',
+  bookmarksBarEnabled: false,
+  bookmarksBarSize: 'normal',
+  bookmarkOpenMode: 'new-tab'
 }
 
 function getSystemTone(): 'light' | 'dark' {

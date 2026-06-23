@@ -7,7 +7,7 @@ export default defineConfig({
   entrypointsDir: '.',
   manifest: {
     name: 'Tab Harbor',
-    permissions: ['tabs', 'storage', 'tabGroups'],
+    permissions: ['tabs', 'storage', 'tabGroups', 'bookmarks', 'favicon'],
     host_permissions: ['<all_urls>']
   },
   vite: () => ({

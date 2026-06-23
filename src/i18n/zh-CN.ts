@@ -201,5 +201,11 @@ export const zhCN: Record<TranslationKey, string> = {
   tabScopeCurrentWindow: '当前窗口',
   tabScopeAllWindows: '全部窗口',
   tabOutDupeBannerText: '已打开 {{count}} 个 Tab Harbor 标签页，保留当前这个？',
-  tabOutDupeBannerCloseExtras: '关闭多余标签页'
+  tabOutDupeBannerCloseExtras: '关闭多余标签页',
+  bookmarksBarLabel: '书签栏',
+  bookmarksBarSizeLabel: '书签栏尺寸',
+  bookmarksBarSizeCompact: '紧凑',
+  bookmarksBarSizeNormal: '适中',
+  bookmarksBarSizeLarge: '大',
+  bookmarkOpenModeLabel: '打开书签'
 }
