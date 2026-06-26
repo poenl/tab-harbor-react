@@ -21,7 +21,7 @@ export function Footer({ totalTabs }: FooterProps) {
       <div className="text-muted-foreground text-xs">
         <span>
           <a
-            href="https://github.com/V-IOLE-T/tab-harbor"
+            href="https://github.com/poenl/tab-harbor-react"
             target="_blank"
             className="text-primary no-underline hover:underline"
           >
@@ -29,11 +29,11 @@ export function Footer({ totalTabs }: FooterProps) {
           </a>{' '}
           {t('byAuthor')}{' '}
           <a
-            href="https://github.com/V-IOLE-T"
+            href="https://github.com/poenl"
             target="_blank"
             className="text-primary no-underline hover:underline"
           >
-            OO
+            poenl
           </a>
         </span>
       </div>
