@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
-import { getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
+import { Favicon } from '@/components/favicon'
 import { Moon, Archive, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -25,37 +24,6 @@ interface TabChipProps {
 
   // Duplicate count
   dupeCount?: number
-}
-
-// ── 网站图标（favicon → 首字母） ──
-function isLocalhost(url: string) {
-  try {
-    return new URL(url).hostname === 'localhost'
-  } catch {
-    return false
-  }
-}
-
-function Favicon({ tab }: { tab: OpenTab }) {
-  const [imgError, setImgError] = useState(false)
-
-  if (tab.favIconUrl && !imgError && !isLocalhost(tab.favIconUrl)) {
-    return (
-      <img
-        src={tab.favIconUrl}
-        alt=""
-        className="w-3.5 h-3.5 rounded-xs shrink-0"
-        onError={() => setImgError(true)}
-      />
-    )
-  }
-
-  const fallbackLabel = getFallbackLabel(tab.title, tab.url)
-  return (
-    <span className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-[9px] font-bold shrink-0 text-primary bg-secondary">
-      {fallbackLabel.slice(0, 2)}
-    </span>
-  )
 }
 
 export function TabChip({
@@ -84,7 +52,7 @@ export function TabChip({
         {mode === 'select' && (
           <Checkbox checked={!!selected} onCheckedChange={() => onToggle?.(tab.id)} />
         )}
-        <Favicon tab={tab} />
+        <Favicon tab={tab} imgCls="w-3.5 h-3.5" fallbackCls="w-3.5 h-3.5 text-[9px]" />
 
         <span className={cn('truncate flex-1', tab.discarded && 'text-muted-foreground/40')}>
           {tab.title || t('untitledTab')}

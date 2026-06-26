@@ -451,7 +451,10 @@ export function BookmarksBar() {
           )}
         </nav>
       </div>
-      <div className="shrink-0 max-[960px]:hidden" style={{ height: SIZE_HEIGHT[size] + 'px' }}></div>
+      <div
+        className="shrink-0 max-[960px]:hidden"
+        style={{ height: SIZE_HEIGHT[size] + 'px' }}
+      ></div>
     </>
   )
 }

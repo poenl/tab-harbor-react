@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { useTranslation } from '@/i18n'
-import { getFallbackLabel } from '@/newtab/utils/icon-utils.ts'
+import { GroupIcon } from '@/components/group-icon'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 export interface NavItem {
@@ -13,48 +12,6 @@ interface GroupNavProps {
   items: NavItem[]
   onNavigate?: (id: string) => void
   variant?: 'icon' | 'name'
-}
-
-// ── 圆点图标（网站图标 → 首字母） ──
-function isLocalhost(url: string) {
-  try {
-    return new URL(url).hostname === 'localhost'
-  } catch {
-    return false
-  }
-}
-
-function GroupIcon({ item }: { item: NavItem }) {
-  const label = item.label
-  const [imgError, setImgError] = useState(false)
-
-  const preferredTab =
-    item.tabs.find((t) => {
-      const url = t.favIconUrl || ''
-      return url.startsWith('https://') || url.startsWith('data:')
-    }) ||
-    item.tabs.find((t) => t.url) ||
-    item.tabs[0]
-
-  const fallbackLabel = getFallbackLabel(label, preferredTab?.url || label)
-
-  if (preferredTab?.favIconUrl && !imgError && !isLocalhost(preferredTab.favIconUrl)) {
-    return (
-      <img
-        src={preferredTab.favIconUrl}
-        alt=""
-        draggable={false}
-        onError={() => setImgError(true)}
-        className="w-5 h-5 rounded-xs object-contain"
-      />
-    )
-  }
-
-  return (
-    <span className="w-5 h-5 rounded-full inline-flex items-center justify-center text-[9px] font-bold text-primary bg-secondary">
-      {fallbackLabel.slice(0, 2)}
-    </span>
-  )
 }
 
 export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps) {
@@ -86,7 +43,12 @@ export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps)
                   draggable={false}
                   className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
                 >
-                  <GroupIcon item={item} />
+                  <GroupIcon
+                    tabs={item.tabs}
+                    label={item.label}
+                    imgCls="w-5 h-5 rounded-xs"
+                    fallbackCls="w-5 h-5 rounded-full text-[9px]"
+                  />
                 </button>
               )}
             </TooltipTrigger>
