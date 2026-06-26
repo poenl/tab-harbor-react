@@ -1,5 +1,5 @@
 import { useTranslation } from '@/i18n'
-import { getGreeting, getDateDisplay } from '@/newtab/utils/domain-grouping.ts'
+import { getGreeting, getDateDisplay } from '@/newtab/utils/time.ts'
 
 const GREETING_KEY: Record<string, string> = {
   'Good morning': 'greetingMorning',

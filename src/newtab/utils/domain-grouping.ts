@@ -1,3 +1,4 @@
+// 标准化的标签页数据
 export interface OpenTab {
   id: number
   url: string
@@ -8,6 +9,7 @@ export interface OpenTab {
   discarded: boolean
 }
 
+// 按域名分组后的集合
 export interface DomainGroup {
   domain: string
   label?: string
@@ -15,46 +17,9 @@ export interface DomainGroup {
   isManual?: boolean
 }
 
-const FRIENDLY_DOMAINS: Record<string, string> = {
-  'github.com': 'GitHub',
-  'mail.google.com': 'Gmail',
-  'x.com': 'X',
-  'twitter.com': 'X',
-  'www.youtube.com': 'YouTube',
-  'www.linkedin.com': 'LinkedIn',
-  'www.reddit.com': 'Reddit',
-  'news.ycombinator.com': 'Hacker News',
-  'stackoverflow.com': 'Stack Overflow',
-  'discord.com': 'Discord',
-  'chatgpt.com': 'ChatGPT',
-  'chat.openai.com': 'ChatGPT',
-  'claude.ai': 'Claude',
-  'notion.so': 'Notion',
-  'linear.app': 'Linear',
-  'figma.com': 'Figma',
-  'vercel.com': 'Vercel',
-  'netlify.com': 'Netlify',
-  'medium.com': 'Medium',
-  'dev.to': 'Dev.to',
-  'dribbble.com': 'Dribbble',
-  'npmjs.com': 'npm',
-  'docs.google.com': 'Google Docs',
-  'drive.google.com': 'Google Drive',
-  'meet.google.com': 'Google Meet',
-  'calendar.google.com': 'Google Calendar',
-  'slack.com': 'Slack',
-  'trello.com': 'Trello',
-  'miro.com': 'Miro',
-  'codepen.io': 'CodePen',
-  'codesandbox.io': 'CodeSandbox',
-  'observablehq.com': 'Observable',
-  'wikipedia.org': 'Wikipedia'
-}
-
+// 将 hostname 转为可读标签
 function friendlyDomain(hostname: string): string {
   if (!hostname) return ''
-
-  if (FRIENDLY_DOMAINS[hostname]) return FRIENDLY_DOMAINS[hostname]
 
   if (hostname.endsWith('.substack.com') && hostname !== 'substack.com') {
     const name = hostname.replace('.substack.com', '')
@@ -75,42 +40,6 @@ function friendlyDomain(hostname: string): string {
     .join(' ')
 }
 
-export function getGreeting(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 17) return 'Good afternoon'
-  return 'Good evening'
-}
-
-const WEEKDAYS = [
-  'SUNDAY',
-  'MONDAY',
-  'TUESDAY',
-  'WEDNESDAY',
-  'THURSDAY',
-  'FRIDAY',
-  'SATURDAY'
-] as const
-const MONTHS = [
-  'JAN',
-  'FEB',
-  'MAR',
-  'APR',
-  'MAY',
-  'JUN',
-  'JUL',
-  'AUG',
-  'SEP',
-  'OCT',
-  'NOV',
-  'DEC'
-] as const
-
-export function getDateDisplay(): string {
-  const d = new Date()
-  return `${WEEKDAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`
-}
-
 interface ChromeTab {
   id?: number
   url?: string
@@ -121,45 +50,7 @@ interface ChromeTab {
   discarded?: boolean
 }
 
-interface LandingPattern {
-  hostname?: string
-  hostnameEndsWith?: string
-  test?: (pathname: string, url: string) => boolean
-  pathPrefix?: string
-  pathExact?: string[]
-}
-
-const LANDING_PAGE_PATTERNS: LandingPattern[] = [
-  {
-    hostname: 'mail.google.com',
-    test: (p, h) => !h.includes('#inbox/') && !h.includes('#sent/') && !h.includes('#search/')
-  },
-  { hostname: 'x.com', pathExact: ['/home'] },
-  { hostname: 'www.linkedin.com', pathExact: ['/'] },
-  { hostname: 'github.com', pathExact: ['/'] },
-  { hostname: 'www.youtube.com', pathExact: ['/'] }
-]
-
-function isLandingPage(url: string): boolean {
-  try {
-    const parsed = new URL(url)
-    return LANDING_PAGE_PATTERNS.some((p) => {
-      const hostnameMatch = p.hostname
-        ? parsed.hostname === p.hostname
-        : p.hostnameEndsWith
-          ? parsed.hostname.endsWith(p.hostnameEndsWith)
-          : false
-      if (!hostnameMatch) return false
-      if (p.test) return p.test(parsed.pathname, url)
-      if (p.pathPrefix) return parsed.pathname.startsWith(p.pathPrefix)
-      if (p.pathExact) return p.pathExact.includes(parsed.pathname)
-      return parsed.pathname === '/'
-    })
-  } catch {
-    return false
-  }
-}
-
+// 提取主域名（处理 .co.uk 等双段 TLD）
 function getPrimaryDomain(hostname: string): string {
   const parts = hostname.split('.')
   if (parts.length <= 2) return hostname
@@ -171,6 +62,7 @@ function getPrimaryDomain(hostname: string): string {
   return parts.slice(-2).join('.')
 }
 
+// 排除浏览器内部页面
 function isRealTab(tab: OpenTab): boolean {
   const url = tab.url || ''
   return (
@@ -182,6 +74,7 @@ function isRealTab(tab: OpenTab): boolean {
   )
 }
 
+// 补全标签页缺失字段
 export function normalizeTab(t: ChromeTab): OpenTab {
   return {
     id: t.id ?? 0,
@@ -194,6 +87,7 @@ export function normalizeTab(t: ChromeTab): OpenTab {
   }
 }
 
+// 按主域名分组，组间按浏览器标签栏顺序排列
 export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   const seen = new Set<number>()
   const realTabs = tabs.filter((t) => {
@@ -203,19 +97,18 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   })
 
   const groupMap: Record<string, DomainGroup> = {}
-  const landingTabs: OpenTab[] = []
+  const domainOrder = new Map<string, number>()
+  let orderIdx = 0
 
   for (const tab of realTabs) {
-    if (isLandingPage(tab.url)) {
-      landingTabs.push(tab)
-      continue
-    }
-
     try {
       let hostname: string
       if (tab.url.startsWith('file://')) {
         hostname = 'local-files'
-        groupMap[hostname] = { domain: hostname, tabs: [], label: 'Local Files' }
+        if (!groupMap[hostname]) {
+          groupMap[hostname] = { domain: hostname, tabs: [], label: 'Local Files' }
+          domainOrder.set(hostname, orderIdx++)
+        }
         groupMap[hostname].tabs.push(tab)
         continue
       } else {
@@ -224,6 +117,7 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
 
       if (!groupMap[hostname]) {
         groupMap[hostname] = { domain: hostname, tabs: [] }
+        domainOrder.set(hostname, orderIdx++)
       }
       groupMap[hostname].tabs.push(tab)
     } catch {
@@ -231,26 +125,9 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
     }
   }
 
-  if (landingTabs.length > 0) {
-    groupMap['__landing-pages__'] = {
-      domain: '__landing-pages__',
-      tabs: landingTabs,
-      label: 'Landing Pages'
-    }
-  }
-
-  const landingHostnames = new Set(LANDING_PAGE_PATTERNS.map((p) => p.hostname).filter(Boolean))
-
-  const groups = Object.values(groupMap).sort((a, b) => {
-    if (a.domain === '__landing-pages__') return -1
-    if (b.domain === '__landing-pages__') return 1
-
-    const aIsPriority = landingHostnames.has(a.domain)
-    const bIsPriority = landingHostnames.has(b.domain)
-    if (aIsPriority !== bIsPriority) return aIsPriority ? -1 : 1
-
-    return b.tabs.length - a.tabs.length
-  })
+  const groups = Object.values(groupMap).sort(
+    (a, b) => (domainOrder.get(a.domain) ?? 0) - (domainOrder.get(b.domain) ?? 0)
+  )
 
   for (const group of groups) {
     if (!group.label) {
