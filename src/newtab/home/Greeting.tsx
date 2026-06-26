@@ -14,10 +14,10 @@ export function Greeting() {
   return (
     // ── 问候语 + 日期 ──
     <div>
-      <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-none text-foreground whitespace-nowrap m-0">
+      <h1 className="text-foreground m-0 font-serif text-4xl leading-none font-normal tracking-[-0.02em] whitespace-nowrap">
         {t(GREETING_KEY[greeting] as any)}
       </h1>
-      <div className="text-xs font-semibold tracking-[0.18em] uppercase leading-none text-muted-foreground mt-4.5">
+      <div className="text-muted-foreground mt-4.5 text-xs leading-none font-semibold tracking-[0.18em] uppercase">
         {getDateDisplay()}
       </div>
     </div>

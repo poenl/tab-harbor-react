@@ -29,14 +29,14 @@ function TabFavicon({ tab }: { tab: BrowserTab }) {
       <img
         src={tab.favIconUrl}
         alt=""
-        className="size-4 rounded-xs shrink-0"
+        className="size-4 shrink-0 rounded-xs"
         onError={() => setImgError(true)}
       />
     )
   }
 
   return (
-    <span className="size-4 rounded-full inline-flex items-center justify-center text-[8px] font-bold shrink-0 bg-accent/10 text-accent">
+    <span className="bg-accent/10 text-accent inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold">
       {initial}
     </span>
   )
@@ -66,7 +66,7 @@ function TabRow({
 }) {
   return (
     <div
-      className={`group flex items-center gap-2 rounded-[10px] py-1.5 px-2.5 text-xs leading-[1.4] cursor-pointer transition-colors duration-150 ${selected ? 'bg-accent/8' : 'hover:bg-accent/4'}`}
+      className={`group flex cursor-pointer items-center gap-2 rounded-[10px] px-2.5 py-1.5 text-xs leading-[1.4] transition-colors duration-150 ${selected ? 'bg-accent/8' : 'hover:bg-accent/4'}`}
     >
       <Checkbox
         checked={selected}
@@ -74,16 +74,16 @@ function TabRow({
         className="size-4 rounded-lg border-[1.5px]"
       />
       <TabFavicon tab={tab} />
-      <span className="flex-1 min-w-0 truncate text-foreground">{tab.title || tab.url}</span>
+      <span className="text-foreground min-w-0 flex-1 truncate">{tab.title || tab.url}</span>
       {alreadyAdded ? (
-        <Check strokeWidth={2.5} className="size-4 text-accent/70 shrink-0" />
+        <Check strokeWidth={2.5} className="text-accent/70 size-4 shrink-0" />
       ) : (
         <button
           onClick={(e) => {
             e.stopPropagation()
             onAddSingle?.(tab)
           }}
-          className="size-6 p-0 rounded-full border-none bg-accent/10 text-accent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 cursor-pointer shrink-0"
+          className="bg-accent/10 text-accent flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full border-none p-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
         >
           <Plus strokeWidth={2.5} className="size-3.5" />
         </button>
@@ -185,24 +185,24 @@ export function TabPicker({ onClose }: TabPickerProps) {
   return (
     <>
       {/* ── 遮罩 ── */}
-      <div className="fixed inset-0 z-50 bg-foreground/6" onClick={onClose} />
+      <div className="bg-foreground/6 fixed inset-0 z-50" onClick={onClose} />
 
       {/* ── 面板 ── */}
       <div
-        className="fixed bottom-6 right-6 z-50 w-80 h-[min(480px,calc(100vh-80px))] backdrop-blur-xl border border-border rounded-[18px] shadow-[0_20px_42px_var(--tw-shadow-color)] shadow-accent/10 flex flex-col overflow-hidden"
+        className="border-border shadow-accent/10 fixed right-6 bottom-6 z-50 flex h-[min(480px,calc(100vh-80px))] w-80 flex-col overflow-hidden rounded-[18px] border shadow-[0_20px_42px_var(--tw-shadow-color)] backdrop-blur-xl"
         style={{
           backgroundColor:
             'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
         }}
       >
         {/* ── 头部 ── */}
-        <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 shrink-0">
+        <div className="flex shrink-0 items-center justify-between gap-3 px-4 pt-2.5 pb-2">
           <div className="tab-picker-view-switch flex gap-4" role="tablist">
             <button
               onClick={() => setMode('tabs')}
               role="tab"
               aria-selected={mode === 'tabs'}
-              className={`text-base font-serif leading-[1.05] border-none bg-transparent p-0 cursor-pointer transition-colors ${mode === 'tabs' ? 'text-foreground underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] underline-offset-[0.24em] decoration-[1.5px]' : 'text-muted-foreground/60 hover:text-foreground'}`}
+              className={`cursor-pointer border-none bg-transparent p-0 font-serif text-base leading-[1.05] transition-colors ${mode === 'tabs' ? 'text-foreground underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-[1.5px] underline-offset-[0.24em]' : 'text-muted-foreground/60 hover:text-foreground'}`}
             >
               {t('tabPickerTitle')}
             </button>
@@ -210,46 +210,46 @@ export function TabPicker({ onClose }: TabPickerProps) {
               onClick={() => setMode('url')}
               role="tab"
               aria-selected={mode === 'url'}
-              className={`text-base font-serif leading-[1.05] border-none bg-transparent p-0 cursor-pointer transition-colors ${mode === 'url' ? 'text-foreground underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] underline-offset-[0.24em] decoration-[1.5px]' : 'text-muted-foreground/60 hover:text-foreground'}`}
+              className={`cursor-pointer border-none bg-transparent p-0 font-serif text-base leading-[1.05] transition-colors ${mode === 'url' ? 'text-foreground underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-[1.5px] underline-offset-[0.24em]' : 'text-muted-foreground/60 hover:text-foreground'}`}
             >
               {t('addByUrlTitle')}
             </button>
           </div>
           <button
             onClick={onClose}
-            className="size-7 p-0 rounded-full border-none bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center shrink-0 hover:bg-muted/30 hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:bg-muted/30 hover:text-foreground flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0 transition-colors"
           >
             <X strokeWidth={2} className="size-3.5" />
           </button>
         </div>
 
         {/* ── 内容 ── */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {mode === 'tabs' && (
             <>
               {/* ── 搜索栏 ── */}
-              <div className="flex items-center gap-2 px-3.5 pb-2.5 shrink-0">
-                <Search strokeWidth={1.8} className="size-3.5 text-muted-foreground shrink-0" />
+              <div className="flex shrink-0 items-center gap-2 px-3.5 pb-2.5">
+                <Search strokeWidth={1.8} className="text-muted-foreground size-3.5 shrink-0" />
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={t('tabPickerSearchPlaceholder')}
-                  className="flex-1 border-none bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground shadow-none focus-visible:ring-0 h-auto p-0"
+                  className="text-foreground placeholder:text-muted-foreground h-auto flex-1 border-none bg-transparent p-0 text-xs shadow-none outline-none focus-visible:ring-0"
                 />
               </div>
 
               {/* ── 标签列表 ── */}
               <div className="flex-1 overflow-y-auto overscroll-contain px-1.5 pb-1">
                 {loading ? (
-                  <div className="p-6 text-xs text-muted-foreground text-center">
+                  <div className="text-muted-foreground p-6 text-center text-xs">
                     {t('loading')}
                   </div>
                 ) : groupedTabs.length === 0 ? (
-                  <div className="p-6 text-xs text-muted-foreground text-center">No tabs found</div>
+                  <div className="text-muted-foreground p-6 text-center text-xs">No tabs found</div>
                 ) : (
                   groupedTabs.map((group) => (
                     <div key={group.domain}>
-                      <div className="sticky top-0 z-1 text-[10px] font-bold tracking-[0.14em] uppercase text-muted-foreground px-2.5 py-2 bg-card/95">
+                      <div className="text-muted-foreground bg-card/95 sticky top-0 z-1 px-2.5 py-2 text-[10px] font-bold tracking-[0.14em] uppercase">
                         {group.domain}
                       </div>
                       {group.tabs.map((tab) => (
@@ -269,19 +269,19 @@ export function TabPicker({ onClose }: TabPickerProps) {
 
               {/* ── 底部栏 ── */}
               {selectedIds.size > 0 && (
-                <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[color-mix(in_srgb,var(--accent)_16%,transparent)] shrink-0">
-                  <span className="flex-1 text-xs text-muted-foreground">
+                <div className="flex shrink-0 items-center gap-2 border-t border-[color-mix(in_srgb,var(--accent)_16%,transparent)] px-3.5 py-2.5">
+                  <span className="text-muted-foreground flex-1 text-xs">
                     {selectedIds.size} selected
                   </span>
                   <button
                     onClick={handleClearSelection}
-                    className="text-xs font-medium bg-transparent text-muted-foreground p-1.5 rounded-[6px] border-none cursor-pointer hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md border-none bg-transparent p-1.5 text-xs font-medium transition-colors"
                   >
                     {t('clearSelection')}
                   </button>
                   <button
                     onClick={handleAddSelected}
-                    className="text-xs font-semibold bg-primary text-primary-foreground rounded-full px-3.5 py-1.5 border-none cursor-pointer transition-all hover:opacity-85"
+                    className="bg-primary text-primary-foreground cursor-pointer rounded-full border-none px-3.5 py-1.5 text-xs font-semibold transition-all hover:opacity-85"
                   >
                     {t('addLink')}
                   </button>
@@ -290,7 +290,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
             </>
           )}
           {mode === 'url' && (
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-hidden">
               <ShortcutEditorForm shortcut={null} onSave={handleSaveFromUrl} />
             </div>
           )}

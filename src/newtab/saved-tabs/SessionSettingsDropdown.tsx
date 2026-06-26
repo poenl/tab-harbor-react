@@ -20,7 +20,7 @@ export function SessionSettingsDropdown() {
           <PopoverTrigger asChild>
             <button
               aria-label={t('savedSessionSettings')}
-              className="p-0.75 rounded-full border-none bg-transparent cursor-pointer transition-colors duration-150 text-muted-foreground hover:text-foreground hover:bg-accent/10 data-[state=open]:text-accent data-[state=open]:bg-accent/10"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent/10 data-[state=open]:text-accent data-[state=open]:bg-accent/10 cursor-pointer rounded-full border-none bg-transparent p-0.75 transition-colors duration-150"
             >
               <svg
                 viewBox="0 0 1024 1024"
@@ -40,7 +40,7 @@ export function SessionSettingsDropdown() {
         side="bottom"
         align="end"
         sideOffset={8}
-        className="w-62 backdrop-blur-xl border border-border rounded-2xl shadow-lg p-4 bg-transparent ring-0 data-open:animate-none data-closed:animate-none"
+        className="border-border w-62 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl data-closed:animate-none data-open:animate-none"
         style={
           {
             backgroundColor:
@@ -50,7 +50,7 @@ export function SessionSettingsDropdown() {
       >
         {/* ── 默认打开方式 ── */}
         <div className="flex items-center justify-between gap-2.5">
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5">
+          <span className="text-muted-foreground pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('savedSessionRestoreModeLabel')}
           </span>
           <InlineSelect
@@ -64,8 +64,8 @@ export function SessionSettingsDropdown() {
         </div>
 
         {/* ── 顶部导航显示 ── */}
-        <div className="flex items-center justify-between gap-2.5 mt-3.5 pt-3.5 border-t border-border/18">
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5">
+        <div className="border-border/18 mt-3.5 flex items-center justify-between gap-2.5 border-t pt-3.5">
+          <span className="text-muted-foreground pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('savedSessionNavDisplayModeLabel')}
           </span>
           <InlineSelect

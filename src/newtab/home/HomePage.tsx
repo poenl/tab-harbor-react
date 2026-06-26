@@ -147,7 +147,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
       <TabOutDupeBanner />
 
       {/* ── 两列布局（左: 1.35fr = 标签列表 / 右: 0.95fr = 问候+搜索+快捷） ── */}
-      <div className="grid grid-cols-[1.35fr_0.95fr] gap-8 items-start max-[960px]:grid-cols-1 max-[960px]:gap-5">
+      <div className="grid grid-cols-[1.35fr_0.95fr] items-start gap-8 max-[960px]:grid-cols-1 max-[960px]:gap-5">
         {/* ── 左栏：打开标签页 ── */}
         <section className="min-w-0">
           <SectionHeader
@@ -165,7 +165,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
                         aria-label={t('sleepAllTabsButton')}
                         className="text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
                       >
-                        <Moon strokeWidth={1.8} className="w-4 h-4" />
+                        <Moon strokeWidth={1.8} className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="top">{t('sleepAllTabsButton')}</TooltipContent>
@@ -180,7 +180,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
                       aria-label={t('saveSessionButton')}
                       className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                     >
-                      <Archive strokeWidth={1.8} className="w-4 h-4" />
+                      <Archive strokeWidth={1.8} className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="top">{t('saveSessionButton')}</TooltipContent>
@@ -195,7 +195,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
                           aria-label={t('closeAllTabsButton')}
                           className="text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
                         >
-                          <X strokeWidth={1.8} className="w-4 h-4" />
+                          <X strokeWidth={1.8} className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>
                     </TooltipTrigger>

@@ -69,7 +69,7 @@ function toFlatNode(n: Browser.bookmarks.BookmarkTreeNode): FlatNode {
 
 function FaviconForUrl({ url, title, cls }: { url: string; title: string; cls: { icon: string } }) {
   return (
-    <span className={`${cls.icon} shrink-0 rounded-xs inline-flex items-center justify-center`}>
+    <span className={`${cls.icon} inline-flex shrink-0 items-center justify-center rounded-xs`}>
       <img
         src={getFaviconHref(url)}
         alt=""
@@ -81,7 +81,7 @@ function FaviconForUrl({ url, title, cls }: { url: string; title: string; cls: {
           if (fb) fb.classList.remove('hidden')
         }}
       />
-      <span className="hidden text-[8px] font-bold text-muted-foreground items-center justify-center w-full h-full">
+      <span className="text-muted-foreground hidden h-full w-full items-center justify-center text-[8px] font-bold">
         {title.charAt(0).toUpperCase()}
       </span>
     </span>
@@ -106,7 +106,7 @@ function BookmarkLink({
         e.preventDefault()
         openBookmark(url, preferences.bookmarkOpenMode)
       }}
-      className={`flex items-center ${cls.gap} ${cls.py} px-1.5 hover:bg-muted/60 transition-colors duration-150 shrink-0 max-w-45 cursor-pointer no-underline text-muted-foreground hover:text-foreground`}
+      className={`flex items-center ${cls.gap} ${cls.py} hover:bg-muted/60 text-muted-foreground hover:text-foreground max-w-45 shrink-0 cursor-pointer px-1.5 no-underline transition-colors duration-150`}
     >
       <FaviconForUrl url={url} title={title} cls={cls} />
       <span className={`truncate ${cls.text}`}>{title}</span>
@@ -130,10 +130,10 @@ function DropdownBookmarkItem({
         e.preventDefault()
         openBookmark(node.url, preferences.bookmarkOpenMode)
       }}
-      className="relative flex items-center gap-2 px-2 py-1.5 hover:bg-muted/60 transition-colors duration-150 cursor-pointer no-underline text-muted-foreground hover:text-foreground"
+      className="hover:bg-muted/60 text-muted-foreground hover:text-foreground relative flex cursor-pointer items-center gap-2 px-2 py-1.5 no-underline transition-colors duration-150"
     >
       <FaviconForUrl url={node.url} title={node.title} cls={cls} />
-      <span className={`truncate flex-1 ${cls.text}`}>{node.title}</span>
+      <span className={`flex-1 truncate ${cls.text}`}>{node.title}</span>
     </a>
   )
 }
@@ -147,9 +147,9 @@ function DropdownFolderItem({
 }) {
   const cls = SIZE_CLASSES[size]
   return (
-    <div className="flex items-center gap-2 px-2 py-1.5 text-muted-foreground">
+    <div className="text-muted-foreground flex items-center gap-2 px-2 py-1.5">
       <Folder className={`shrink-0 ${cls.icon}`} />
-      <span className={`truncate flex-1 ${cls.text}`}>{node.title}</span>
+      <span className={`flex-1 truncate ${cls.text}`}>{node.title}</span>
     </div>
   )
 }
@@ -208,7 +208,7 @@ function FolderMenu({
 
   const dropdownEl = dropdown && (
     <div
-      className="min-w-44 max-w-64 overflow-y-auto border border-border rounded-xl shadow-lg z-60 scrollbar-hide overscroll-contain"
+      className="border-border scrollbar-hide z-60 max-w-64 min-w-44 overflow-y-auto overscroll-contain rounded-xl border shadow-lg"
       style={{
         position: 'fixed',
         top: dropdown.top,
@@ -216,7 +216,7 @@ function FolderMenu({
         maxHeight: dropdown.maxHeight
       }}
     >
-      <div className="p-1.5 blur-bg relative">
+      <div className="blur-bg relative p-1.5">
         {node.children.map((child) => {
           if (child.type === 'bookmark')
             return <DropdownBookmarkItem key={child.id} node={child} size={size} />
@@ -237,10 +237,10 @@ function FolderMenu({
         onMouseLeave={handleMouseLeave}
       >
         <button
-          className={`flex items-center ${cls.gap} ${cls.py} px-1.5 hover:bg-muted/60 transition-colors duration-150 cursor-pointer border-none bg-transparent text-muted-foreground hover:text-foreground`}
+          className={`flex items-center ${cls.gap} ${cls.py} hover:bg-muted/60 text-muted-foreground hover:text-foreground cursor-pointer border-none bg-transparent px-1.5 transition-colors duration-150`}
         >
           <Folder className={`shrink-0 ${cls.icon}`} />
-          <span className={`truncate max-w-30 ${cls.text}`}>{node.title}</span>
+          <span className={`max-w-30 truncate ${cls.text}`}>{node.title}</span>
           <ChevronRight
             className={`shrink-0 transition-transform duration-150 ${dropdown ? 'rotate-90' : ''} ${cls.icon}`}
           />
@@ -257,10 +257,10 @@ function FolderMenu({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <button className="flex items-center gap-2 w-full px-2 py-1.5 hover:bg-muted/60 transition-colors duration-150 cursor-pointer border-none bg-transparent text-muted-foreground hover:text-foreground text-left">
+      <button className="hover:bg-muted/60 text-muted-foreground hover:text-foreground flex w-full cursor-pointer items-center gap-2 border-none bg-transparent px-2 py-1.5 text-left transition-colors duration-150">
         <Folder className={`shrink-0 ${cls.icon}`} />
-        <span className={`truncate flex-1 ${cls.text}`}>{node.title}</span>
-        <ChevronRight className="shrink-0 w-3 h-3" />
+        <span className={`flex-1 truncate ${cls.text}`}>{node.title}</span>
+        <ChevronRight className="h-3 w-3 shrink-0" />
       </button>
       {dropdownEl}
     </div>
@@ -293,7 +293,7 @@ function OverflowMenu({ items, size }: { items: FlatNode[]; size: BookmarksBarSi
 
   const dropdown = open && (
     <div
-      className="absolute top-full right-0 mt-0.5 min-w-44 max-w-64 overflow-y-auto backdrop-blur-xl border border-border rounded-xl shadow-lg p-1.5 z-50 scrollbar-hide overscroll-contain"
+      className="border-border scrollbar-hide absolute top-full right-0 z-50 mt-0.5 max-w-64 min-w-44 overflow-y-auto overscroll-contain rounded-xl border p-1.5 shadow-lg backdrop-blur-xl"
       style={{
         backgroundColor:
           'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)',
@@ -310,13 +310,13 @@ function OverflowMenu({ items, size }: { items: FlatNode[]; size: BookmarksBarSi
 
   return (
     <div
-      className="relative shrink-0 ml-auto pr-4"
+      className="relative ml-auto shrink-0 pr-4"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <button
         onClick={handleClick}
-        className={`flex items-center justify-center ${cls.py} px-1 hover:bg-muted/60 transition-colors duration-150 cursor-pointer border-none bg-transparent text-muted-foreground hover:text-foreground`}
+        className={`flex items-center justify-center ${cls.py} hover:bg-muted/60 text-muted-foreground hover:text-foreground cursor-pointer border-none bg-transparent px-1 transition-colors duration-150`}
       >
         <ChevronsRight className={cls.icon} />
       </button>
@@ -416,7 +416,7 @@ export function BookmarksBar() {
 
   return (
     <>
-      <div className="w-full fixed top-0 z-10 shadow-sm blur-bg max-[960px]:hidden">
+      <div className="blur-bg fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden">
         <nav
           ref={containerRef}
           className={`flex items-center ${cls.gap} relative`}

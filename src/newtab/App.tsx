@@ -45,13 +45,13 @@ export default function App() {
 
   return (
     <TooltipProvider disableHoverableContent>
-      <div className="h-screen flex flex-col">
+      <div className="flex h-screen flex-col">
         {/* ── 书签栏（页面顶部全宽） ── */}
         <BookmarksBar />
 
-        <div className="flex-1 flex flex-col max-w-315 w-full mx-auto px-8 pt-10 max-[960px]:px-5 max-[960px]:py-6 max-[960px]:pb-12">
+        <div className="mx-auto flex w-full max-w-315 flex-1 flex-col px-8 pt-10 max-[960px]:px-5 max-[960px]:py-6 max-[960px]:pb-12">
           {/* ── 顶部导航栏：分组圆点 + 页面切换 + 设置 ── */}
-          <div className="flex items-start gap-4 mb-3.5 flex-wrap">
+          <div className="mb-3.5 flex flex-wrap items-start gap-4">
             {currentPage === 'home' ? (
               <GroupNav
                 items={groups.map((g) => ({
@@ -68,7 +68,7 @@ export default function App() {
                 variant={preferences.savedSessionNavDisplayMode}
               />
             )}
-            <div className="flex items-center gap-1.5 pt-2 ml-auto relative">
+            <div className="relative ml-auto flex items-center gap-1.5 pt-2">
               <WorkspacePageSwitch currentPage={currentPage} onPageChange={setCurrentPage} />
               <SettingsDropdown />
             </div>

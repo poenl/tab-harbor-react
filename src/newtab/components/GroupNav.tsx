@@ -21,7 +21,7 @@ export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps)
 
   return (
     // ── 分组导航圆点 ──
-    <nav className="flex gap-2.5 flex-wrap flex-1 min-w-0">
+    <nav className="flex min-w-0 flex-1 flex-wrap gap-2.5">
       {items.map((item) => {
         const label = item.label
 
@@ -32,7 +32,7 @@ export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps)
                 <button
                   onClick={() => onNavigate?.(item.id)}
                   aria-label={t('jumpToLabel', { label })}
-                  className="inline-flex items-center max-w-32 h-10 px-1 bg-transparent border-none rounded-none text-xs font-medium text-muted-foreground underline decoration-transparent underline-offset-[0.32em] decoration-1 hover:text-foreground hover:decoration-accent/64 transition-all duration-150 cursor-pointer truncate"
+                  className="text-muted-foreground hover:text-foreground hover:decoration-accent/64 inline-flex h-10 max-w-32 cursor-pointer items-center truncate rounded-none border-none bg-transparent px-1 text-xs font-medium underline decoration-transparent decoration-1 underline-offset-[0.32em] transition-all duration-150"
                 >
                   <span className="truncate">{label}</span>
                 </button>
@@ -41,7 +41,7 @@ export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps)
                   onClick={() => onNavigate?.(item.id)}
                   aria-label={t('jumpToLabel', { label })}
                   draggable={false}
-                  className="w-10 h-10 rounded-full border border-border bg-card inline-flex items-center justify-center cursor-grab hover:-translate-y-px hover:border-primary transition-[transform,border-color] duration-200 ease-out"
+                  className="border-border bg-card hover:border-primary inline-flex h-10 w-10 cursor-grab items-center justify-center rounded-full border transition-[transform,border-color] duration-200 ease-out hover:-translate-y-px"
                 >
                   <GroupIcon
                     tabs={item.tabs}

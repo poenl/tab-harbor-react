@@ -52,7 +52,7 @@ export function GroupIcon({
   return (
     <span
       className={cn(
-        'inline-flex items-center justify-center font-bold bg-secondary text-primary',
+        'bg-secondary text-primary inline-flex items-center justify-center font-bold',
         fallbackCls
       )}
     >

@@ -107,10 +107,10 @@ export function SavedTabsPage() {
         <SectionHeader
           title={t('workspacePageSavedTabs')}
           actions={
-            <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex min-w-0 items-center gap-2.5">
               <SessionSettingsDropdown />
               {sessions.length > 0 && (
-                <span className="text-xs font-medium tracking-[0.02em] text-primary whitespace-nowrap">
+                <span className="text-primary text-xs font-medium tracking-[0.02em] whitespace-nowrap">
                   {sessions.length}{' '}
                   {t(sessions.length === 1 ? 'sessionWordSingular' : 'sessionWordPlural')}
                 </span>
@@ -146,7 +146,7 @@ export function SavedTabsPage() {
 
             {isDraggingOutside && (
               // ── 拖拽至外部提示区域 ──
-              <div className="border-2 border-dashed border-primary/30 rounded-xl py-8 text-center text-sm text-muted-foreground transition-all">
+              <div className="border-primary/30 text-muted-foreground rounded-xl border-2 border-dashed py-8 text-center text-sm transition-all">
                 放开以创建新会话
               </div>
             )}

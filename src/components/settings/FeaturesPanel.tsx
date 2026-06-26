@@ -15,14 +15,14 @@ export function FeaturesPanel() {
   return (
     <div className="flex flex-col gap-0">
       <div className="theme-menu-section">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+        <label className="flex cursor-pointer items-center gap-2.5 select-none">
           <Switch
             checked={preferences.hitokotoEnabled}
             onCheckedChange={() =>
               updatePreferences({ hitokotoEnabled: !preferences.hitokotoEnabled })
             }
           />
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+          <span className="text-muted-foreground cursor-pointer text-xs font-bold tracking-[0.16em] uppercase">
             {t('hitokotoLabel')}
           </span>
         </label>
@@ -31,14 +31,14 @@ export function FeaturesPanel() {
       <Separator className="my-3.5" />
 
       <div className="theme-menu-section">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+        <label className="flex cursor-pointer items-center gap-2.5 select-none">
           <Switch
             checked={preferences.sleepControlEnabled}
             onCheckedChange={() =>
               updatePreferences({ sleepControlEnabled: !preferences.sleepControlEnabled })
             }
           />
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+          <span className="text-muted-foreground cursor-pointer text-xs font-bold tracking-[0.16em] uppercase">
             {t('sleepControlLabel')}
           </span>
         </label>
@@ -47,7 +47,7 @@ export function FeaturesPanel() {
       <Separator className="my-3.5" />
 
       <div className="theme-menu-section">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+        <label className="flex cursor-pointer items-center gap-2.5 select-none">
           <Switch
             checked={preferences.closeDuplicateNewTabsEnabled}
             onCheckedChange={async () => {
@@ -59,7 +59,7 @@ export function FeaturesPanel() {
               }
             }}
           />
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+          <span className="text-muted-foreground cursor-pointer text-xs font-bold tracking-[0.16em] uppercase">
             {t('closeDuplicateNewTabsLabel')}
           </span>
         </label>
@@ -69,7 +69,7 @@ export function FeaturesPanel() {
 
       <div className="theme-menu-section">
         <div className="flex items-center justify-between gap-2.5">
-          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('tabScopeLabel')}
           </Label>
           <InlineSelect
@@ -87,14 +87,14 @@ export function FeaturesPanel() {
 
       <div className="flex flex-col gap-2.5">
         <div className="theme-menu-section">
-          <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <label className="flex cursor-pointer items-center gap-2.5 select-none">
             <Switch
               checked={preferences.bookmarksBarEnabled}
               onCheckedChange={() =>
                 updatePreferences({ bookmarksBarEnabled: !preferences.bookmarksBarEnabled })
               }
             />
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] cursor-pointer">
+            <span className="text-muted-foreground cursor-pointer text-xs font-bold tracking-[0.16em] uppercase">
               {t('bookmarksBarLabel')}
             </span>
           </label>
@@ -103,7 +103,7 @@ export function FeaturesPanel() {
         {preferences.bookmarksBarEnabled && (
           <div className="theme-menu-section">
             <div className="flex items-center justify-between gap-2.5">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+              <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
                 {t('bookmarksBarSizeLabel')}
               </Label>
               <InlineSelect
@@ -118,7 +118,7 @@ export function FeaturesPanel() {
             </div>
             <Separator className="my-3.5" />
             <div className="flex items-center justify-between gap-2.5">
-              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+              <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
                 {t('bookmarkOpenModeLabel')}
               </Label>
               <InlineSelect

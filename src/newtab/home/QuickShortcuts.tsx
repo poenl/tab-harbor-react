@@ -18,7 +18,7 @@ function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
         type="button"
         onClick={onAdd}
         aria-label={t('addQuickTab')}
-        className="grid justify-items-center content-start w-full text-center cursor-pointer bg-none border-none p-0 hover:-translate-y-px transition-transform duration-300 ease-out"
+        className="grid w-full cursor-pointer content-start justify-items-center border-none bg-none p-0 text-center transition-transform duration-300 ease-out hover:-translate-y-px"
         style={
           {
             gridTemplateRows: `calc(40px * var(--shortcut-scale, 1)) auto`,
@@ -27,7 +27,7 @@ function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
         }
       >
         <span
-          className="rounded-xl bg-secondary flex items-center justify-center ring-1 ring-inset ring-border"
+          className="bg-secondary ring-border flex items-center justify-center rounded-xl ring-1 ring-inset"
           style={
             {
               width: `calc(40px * var(--shortcut-scale, 1))`,
@@ -35,9 +35,9 @@ function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
             } as React.CSSProperties
           }
         >
-          <Plus strokeWidth={1.8} aria-hidden="true" className="w-5.5 h-5.5 text-primary" />
+          <Plus strokeWidth={1.8} aria-hidden="true" className="text-primary h-5.5 w-5.5" />
         </span>
-        <span className="text-xs leading-[1.45] text-muted-foreground">{t('addLink')}</span>
+        <span className="text-muted-foreground text-xs leading-[1.45]">{t('addLink')}</span>
       </button>
     </div>
   )
@@ -54,9 +54,9 @@ function EditButton({ shortcutId, onEdit }: { shortcutId: string; onEdit: (id: s
         onEdit(shortcutId)
       }}
       aria-label={t('editQuickTab')}
-      className="absolute -top-0.5 left-0 w-4.5 h-4.5 p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-primary hover:bg-secondary hover:text-primary"
+      className="border-border bg-card text-muted-foreground shadow-foreground/5 hover:border-primary hover:bg-secondary hover:text-primary pointer-events-none absolute -top-0.5 left-0 flex h-4.5 w-4.5 translate-y-0.5 scale-90 items-center justify-center rounded-full border p-0 opacity-0 shadow-[0_3px_8px_var(--tw-shadow-color)] transition-all duration-200 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
     >
-      <Pencil strokeWidth={1.8} aria-hidden="true" className="w-2.25 h-2.25" />
+      <Pencil strokeWidth={1.8} aria-hidden="true" className="h-2.25 w-2.25" />
     </button>
   )
 }
@@ -78,9 +78,9 @@ function RemoveButton({
         onRemove(shortcutId)
       }}
       aria-label={t('removeQuickTab')}
-      className="absolute -top-0.5 right-0 w-4.5 h-4.5 p-0 rounded-full border border-border bg-card text-muted-foreground flex items-center justify-center opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-200 translate-y-0.5 scale-90 group-hover:translate-y-0 group-hover:scale-100 group-focus-within:translate-y-0 group-focus-within:scale-100 shadow-[0_3px_8px_var(--tw-shadow-color)] shadow-foreground/5 hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+      className="border-border bg-card text-muted-foreground shadow-foreground/5 hover:border-destructive hover:bg-destructive/10 hover:text-destructive pointer-events-none absolute -top-0.5 right-0 flex h-4.5 w-4.5 translate-y-0.5 scale-90 items-center justify-center rounded-full border p-0 opacity-0 shadow-[0_3px_8px_var(--tw-shadow-color)] transition-all duration-200 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
     >
-      <X strokeWidth={1.8} aria-hidden="true" className="w-2.25 h-2.25" />
+      <X strokeWidth={1.8} aria-hidden="true" className="h-2.25 w-2.25" />
     </button>
   )
 }
@@ -145,12 +145,12 @@ export function QuickShortcuts() {
           }
         >
           {shortcuts.map((s) => (
-            <div key={s.id} data-shortcut-id={s.id} className="relative group">
+            <div key={s.id} data-shortcut-id={s.id} className="group relative">
               <button
                 type="button"
                 onClick={() => handleOpen(s.url)}
                 aria-label={s.label || s.url}
-                className="grid justify-items-center content-start gap-[calc(6px*var(--shortcut-scale,1))] w-full text-center cursor-pointer bg-none border-none p-0 hover:-translate-y-px transition-transform duration-300 ease-out"
+                className="grid w-full cursor-pointer content-start justify-items-center gap-[calc(6px*var(--shortcut-scale,1))] border-none bg-none p-0 text-center transition-transform duration-300 ease-out hover:-translate-y-px"
                 style={
                   {
                     gridTemplateRows: `calc(40px * var(--shortcut-scale, 1)) auto`
@@ -158,7 +158,7 @@ export function QuickShortcuts() {
                 }
               >
                 <span
-                  className="rounded-xl bg-secondary flex items-center justify-center group-hover:shadow-[0_4px_10px_var(--tw-shadow-color)] group-hover:shadow-primary/10 transition-shadow duration-200"
+                  className="bg-secondary group-hover:shadow-primary/10 flex items-center justify-center rounded-xl transition-shadow duration-200 group-hover:shadow-[0_4px_10px_var(--tw-shadow-color)]"
                   style={
                     {
                       width: `calc(40px * var(--shortcut-scale, 1))`,
@@ -168,7 +168,7 @@ export function QuickShortcuts() {
                 >
                   <ShortcutIcon shortcut={s} />
                 </span>
-                <span className="text-xs leading-[1.45] text-foreground max-w-full overflow-hidden line-clamp-2">
+                <span className="text-foreground line-clamp-2 max-w-full overflow-hidden text-xs leading-[1.45]">
                   {s.label || getFallbackLabel('', s.url)}
                 </span>
               </button>

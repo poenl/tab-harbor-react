@@ -9,16 +9,16 @@ export function Footer({ totalTabs }: FooterProps) {
 
   return (
     // ── 页脚：标签总数 + 版权信息 ──
-    <footer className="flex justify-between items-end gap-4 flex-wrap pb-12 pt-5 border-t border-border max-[960px]:mt-8 mt-auto">
+    <footer className="border-border mt-auto flex flex-wrap items-end justify-between gap-4 border-t pt-5 pb-12 max-[960px]:mt-8">
       <div className="flex flex-col gap-1">
-        <div className="font-serif text-3xl font-light text-foreground leading-none">
+        <div className="text-foreground font-serif text-3xl leading-none font-light">
           {totalTabs}
         </div>
-        <div className="text-xs uppercase tracking-[1.5px] text-muted-foreground">
+        <div className="text-muted-foreground text-xs tracking-[1.5px] uppercase">
           {t('openTabsSectionTitle')}
         </div>
       </div>
-      <div className="text-xs text-muted-foreground">
+      <div className="text-muted-foreground text-xs">
         <span>
           <a
             href="https://github.com/V-IOLE-T/tab-harbor"

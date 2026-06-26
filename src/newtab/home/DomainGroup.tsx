@@ -153,10 +153,10 @@ export function DomainGroupCard({
 
   return (
     // ── 域名分组卡片（展示/选择共用同一套卡片样式） ──
-    <div className="bg-card border border-border rounded-2xl p-[14px_16px] flex flex-col gap-2 shadow-[0_14px_28px_var(--tw-shadow-color)] shadow-primary/5 hover:shadow-[0_16px_30px_var(--tw-shadow-color)] hover:shadow-primary/10 hover:-translate-y-px transition-all duration-250">
+    <div className="bg-card border-border shadow-primary/5 hover:shadow-primary/10 flex flex-col gap-2 rounded-2xl border p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] transition-all duration-250 hover:-translate-y-px hover:shadow-[0_16px_30px_var(--tw-shadow-color)]">
       {/* ── 选择模式头部 ── */}
       {mode === 'select' && (
-        <div className="flex items-start justify-between gap-3 border-b border-border/50 pb-3">
+        <div className="border-border/50 flex items-start justify-between gap-3 border-b pb-3">
           <div className="flex items-center gap-2">
             {showSelectAll && (
               <Checkbox
@@ -170,7 +170,7 @@ export function DomainGroupCard({
                 onCheckedChange={onSelectAll}
               />
             )}
-            <div className="text-sm font-semibold text-foreground">{t('sessionPickerTitle')}</div>
+            <div className="text-foreground text-sm font-semibold">{t('sessionPickerTitle')}</div>
           </div>
           <Button
             variant="ghost"
@@ -193,19 +193,19 @@ export function DomainGroupCard({
         return (
           <div key={group.domain}>
             {/* ── 卡片标题 + 标签计数（展示模式加组级保存，选择模式加 checkbox） ── */}
-            <div className="flex items-center gap-2 min-h-7 mb-2">
+            <div className="mb-2 flex min-h-7 items-center gap-2">
               {mode === 'select' && (
                 <Checkbox
                   checked={getGroupState(group)}
                   onCheckedChange={() => onToggleGroup?.(group.domain)}
                 />
               )}
-              <span className="flex-1 min-w-0 truncate">
-                <h3 className="text-base font-semibold tracking-[-0.01em] text-foreground m-0 inline">
+              <span className="min-w-0 flex-1 truncate">
+                <h3 className="text-foreground m-0 inline text-base font-semibold tracking-[-0.01em]">
                   {groupLabel}
                 </h3>
                 {mode === 'view' && hasDupes && (
-                  <span className="inline-flex ml-2 text-xs font-semibold text-accent">
+                  <span className="text-accent ml-2 inline-flex text-xs font-semibold">
                     {t('duplicatesCount', {
                       count: totalExtras,
                       suffix: totalExtras !== 1 ? 's' : ''
@@ -226,7 +226,7 @@ export function DomainGroupCard({
                         aria-label={t('sleepAllTabsButton')}
                         className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                       >
-                        <Moon strokeWidth={1.8} className="w-3.5 h-3.5" />
+                        <Moon strokeWidth={1.8} className="h-3.5 w-3.5" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="top">{t('sleepAllTabsButton')}</TooltipContent>
@@ -242,7 +242,7 @@ export function DomainGroupCard({
                       aria-label={t('saveGroupSession')}
                       className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                     >
-                      <Archive strokeWidth={1.8} className="w-3.5 h-3.5" />
+                      <Archive strokeWidth={1.8} className="h-3.5 w-3.5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="top">{t('saveGroupSession')}</TooltipContent>
@@ -251,7 +251,7 @@ export function DomainGroupCard({
               {group.tabs.length > 1 && (
                 <Badge
                   variant="secondary"
-                  className="ml-auto text-xs font-semibold rounded-[3px] shrink-0"
+                  className="ml-auto shrink-0 rounded-[3px] text-xs font-semibold"
                 >
                   {group.tabs.length}
                 </Badge>
@@ -286,7 +286,7 @@ export function DomainGroupCard({
             {mode === 'view' && group.tabs.length > INITIAL_VISIBLE && !expanded && (
               <button
                 onClick={() => setExpanded(true)}
-                className="self-start text-xs text-primary bg-transparent border border-border rounded-md px-3 py-1 cursor-pointer hover:bg-secondary hover:border-primary transition-all duration-150"
+                className="text-primary border-border hover:bg-secondary hover:border-primary cursor-pointer self-start rounded-md border bg-transparent px-3 py-1 text-xs transition-all duration-150"
               >
                 {t('moreCount', { count: group.tabs.length - INITIAL_VISIBLE })}
               </button>
@@ -296,7 +296,7 @@ export function DomainGroupCard({
             {mode === 'view' && hasDupes && (
               <button
                 onClick={() => closeGroupDuplicates(dupeEntries.map(([url]) => url))}
-                className="self-start text-xs text-muted-foreground bg-card border border-border rounded-full px-3 py-1.5 cursor-pointer hover:text-accent hover:border-accent transition-all duration-150 mt-2"
+                className="text-muted-foreground bg-card border-border hover:text-accent hover:border-accent mt-2 cursor-pointer self-start rounded-full border px-3 py-1.5 text-xs transition-all duration-150"
               >
                 {t('closedDuplicatesCount', {
                   count: totalExtras,
@@ -307,7 +307,7 @@ export function DomainGroupCard({
 
             {/* ── 分组间分隔线（仅选择模式多组时） ── */}
             {mode === 'select' && gi < visibleGroups.length - 1 && (
-              <div className="h-px bg-border/50 my-2" />
+              <div className="bg-border/50 my-2 h-px" />
             )}
           </div>
         )
@@ -315,12 +315,12 @@ export function DomainGroupCard({
 
       {/* ── 选择模式 Footer ── */}
       {mode === 'select' && (
-        <footer className="flex items-center gap-2 border-t border-border/50 pt-3">
-          <span className="flex-1 text-xs text-muted-foreground">
+        <footer className="border-border/50 flex items-center gap-2 border-t pt-3">
+          <span className="text-muted-foreground flex-1 text-xs">
             {t('sessionPickerSelectedCount', { count: selectedCount })}
           </span>
 
-          <div className="inline-flex items-center gap-0.5 border border-border/60 rounded-lg bg-secondary/30">
+          <div className="border-border/60 bg-secondary/30 inline-flex items-center gap-0.5 rounded-lg border">
             <Button
               variant="ghost"
               size="sm"
@@ -345,7 +345,7 @@ export function DomainGroupCard({
               value={newSessionName}
               onChange={(e) => setNewSessionName(e.target.value)}
               placeholder={t('sessionPickerNewSessionNamePlaceholder')}
-              className={cn('w-full h-7', footerMode !== 'new' && 'hidden')}
+              className={cn('h-7 w-full', footerMode !== 'new' && 'hidden')}
             />
 
             <div className={cn('w-full', footerMode !== 'existing' && 'hidden')}>
@@ -369,7 +369,7 @@ export function DomainGroupCard({
             size="sm"
             disabled={selectedCount === 0}
             onClick={handleSelectSave}
-            className="rounded-full text-xs h-7 min-w-[9em]"
+            className="h-7 min-w-[9em] rounded-full text-xs"
           >
             {footerMode === 'existing'
               ? t('sessionPickerAddToExisting')

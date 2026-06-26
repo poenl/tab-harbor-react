@@ -19,15 +19,15 @@ export function InlineSelect({
   onChange: (key: string) => void
 }) {
   return (
-    <div className="flex flex-1 justify-end flex-wrap gap-[10px_14px]">
+    <div className="flex flex-1 flex-wrap justify-end gap-[10px_14px]">
       {options.map((opt) => (
         <button
           key={opt.key}
           onClick={() => onChange(opt.key)}
-          className={`border-none bg-transparent p-0 text-xs font-semibold cursor-pointer transition-colors duration-150 min-h-auto ${
+          className={`min-h-auto cursor-pointer border-none bg-transparent p-0 text-xs font-semibold transition-colors duration-150 ${
             value === opt.key
-              ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] underline-offset-[0.24em] decoration-1'
-              : 'text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)] hover:text-foreground'
+              ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-1 underline-offset-[0.24em]'
+              : 'hover:text-foreground text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)]'
           }`}
         >
           {opt.label}
@@ -53,19 +53,19 @@ function PaletteCard({
   return (
     <button
       onClick={onClick}
-      className={`border rounded-[14px] px-2.5 py-1.5 flex items-center gap-2 cursor-pointer transition-all duration-150 min-h-11 ${
+      className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-[14px] border px-2.5 py-1.5 transition-all duration-150 ${
         active
           ? 'border-accent/30 bg-accent/10'
           : 'border-border hover:border-accent/20 hover:-translate-y-px'
       }`}
     >
       <span
-        className="w-6 h-3.5 rounded-full shrink-0 ring-1 ring-inset ring-border/30"
+        className="ring-border/30 h-3.5 w-6 shrink-0 rounded-full ring-1 ring-inset"
         style={{ background: `linear-gradient(90deg, ${colors.paper} 50%, ${colors.accent} 50%)` }}
       />
-      <span className="text-xs font-semibold text-foreground whitespace-nowrap">{name}</span>
+      <span className="text-foreground text-xs font-semibold whitespace-nowrap">{name}</span>
       <span
-        className={`ml-auto size-3.5 rounded-full border flex items-center justify-center shrink-0 transition-all duration-150 ${
+        className={`ml-auto flex size-3.5 shrink-0 items-center justify-center rounded-full border transition-all duration-150 ${
           active ? 'bg-accent/10 border-accent/30 text-accent' : 'border-border text-transparent'
         }`}
       >
@@ -99,7 +99,7 @@ export function AppearancePanel() {
       {/* ── 外观模式 ── */}
       <div className="theme-menu-section">
         <div className="flex items-center justify-between gap-2.5">
-          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('appearanceMode')}
           </Label>
           <InlineSelect
@@ -118,7 +118,7 @@ export function AppearancePanel() {
       <div className="theme-menu-section">
         <Separator className="my-3.5" />
 
-        <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+        <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
           {t('deskPalette')}
         </Label>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(128px,1fr))] gap-2">
@@ -141,7 +141,7 @@ export function AppearancePanel() {
       <div className="theme-menu-section">
         <Separator className="my-3.5" />
 
-        <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+        <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
           {t('deskBackdrop')}
         </Label>
         <div className="flex gap-2.5">
@@ -157,7 +157,7 @@ export function AppearancePanel() {
             variant="ghost"
             size="sm"
             onClick={() => updatePreferences({ customBackground: '' })}
-            className="flex-1 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex-1"
           >
             {t('clearText')}
           </Button>
@@ -184,10 +184,10 @@ export function AppearancePanel() {
         <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('languageLabel')}
           </Label>
-          <div className="flex flex-1 justify-end flex-wrap gap-[10px_14px]">
+          <div className="flex flex-1 flex-wrap justify-end gap-[10px_14px]">
             {[
               { key: 'auto', label: t('languageAuto') },
               { key: 'en', label: t('languageEnglish') },
@@ -200,10 +200,10 @@ export function AppearancePanel() {
                   await browser.storage.local.set({ languagePreference: pref })
                   window.location.reload()
                 }}
-                className={`border-none bg-transparent p-0 text-xs font-semibold cursor-pointer transition-colors duration-150 min-h-auto ${
+                className={`min-h-auto cursor-pointer border-none bg-transparent p-0 text-xs font-semibold transition-colors duration-150 ${
                   currentLang === lang.key
-                    ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] underline-offset-[0.24em] decoration-1'
-                    : 'text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)] hover:text-foreground'
+                    ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-1 underline-offset-[0.24em]'
+                    : 'hover:text-foreground text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)]'
                 }`}
               >
                 {lang.label}
@@ -218,10 +218,10 @@ export function AppearancePanel() {
         <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('surfaceOpacity')}
           </Label>
-          <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="flex flex-1 items-center justify-end gap-2">
             <Slider
               value={[preferences.surfaceOpacity]}
               onValueChange={([v]) =>
@@ -232,7 +232,7 @@ export function AppearancePanel() {
               step={1}
               className="flex-1"
             />
-            <span className="text-xs text-foreground font-semibold min-w-7.5 text-right">
+            <span className="text-foreground min-w-7.5 text-right text-xs font-semibold">
               {preferences.surfaceOpacity}%
             </span>
           </div>
@@ -244,10 +244,10 @@ export function AppearancePanel() {
         <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('uiScaleLabel')}
           </Label>
-          <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="flex flex-1 items-center justify-end gap-2">
             <Slider
               value={[preferences.uiScale]}
               onValueChange={([v]) =>
@@ -258,7 +258,7 @@ export function AppearancePanel() {
               step={1}
               className="flex-1"
             />
-            <span className="text-xs text-foreground font-semibold min-w-7.5 text-right">
+            <span className="text-foreground min-w-7.5 text-right text-xs font-semibold">
               {preferences.uiScale}%
             </span>
           </div>
@@ -270,10 +270,10 @@ export function AppearancePanel() {
         <Separator className="my-3.5" />
 
         <div className="flex items-center justify-between gap-2.5">
-          <Label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.16em] pl-0.5 pt-1">
+          <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
             {t('shortcutScaleLabel')}
           </Label>
-          <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="flex flex-1 items-center justify-end gap-2">
             <Slider
               value={[preferences.shortcutScale]}
               onValueChange={([v]) =>
@@ -284,7 +284,7 @@ export function AppearancePanel() {
               step={1}
               className="flex-1"
             />
-            <span className="text-xs text-foreground font-semibold min-w-7.5 text-right">
+            <span className="text-foreground min-w-7.5 text-right text-xs font-semibold">
               {preferences.shortcutScale}%
             </span>
           </div>

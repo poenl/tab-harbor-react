@@ -15,10 +15,10 @@ export function WorkspacePageSwitch({ currentPage, onPageChange }: WorkspacePage
       <button
         onClick={() => onPageChange('home')}
         className={cn(
-          'text-xs font-semibold underline underline-offset-[0.32em] decoration-1 transition-colors duration-150',
+          'text-xs font-semibold underline decoration-1 underline-offset-[0.32em] transition-colors duration-150',
           currentPage === 'home'
             ? 'text-primary decoration-primary/30'
-            : 'text-muted-foreground decoration-transparent hover:text-foreground'
+            : 'text-muted-foreground hover:text-foreground decoration-transparent'
         )}
       >
         {t('workspacePageHome')}
@@ -26,10 +26,10 @@ export function WorkspacePageSwitch({ currentPage, onPageChange }: WorkspacePage
       <button
         onClick={() => onPageChange('saved-tabs')}
         className={cn(
-          'text-xs font-semibold underline underline-offset-[0.32em] decoration-1 transition-colors duration-150',
+          'text-xs font-semibold underline decoration-1 underline-offset-[0.32em] transition-colors duration-150',
           currentPage === 'saved-tabs'
             ? 'text-primary decoration-primary/30'
-            : 'text-muted-foreground decoration-transparent hover:text-foreground'
+            : 'text-muted-foreground hover:text-foreground decoration-transparent'
         )}
       >
         {t('workspacePageSavedTabs')}

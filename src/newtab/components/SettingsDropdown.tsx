@@ -17,7 +17,7 @@ export function SettingsDropdown() {
           <PopoverTrigger asChild>
             <button
               aria-label={t('deskSettings')}
-              className="p-1 rounded-full border-none bg-transparent cursor-pointer transition-colors duration-150 text-muted-foreground hover:text-foreground hover:bg-accent/10 data-[state=open]:text-accent data-[state=open]:bg-accent/10"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent/10 data-[state=open]:text-accent data-[state=open]:bg-accent/10 cursor-pointer rounded-full border-none bg-transparent p-1 transition-colors duration-150"
             >
               <svg
                 fill="none"
@@ -45,7 +45,7 @@ export function SettingsDropdown() {
         side="bottom"
         align="end"
         sideOffset={10}
-        className="w-80 backdrop-blur-xl border border-border rounded-2xl shadow-lg p-4 bg-transparent ring-0 data-open:animate-none data-closed:animate-none"
+        className="border-border w-80 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl data-closed:animate-none data-open:animate-none"
         style={
           {
             backgroundColor:
@@ -54,23 +54,23 @@ export function SettingsDropdown() {
         }
       >
         {/* ── 标签栏 ── */}
-        <div className="flex items-center gap-4.5 pb-2.5 mb-4 border-b border-border/18">
+        <div className="border-border/18 mb-4 flex items-center gap-4.5 border-b pb-2.5">
           <button
             onClick={() => setActiveTab('appearance')}
-            className={`border-none bg-transparent p-0 pb-0.75 text-xs font-bold cursor-pointer transition-colors duration-150 ${
+            className={`cursor-pointer border-none bg-transparent p-0 pb-0.75 text-xs font-bold transition-colors duration-150 ${
               activeTab === 'appearance'
-                ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] underline-offset-[0.28em] decoration-1'
-                : 'text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)] hover:text-foreground'
+                ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-1 underline-offset-[0.28em]'
+                : 'hover:text-foreground text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)]'
             }`}
           >
             {t('settingsTabAppearance')}
           </button>
           <button
             onClick={() => setActiveTab('features')}
-            className={`border-none bg-transparent p-0 pb-0.75 text-xs font-bold cursor-pointer transition-colors duration-150 ${
+            className={`cursor-pointer border-none bg-transparent p-0 pb-0.75 text-xs font-bold transition-colors duration-150 ${
               activeTab === 'features'
-                ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] underline-offset-[0.28em] decoration-1'
-                : 'text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)] hover:text-foreground'
+                ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-1 underline-offset-[0.28em]'
+                : 'hover:text-foreground text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)]'
             }`}
           >
             {t('settingsTabFeatures')}

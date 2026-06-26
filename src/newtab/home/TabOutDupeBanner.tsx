@@ -46,12 +46,12 @@ export function TabOutDupeBanner() {
 
   return (
     // ── 多余 Tab Harbor 标签页横幅 ──
-    <div className="flex items-center justify-between gap-3 bg-accent/5 border border-accent/15 rounded-xl px-5 py-4 mb-4">
+    <div className="bg-accent/5 border-accent/15 mb-4 flex items-center justify-between gap-3 rounded-xl border px-5 py-4">
       <div className="flex items-center gap-3">
-        <div className="size-9 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-          <Copy strokeWidth={1.5} className="size-4.5 text-accent shrink-0" />
+        <div className="bg-accent/10 flex size-9 shrink-0 items-center justify-center rounded-full">
+          <Copy strokeWidth={1.5} className="text-accent size-4.5 shrink-0" />
         </div>
-        <span className="text-sm text-foreground leading-normal">
+        <span className="text-foreground text-sm leading-normal">
           {t('tabOutDupeBannerText', { count: tabOutCount })}
         </span>
       </div>
@@ -59,7 +59,7 @@ export function TabOutDupeBanner() {
         variant="default"
         size="sm"
         onClick={handleCloseExtras}
-        className="shrink-0 text-xs rounded-md min-h-9"
+        className="min-h-9 shrink-0 rounded-md text-xs"
       >
         {t('tabOutDupeBannerCloseExtras')}
       </Button>

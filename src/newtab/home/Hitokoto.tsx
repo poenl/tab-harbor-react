@@ -12,11 +12,11 @@ export function Hitokoto() {
     <div
       aria-live="polite"
       role="note"
-      className="font-serif text-sm leading-[1.6] text-muted-foreground max-w-130"
+      className="text-muted-foreground max-w-130 font-serif text-sm leading-[1.6]"
     >
       <span className="italic">{entry.hitokoto}</span>
       {attribution && (
-        <span className="text-xs text-muted-foreground not-italic whitespace-nowrap">
+        <span className="text-muted-foreground text-xs whitespace-nowrap not-italic">
           {attribution}
         </span>
       )}

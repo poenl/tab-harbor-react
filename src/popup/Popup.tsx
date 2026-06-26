@@ -128,19 +128,19 @@ export default function Popup() {
   const fadeStyle = (i: number) => (ready ? undefined : { transitionDelay: `${i * 30}ms` })
 
   return (
-    <div className="min-w-[380px] max-w-[420px] w-full bg-background text-foreground font-sans text-sm select-none flex flex-col max-h-[600px]">
+    <div className="bg-background text-foreground flex max-h-150 w-full max-w-105 min-w-95 flex-col font-sans text-sm select-none">
       {/* ── 顶部栏 ── */}
       <header
-        className={`flex items-center gap-2 p-[14px_16px_0] shrink-0 ${fadeCls(0)}`}
+        className={`flex shrink-0 items-center gap-2 p-[14px_16px_0] ${fadeCls(0)}`}
         style={fadeStyle(0)}
       >
-        <div className="flex-1 flex bg-secondary rounded-lg p-[3px] gap-[2px]">
+        <div className="bg-secondary flex flex-1 gap-0.5 rounded-lg p-0.75">
           <button
             type="button"
             role="tab"
             aria-selected={view === 'shortcuts'}
             onClick={() => setView('shortcuts')}
-            className={`flex-1 px-2.5 py-[5px] rounded-[7px] text-xs font-medium transition-all duration-180 cursor-pointer border border-transparent ${
+            className={`flex-1 cursor-pointer rounded-[7px] border border-transparent px-2.5 py-1.25 text-xs font-medium transition-all duration-180 ${
               view === 'shortcuts'
                 ? 'bg-card text-foreground font-semibold shadow-[0_1px_3px_var(--shadow),0_1px_1px_rgba(26,22,19,0.04)]'
                 : 'text-muted-foreground hover:text-foreground hover:bg-card/55'
@@ -153,7 +153,7 @@ export default function Popup() {
             role="tab"
             aria-selected={view === 'tabs'}
             onClick={() => setView('tabs')}
-            className={`flex-1 px-2.5 py-[5px] rounded-[7px] text-xs font-medium transition-all duration-180 cursor-pointer border border-transparent ${
+            className={`flex-1 cursor-pointer rounded-[7px] border border-transparent px-2.5 py-1.25 text-xs font-medium transition-all duration-180 ${
               view === 'tabs'
                 ? 'bg-card text-foreground font-semibold shadow-[0_1px_3px_var(--shadow),0_1px_1px_rgba(26,22,19,0.04)]'
                 : 'text-muted-foreground hover:text-foreground hover:bg-card/55'
@@ -167,12 +167,12 @@ export default function Popup() {
           onClick={loadTabs}
           disabled={refreshing}
           aria-label={t('popupRefreshLabel')}
-          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-muted-foreground bg-card/80 hover:bg-secondary hover:text-accent transition-all duration-150 cursor-pointer active:scale-90 disabled:pointer-events-none disabled:opacity-60"
+          className="text-muted-foreground bg-card/80 hover:bg-secondary hover:text-accent flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-all duration-150 active:scale-90 disabled:pointer-events-none disabled:opacity-60"
         >
           {refreshing ? (
-            <Spinner className="w-3.5 h-3.5" />
+            <Spinner className="h-3.5 w-3.5" />
           ) : (
-            <RefreshCw strokeWidth={2} className="w-3.5 h-3.5" />
+            <RefreshCw strokeWidth={2} className="h-3.5 w-3.5" />
           )}
         </button>
       </header>
@@ -180,28 +180,28 @@ export default function Popup() {
       {/* ── 快捷方式面板 ── */}
       {view === 'shortcuts' && (
         <section
-          className={`flex-1 overflow-y-auto min-h-0 p-[14px_16px_16px] ${fadeCls(1)}`}
+          className={`min-h-0 flex-1 overflow-y-auto p-[14px_16px_16px] ${fadeCls(1)}`}
           style={fadeStyle(1)}
         >
           {shortcuts.length === 0 ? (
-            <div className="py-7 text-center text-muted-foreground text-xs">
+            <div className="text-muted-foreground py-7 text-center text-xs">
               {t('popupShortcutsEmpty')}
             </div>
           ) : (
-            <div className="flex flex-wrap gap-2.5 content-start pr-0.5">
+            <div className="flex flex-wrap content-start gap-2.5 pr-0.5">
               {shortcuts.map((s, i) => (
-                <div key={s.id} className={`w-[76px] shrink-0 ${fadeCls(i)}`} style={fadeStyle(i)}>
+                <div key={s.id} className={`w-19 shrink-0 ${fadeCls(i)}`} style={fadeStyle(i)}>
                   <button
                     type="button"
                     onClick={() => handleOpenUrl(s.url)}
                     aria-label={s.label || s.url}
-                    className="grid justify-items-center content-start gap-1.5 w-full text-center cursor-pointer bg-none border-none p-0 hover:-translate-y-px transition-transform duration-240 ease-out"
+                    className="grid w-full cursor-pointer content-start justify-items-center gap-1.5 border-none bg-none p-0 text-center transition-transform duration-240 ease-out hover:-translate-y-px"
                     style={{ gridTemplateRows: '40px auto' }}
                   >
-                    <span className="w-10 h-10 rounded-xl bg-secondary inline-flex items-center justify-center shrink-0">
+                    <span className="bg-secondary inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                       <ShortcutIcon shortcut={s} />
                     </span>
-                    <span className="text-[11px] leading-[1.45] text-foreground/82 max-w-full overflow-hidden line-clamp-2">
+                    <span className="text-foreground/82 line-clamp-2 max-w-full overflow-hidden text-[11px] leading-[1.45]">
                       {s.label || getFallbackLabel('', s.url)}
                     </span>
                   </button>
@@ -215,20 +215,20 @@ export default function Popup() {
       {/* ── 标签页面板 ── */}
       {view === 'tabs' && (
         <section
-          className={`flex flex-col flex-1 min-h-0 overflow-hidden ${fadeCls(1)}`}
+          className={`flex min-h-0 flex-1 flex-col overflow-hidden ${fadeCls(1)}`}
           style={fadeStyle(1)}
         >
           {loading ? (
-            <div className="py-7 text-center text-muted-foreground text-xs">{t('loading')}</div>
+            <div className="text-muted-foreground py-7 text-center text-xs">{t('loading')}</div>
           ) : openTabs.length === 0 || groups.length === 0 ? (
-            <div className="py-7 text-center text-muted-foreground text-xs px-4">
+            <div className="text-muted-foreground px-4 py-7 text-center text-xs">
               {t('popupTabsEmpty')}
             </div>
           ) : (
             <>
               {/* ── 分组导航（固定顶部） ── */}
               <div
-                className={`grid grid-cols-[repeat(auto-fill,40px)] justify-center gap-1.5 px-4 pb-1.5 pt-3 shrink-0 ${fadeCls(2)}`}
+                className={`grid shrink-0 grid-cols-[repeat(auto-fill,40px)] justify-center gap-1.5 px-4 pt-3 pb-1.5 ${fadeCls(2)}`}
                 style={fadeStyle(2)}
               >
                 {groups.map((g, i) => {
@@ -240,7 +240,7 @@ export default function Popup() {
                           type="button"
                           onClick={() => handleJumpToGroup(g.domain)}
                           aria-label={label}
-                          className={`w-10 h-10 rounded-full border shrink-0 inline-flex items-center justify-center cursor-pointer transition-all duration-200 ease-out hover:-translate-y-px ${
+                          className={`inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 ease-out hover:-translate-y-px ${
                             activeGroup === g.domain
                               ? 'border-primary bg-card shadow-sm'
                               : 'border-border bg-card/64 hover:border-primary'
@@ -264,7 +264,7 @@ export default function Popup() {
               </div>
 
               {/* ── 标签分组列表（可滚动） ── */}
-              <div className="flex-1 overflow-y-auto min-h-0 px-4 pb-4 pr-2 scrollbar-hide">
+              <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto px-4 pr-2 pb-4">
                 <div className="flex flex-col gap-2">
                   {groups.map((g, gi) => {
                     const label = g.label || g.domain
@@ -275,7 +275,7 @@ export default function Popup() {
                         className={`flex flex-col gap-1.5 ${fadeCls(gi)}`}
                         style={fadeStyle(gi)}
                       >
-                        <h3 className="text-xs font-semibold text-foreground tracking-[-0.01em] m-0 border-l-2 border-secondary pl-1.5">
+                        <h3 className="text-foreground border-secondary m-0 border-l-2 pl-1.5 text-xs font-semibold tracking-[-0.01em]">
                           {label}
                         </h3>
                         <div className="flex flex-col gap-1">
@@ -288,7 +288,7 @@ export default function Popup() {
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleFocusTab(tab)
                               }}
-                              className={`flex items-center gap-2 px-2.5 py-[7px] rounded-xl bg-card border border-border/45 shadow-[0_1px_2px_var(--shadow)] cursor-pointer transition-all duration-140 hover:bg-card/88 hover:border-accent/40 hover:shadow-[0_2px_5px_var(--shadow)] ${fadeCls(ti)}`}
+                              className={`bg-card border-border/45 hover:bg-card/88 hover:border-accent/40 flex cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-1.75 shadow-[0_1px_2px_var(--shadow)] transition-all duration-140 hover:shadow-[0_2px_5px_var(--shadow)] ${fadeCls(ti)}`}
                               style={fadeStyle(ti)}
                             >
                               <Favicon
@@ -296,16 +296,16 @@ export default function Popup() {
                                 imgCls="w-4 h-4"
                                 fallbackCls="w-4 h-4 text-[8px]"
                               />
-                              <span className="flex-1 min-w-0 text-xs text-foreground overflow-hidden line-clamp-2 leading-[1.35] break-words">
+                              <span className="text-foreground line-clamp-2 min-w-0 flex-1 overflow-hidden text-xs leading-[1.35] wrap-break-word">
                                 {tab.title || t('untitledTab')}
                               </span>
                               <button
                                 type="button"
                                 onClick={(e) => handleCloseTab(e, tab.id)}
                                 aria-label={t('closeTabButton')}
-                                className="w-[22px] h-[22px] rounded shrink-0 flex items-center justify-center text-muted-foreground opacity-50 hover:opacity-100 hover:text-[rgb(179,90,90)] hover:bg-[rgba(179,90,90,0.08)] transition-all duration-150 cursor-pointer active:scale-95"
+                                className="text-muted-foreground flex h-5.5 w-5.5 shrink-0 cursor-pointer items-center justify-center rounded opacity-50 transition-all duration-150 hover:bg-[rgba(179,90,90,0.08)] hover:text-[rgb(179,90,90)] hover:opacity-100 active:scale-95"
                               >
-                                <X strokeWidth={2.5} className="w-3 h-3" />
+                                <X strokeWidth={2.5} className="h-3 w-3" />
                               </button>
                             </div>
                           ))}

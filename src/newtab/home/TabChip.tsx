@@ -43,28 +43,28 @@ export function TabChip({
 
   return (
     // ── 标签行（外层容器，无点击事件） ──
-    <div className="flex items-center gap-2 py-2 min-h-11 border-b border-border/50 text-sm leading-[1.4] last:border-b-0 rounded-md -mx-2 px-2.5 transition-colors duration-150 overflow-hidden hover:bg-secondary/50">
+    <div className="border-border/50 hover:bg-secondary/50 -mx-2 flex min-h-11 items-center gap-2 overflow-hidden rounded-md border-b px-2.5 py-2 text-sm leading-[1.4] transition-colors duration-150 last:border-b-0">
       {/* ── 文案区域（绑定跳转/勾选事件） ── */}
       <div
         onClick={() => (mode === 'view' ? onFocus?.(tab.id) : onToggle?.(tab.id))}
-        className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden cursor-pointer rounded-md -my-1 py-1"
+        className="-my-1 flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md py-1"
       >
         {mode === 'select' && (
           <Checkbox checked={!!selected} onCheckedChange={() => onToggle?.(tab.id)} />
         )}
         <Favicon tab={tab} imgCls="w-3.5 h-3.5" fallbackCls="w-3.5 h-3.5 text-[9px]" />
 
-        <span className={cn('truncate flex-1', tab.discarded && 'text-muted-foreground/40')}>
+        <span className={cn('flex-1 truncate', tab.discarded && 'text-muted-foreground/40')}>
           {tab.title || t('untitledTab')}
         </span>
         {dupeCount && dupeCount > 1 && (
-          <span className="text-xs text-accent shrink-0 font-medium">({dupeCount}x)</span>
+          <span className="text-accent shrink-0 text-xs font-medium">({dupeCount}x)</span>
         )}
       </div>
 
       {/* ── 操作按钮组（仅展示模式） ── */}
       {mode === 'view' && (
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex shrink-0 items-center gap-1">
           {showSleep && onSleepTab && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -73,7 +73,7 @@ export function TabChip({
                   aria-label={t('discardTab')}
                   variant="ghost"
                   size="icon-sm"
-                  className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
+                  className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
                 >
                   <Moon strokeWidth={1.8} />
                 </Button>
@@ -89,7 +89,7 @@ export function TabChip({
                   aria-label={t('saveTabSession')}
                   variant="ghost"
                   size="icon-sm"
-                  className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
+                  className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
                 >
                   <Archive strokeWidth={1.8} />
                 </Button>
@@ -105,7 +105,7 @@ export function TabChip({
                   aria-label={t('closeThisTab')}
                   variant="ghost"
                   size="icon-sm"
-                  className="text-muted-foreground/50  hover:bg-secondary/60 hover:text-primary"
+                  className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
                 >
                   <X strokeWidth={1.8} />
                 </Button>

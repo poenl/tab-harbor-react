@@ -18,7 +18,7 @@ export function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
         alt=""
         draggable={false}
         onError={() => setImgError(true)}
-        className="w-5.5 h-5.5 rounded-md object-contain"
+        className="h-5.5 w-5.5 rounded-md object-contain"
       />
     )
   }
@@ -30,7 +30,7 @@ export function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
         alt=""
         draggable={false}
         onError={() => setImgError(true)}
-        className="w-5.5 h-5.5 rounded-md object-contain"
+        className="h-5.5 w-5.5 rounded-md object-contain"
       />
     )
   }
@@ -52,12 +52,12 @@ export function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
               e.currentTarget.removeAttribute('data-fallback-src')
             } else setImgError(true)
           }}
-          className="w-5.5 h-5.5 rounded-md object-contain"
+          className="h-5.5 w-5.5 rounded-md object-contain"
         />
       )
     }
   }
 
   const fallbackText = getFallbackLabel(label, url)
-  return <span className="text-sm font-bold text-primary">{fallbackText}</span>
+  return <span className="text-primary text-sm font-bold">{fallbackText}</span>
 }

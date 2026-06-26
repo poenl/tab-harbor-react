@@ -65,7 +65,7 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
           {...provided.draggableProps}
           style={provided.draggableProps.style as React.CSSProperties}
           data-session-id={session.id}
-          className="bg-card border border-border rounded-2xl p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] shadow-primary/5"
+          className="bg-card border-border shadow-primary/5 rounded-2xl border p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)]"
         >
           {/* ── 卡片顶部：名称 + 摘要 + 操作按钮 ── */}
           <div className="flex items-center gap-2">
@@ -75,10 +75,10 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
             >
               <GripVertical
                 strokeWidth={1.8}
-                className="w-4 h-4 text-muted-foreground/40 shrink-0"
+                className="text-muted-foreground/40 h-4 w-4 shrink-0"
               />
             </span>
-            <div className="flex flex-col flex-1 min-w-0">
+            <div className="flex min-w-0 flex-1 flex-col">
               {renaming ? (
                 <input
                   type="text"
@@ -87,14 +87,14 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                   onBlur={handleRenameSubmit}
                   onKeyDown={handleKeyDown}
                   autoFocus
-                  className="text-base font-semibold tracking-[-0.01em] text-foreground bg-transparent border-b border-primary/30 outline-none py-0"
+                  className="text-foreground border-primary/30 border-b bg-transparent py-0 text-base font-semibold tracking-[-0.01em] outline-none"
                 />
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
                       onClick={() => setRenaming(true)}
-                      className="w-fit max-w-full text-base font-semibold tracking-[-0.01em] text-foreground text-left bg-none border-b border-transparent p-0 cursor-text hover:text-primary transition-colors duration-150 truncate"
+                      className="text-foreground hover:text-primary w-fit max-w-full cursor-text truncate border-b border-transparent bg-none p-0 text-left text-base font-semibold tracking-[-0.01em] transition-colors duration-150"
                     >
                       {session.name}
                     </button>
@@ -103,7 +103,7 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                 </Tooltip>
               )}
 
-              <div className="text-xs text-muted-foreground mt-0.5">
+              <div className="text-muted-foreground mt-0.5 text-xs">
                 {session.tabs.length}{' '}
                 {t(session.tabs.length === 1 ? 'tabsWordSingular' : 'tabsWordPlural')} saved{' '}
                 {formatRelativeTime(session.savedAt, t)}
@@ -115,13 +115,13 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => toggleCollapse(session.id)}
-                    className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-foreground transition-all duration-150"
+                    className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border bg-transparent p-0 transition-all duration-150"
                     aria-label={isCollapsed ? t('expand') || 'Expand' : t('collapse') || 'Collapse'}
                   >
                     {isCollapsed ? (
-                      <ChevronDown strokeWidth={1.8} className="w-4 h-4" />
+                      <ChevronDown strokeWidth={1.8} className="h-4 w-4" />
                     ) : (
-                      <ChevronUp strokeWidth={1.8} className="w-4 h-4" />
+                      <ChevronUp strokeWidth={1.8} className="h-4 w-4" />
                     )}
                   </button>
                 </TooltipTrigger>
@@ -134,10 +134,10 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => restoreSession(session.id)}
-                    className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-150"
+                    className="border-border text-muted-foreground hover:bg-secondary hover:text-primary flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border bg-transparent p-0 transition-all duration-150"
                     aria-label={t('restoreSessionTooltip')}
                   >
-                    <RotateCcw strokeWidth={1.8} className="w-4 h-4" />
+                    <RotateCcw strokeWidth={1.8} className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="top">{t('restoreSessionTooltip')}</TooltipContent>
@@ -147,10 +147,10 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => removeSession(session.id)}
-                    className="w-8 h-8 p-0 border border-border rounded-lg bg-transparent text-muted-foreground cursor-pointer flex items-center justify-center hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all duration-150"
+                    className="border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border bg-transparent p-0 transition-all duration-150"
                     aria-label={t('deleteSessionTooltip')}
                   >
-                    <Trash2 strokeWidth={1.8} className="w-4 h-4" />
+                    <Trash2 strokeWidth={1.8} className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="top">{t('deleteSessionTooltip')}</TooltipContent>
@@ -165,7 +165,7 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="mt-3 pt-3 border-t border-border/50"
+                  className="border-border/50 mt-3 border-t pt-3"
                 >
                   {session.tabs.map((tab, i) => (
                     <SavedSessionTabRow

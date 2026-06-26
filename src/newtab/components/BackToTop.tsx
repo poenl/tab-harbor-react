@@ -26,11 +26,11 @@ export function BackToTop() {
       onClick={handleClick}
       aria-label="Back to top"
       className={cn(
-        'fixed right-[calc(50vw-630px)] bottom-7 size-10.5 rounded-full border border-border/40 bg-card/85 text-accent shadow-lg backdrop-blur-md hover:bg-muted/50 hover:text-accent hover:shadow-xl z-50 transition-all duration-200',
-        'max-[500px]:left-4.5 max-[500px]:bottom-5 max-[500px]:size-11',
+        'border-border/40 bg-card/85 text-accent hover:bg-muted/50 hover:text-accent fixed right-[calc(50vw-630px)] bottom-7 z-50 size-10.5 rounded-full border shadow-lg backdrop-blur-md transition-all duration-200 hover:shadow-xl',
+        'max-[500px]:bottom-5 max-[500px]:left-4.5 max-[500px]:size-11',
         visible
-          ? 'opacity-100 translate-y-0 pointer-events-auto'
-          : 'opacity-0 translate-y-2 pointer-events-none'
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none translate-y-2 opacity-0'
       )}
     >
       <ChevronUp strokeWidth={2} className="size-4.5" />

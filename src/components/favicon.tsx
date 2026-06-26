@@ -27,7 +27,7 @@ export function Favicon({
       <img
         src={tab.favIconUrl}
         alt=""
-        className={cn('rounded-xs shrink-0 object-contain', imgCls)}
+        className={cn('shrink-0 rounded-xs object-contain', imgCls)}
         onError={() => setImgError(true)}
       />
     )
@@ -37,7 +37,7 @@ export function Favicon({
   return (
     <span
       className={cn(
-        'rounded-full inline-flex items-center justify-center font-bold shrink-0 bg-secondary text-primary',
+        'bg-secondary text-primary inline-flex shrink-0 items-center justify-center rounded-full font-bold',
         fallbackCls
       )}
     >
