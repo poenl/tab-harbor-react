@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt'
 import tailwindcss from '@tailwindcss/vite'
+import babel from '@rolldown/plugin-babel'
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
@@ -14,6 +15,11 @@ export default defineConfig({
     host_permissions: ['<all_urls>']
   }),
   vite: () => ({
-    plugins: [tailwindcss()]
+    plugins: [
+      tailwindcss(),
+      babel({
+        presets: [() => ({ plugins: [['babel-plugin-react-compiler', { target: '19' }]] })]
+      })
+    ]
   })
 })
