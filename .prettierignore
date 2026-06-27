@@ -3,3 +3,8 @@ node_modules/
 .output/
 .wxt/
 pnpm-lock.yaml
+.agents/
+.gitnexus/
+AGENTS.md
+README.md
+README.en.md

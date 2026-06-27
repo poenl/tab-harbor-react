@@ -155,13 +155,10 @@ Tab Harbor 是一款 Chrome 新标签页扩展，帮助你管理浏览器中的�
 | 打包 zip | `pnpm zip` | 发布用 |
 | 格式化 | `pnpm format` | Prettier 格式化 |
 
-
-
 ## 📁 项目结构
 
 ```
 src/
-├── background.ts           # Service Worker
 ├── content.ts              # Content Script
 ├── newtab/                 # 新标签页
 │   ├── index.html

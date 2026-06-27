@@ -1,10 +1,6 @@
 import { create } from 'zustand'
 import type { Browser } from 'wxt/browser'
-import {
-  type DomainGroup,
-  normalizeTab,
-  buildDomainGroups
-} from '@/newtab/utils/domain-grouping'
+import { type DomainGroup, normalizeTab, buildDomainGroups } from '@/newtab/utils/domain-grouping'
 import { getTabQuery } from '@/utils/tabs'
 import { useThemeStore } from '@/stores/theme'
 import { closeDuplicateNewTabs } from '@/utils/close-duplicate-tabs'
@@ -18,10 +14,7 @@ interface OpenTabsState {
 
   fetchTabs: () => Promise<void>
   closeTab: (tabId: number) => Promise<void>
-  focusTab: (tab: {
-    id: number
-    windowId: number
-  }) => Promise<void>
+  focusTab: (tab: { id: number; windowId: number }) => Promise<void>
 }
 
 export const useOpenTabsStore = create<OpenTabsState>()((set) => ({

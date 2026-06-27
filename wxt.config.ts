@@ -5,11 +5,14 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   srcDir: 'src',
   entrypointsDir: '.',
-  manifest: {
-    name: 'Tab Harbor',
+  webExt: {
+    disabled: true
+  },
+  manifest: ({ mode }) => ({
+    name: mode === 'development' ? 'Tab Harbor Dev' : 'Tab Harbor',
     permissions: ['tabs', 'storage', 'tabGroups', 'bookmarks', 'favicon'],
     host_permissions: ['<all_urls>']
-  },
+  }),
   vite: () => ({
     plugins: [tailwindcss()]
   })

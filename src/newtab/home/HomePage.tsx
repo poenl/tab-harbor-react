@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from '@/i18n'
-import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
 import { useOpenTabsStore } from '@/stores/openTabs'
 import { useTheme } from '@/stores/theme'

@@ -155,13 +155,10 @@ The design language and interaction logic remain true to Tab Harbor's core philo
 | Package zip | `pnpm zip` | For publishing |
 | Format | `pnpm format` | Prettier |
 
-
-
 ## 📁 Project Structure
 
 ```
 src/
-├── background.ts           # Service Worker
 ├── content.ts              # Content Script
 ├── newtab/                 # New Tab Page
 │   ├── index.html
