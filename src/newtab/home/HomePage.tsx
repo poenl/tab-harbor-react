@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import { useTheme } from '@/stores/theme'
 import { toast } from 'sonner'
 import { Moon, Archive, X } from 'lucide-react'
@@ -28,16 +29,11 @@ import { QuickShortcuts } from './QuickShortcuts.tsx'
 import { Footer } from './Footer.tsx'
 import { TabOutDupeBanner } from './TabOutDupeBanner.tsx'
 
-interface HomePageProps {
-  groups: DomainGroup[]
-  loading: boolean
-  totalTabs: number
-  onCloseTab?: (id: number) => void
-  onFocusTab?: (id: number) => void
-}
-
-export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }: HomePageProps) {
+export function HomePage() {
   const { t } = useTranslation()
+  const groups = useOpenTabsStore((s) => s.groups)
+  const loading = useOpenTabsStore((s) => s.loading)
+  const totalTabs = useOpenTabsStore((s) => s.totalTabs)
   const { preferences } = useTheme()
   const { sleepControlEnabled } = preferences
   const [selectTarget, setSelectTarget] = useState<string | null>(null)
@@ -147,7 +143,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
       <TabOutDupeBanner />
 
       {/* ── 两列布局（左: 1.35fr = 标签列表 / 右: 0.95fr = 问候+搜索+快捷） ── */}
-      <div className="grid grid-cols-[1.35fr_0.95fr] items-start gap-8 max-[960px]:grid-cols-1 max-[960px]:gap-5">
+      <div className="grid grid-cols-[1.35fr_0.95fr] items-start gap-8 max-[960px]:grid-cols-1 max-[960px]:gap-5 mb-15">
         {/* ── 左栏：打开标签页 ── */}
         <section className="min-w-0">
           <SectionHeader
@@ -222,8 +218,6 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
           <TabGroupList
             groups={groups}
             loading={loading}
-            onCloseTab={onCloseTab}
-            onFocusTab={onFocusTab}
             onSleepTab={handleSleepTab}
             onSleepGroup={handleSleepGroup}
             onSaveTab={handleSaveTab}
@@ -249,7 +243,7 @@ export function HomePage({ groups, loading, totalTabs, onCloseTab, onFocusTab }:
         </header>
       </div>
 
-      <Footer totalTabs={totalTabs} />
+      <Footer />
     </>
   )
 }

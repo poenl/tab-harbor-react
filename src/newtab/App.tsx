@@ -8,30 +8,15 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
 import { HomePage } from './home/HomePage.tsx'
 import { SavedTabsPage } from './saved-tabs/SavedTabsPage.tsx'
-import { useOpenTabs } from './hooks/useOpenTabs.ts'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { useTheme } from '@/stores/theme'
 
 export default function App() {
-  const { groups, loading } = useOpenTabs()
+  const groups = useOpenTabsStore((s) => s.groups)
   const sessions = useSavedSessionsStore((s) => s.sessions)
   const { preferences } = useTheme()
   const [currentPage, setCurrentPage] = useState<'home' | 'saved-tabs'>('home')
-
-  async function handleCloseTab(id: number) {
-    try {
-      await browser.tabs.remove(id)
-    } catch {}
-  }
-
-  async function handleFocusTab(id: number) {
-    try {
-      await browser.tabs.update(id, { active: true })
-      await browser.windows.update((await browser.tabs.get(id)).windowId!, { focused: true })
-    } catch {}
-  }
-
-  const totalTabs = groups.reduce((sum, g) => sum + g.tabs.length, 0)
 
   function scrollToAndHighlight(selector: string) {
     const el = document.querySelector(selector)
@@ -75,17 +60,7 @@ export default function App() {
           </div>
 
           {/* ── 主体 ── */}
-          {currentPage === 'home' ? (
-            <HomePage
-              groups={groups}
-              loading={loading}
-              totalTabs={totalTabs}
-              onCloseTab={handleCloseTab}
-              onFocusTab={handleFocusTab}
-            />
-          ) : (
-            <SavedTabsPage />
-          )}
+          {currentPage === 'home' ? <HomePage /> : <SavedTabsPage />}
 
           <Toaster />
           <BackToTop />

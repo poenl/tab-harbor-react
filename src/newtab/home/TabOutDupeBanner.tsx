@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
 import { useTranslation } from '@/i18n'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Copy } from 'lucide-react'
@@ -7,28 +7,16 @@ import { playCloseSound } from '@/newtab/utils/sound'
 
 export function TabOutDupeBanner() {
   const { t } = useTranslation()
-  const [tabOutCount, setTabOutCount] = useState(0)
-
-  useEffect(() => {
-    async function check() {
-      const extensionUrl = browser.runtime.getURL('/newtab.html')
-      const allTabs = await browser.tabs.query({ currentWindow: true })
-      const count = allTabs.filter(
-        (tab) => tab.url === extensionUrl || tab.url === 'chrome://newtab/'
-      ).length
-      setTabOutCount(count)
-    }
-    check()
-  }, [])
+  const tabOutCount = useOpenTabsStore((s) => s.tabOutCount)
 
   async function handleCloseExtras() {
+    const { rawTabs } = useOpenTabsStore.getState()
     const extensionUrl = browser.runtime.getURL('/newtab.html')
-    const currentWindow = await browser.windows.getCurrent()
-    const allTabs = await browser.tabs.query({ currentWindow: true })
-    const tabOutTabs = allTabs.filter(
+    const tabOutTabs = rawTabs.filter(
       (tab) => tab.url === extensionUrl || tab.url === 'chrome://newtab/'
     )
     if (tabOutTabs.length <= 1) return
+    const currentWindow = await browser.windows.getCurrent()
     const keep =
       tabOutTabs.find((t) => t.active && t.windowId === currentWindow.id) ||
       tabOutTabs.find((t) => t.active) ||
@@ -39,7 +27,6 @@ export function TabOutDupeBanner() {
       playCloseSound()
     }
     toast(t('toastClosedExtraTabHarborTabs'))
-    setTabOutCount(1)
   }
 
   if (tabOutCount <= 1) return null

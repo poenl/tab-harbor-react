@@ -1,11 +1,9 @@
 import { useTranslation } from '@/i18n'
+import { useOpenTabsStore } from '@/stores/openTabs'
 
-interface FooterProps {
-  totalTabs: number
-}
-
-export function Footer({ totalTabs }: FooterProps) {
+export function Footer() {
   const { t } = useTranslation()
+  const totalTabs = useOpenTabsStore((s) => s.totalTabs)
 
   return (
     // ── 页脚：标签总数 + 版权信息 ──

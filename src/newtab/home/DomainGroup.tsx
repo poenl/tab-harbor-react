@@ -28,8 +28,6 @@ interface DomainGroupCardProps {
   groups: DomainGroup[]
 
   // View mode callbacks
-  onCloseTab?: (id: number) => void
-  onFocusTab?: (id: number) => void
   onSleepTab?: (id: number) => void
   onSleepGroup?: (domain: string) => void
   onSaveTab?: (tab: any) => void
@@ -48,8 +46,6 @@ interface DomainGroupCardProps {
 export function DomainGroupCard({
   mode,
   groups,
-  onCloseTab,
-  onFocusTab,
   onSleepTab,
   onSleepGroup,
   onSaveTab,
@@ -270,8 +266,6 @@ export function DomainGroupCard({
                   key={tab.id}
                   tab={tab}
                   mode={mode}
-                  onClose={onCloseTab}
-                  onFocus={onFocusTab}
                   onSleepTab={onSleepTab}
                   onSaveTab={onSaveTab}
                   sleepControlEnabled={sleepControlEnabled}

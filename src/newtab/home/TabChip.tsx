@@ -1,5 +1,6 @@
 import { useTranslation } from '@/i18n'
 import type { OpenTab } from '@/newtab/utils/domain-grouping.ts'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import { Favicon } from '@/components/favicon'
 import { Moon, Archive, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -12,8 +13,6 @@ interface TabChipProps {
   mode?: 'view' | 'select'
 
   // View mode
-  onClose?: (id: number) => void
-  onFocus?: (id: number) => void
   onSleepTab?: (id: number) => void
   onSaveTab?: (tab: OpenTab) => void
   sleepControlEnabled?: boolean
@@ -29,8 +28,6 @@ interface TabChipProps {
 export function TabChip({
   tab,
   mode = 'view',
-  onClose,
-  onFocus,
   onSleepTab,
   onSaveTab,
   sleepControlEnabled,
@@ -40,13 +37,15 @@ export function TabChip({
 }: TabChipProps) {
   const { t } = useTranslation()
   const showSleep = sleepControlEnabled && !tab.discarded && !tab.active
+  const closeTab = useOpenTabsStore((s) => s.closeTab)
+  const focusTab = useOpenTabsStore((s) => s.focusTab)
 
   return (
     // ── 标签行（外层容器，无点击事件） ──
     <div className="border-border/50 hover:bg-secondary/50 -mx-2 flex min-h-11 items-center gap-2 overflow-hidden rounded-md border-b px-2.5 py-2 text-sm leading-[1.4] transition-colors duration-150 last:border-b-0">
       {/* ── 文案区域（绑定跳转/勾选事件） ── */}
       <div
-        onClick={() => (mode === 'view' ? onFocus?.(tab.id) : onToggle?.(tab.id))}
+        onClick={() => (mode === 'view' ? focusTab(tab) : onToggle?.(tab.id))}
         className="-my-1 flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md py-1"
       >
         {mode === 'select' && (
@@ -97,22 +96,20 @@ export function TabChip({
               <TooltipContent side="top">{t('saveTabSession')}</TooltipContent>
             </Tooltip>
           )}
-          {onClose && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => onClose(tab.id)}
-                  aria-label={t('closeThisTab')}
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
-                >
-                  <X strokeWidth={1.8} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">{t('closeThisTab')}</TooltipContent>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => closeTab(tab.id)}
+                aria-label={t('closeThisTab')}
+                variant="ghost"
+                size="icon-sm"
+                className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
+              >
+                <X strokeWidth={1.8} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">{t('closeThisTab')}</TooltipContent>
+          </Tooltip>
         </div>
       )}
     </div>

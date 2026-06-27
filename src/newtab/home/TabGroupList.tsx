@@ -6,8 +6,6 @@ import { EmptyState } from './EmptyState.tsx'
 interface TabGroupListProps {
   groups: DomainGroup[]
   loading: boolean
-  onCloseTab?: (id: number) => void
-  onFocusTab?: (id: number) => void
   onSleepTab?: (id: number) => void
   onSleepGroup?: (domain: string) => void
   onSaveTab?: (tab: any) => void
@@ -26,8 +24,6 @@ interface TabGroupListProps {
 export function TabGroupList({
   groups,
   loading,
-  onCloseTab,
-  onFocusTab,
   onSleepTab,
   onSleepGroup,
   onSaveTab,
@@ -71,8 +67,6 @@ export function TabGroupList({
               <DomainGroupCard
                 mode={isSelect ? 'select' : 'view'}
                 groups={[group]}
-                onCloseTab={onCloseTab}
-                onFocusTab={onFocusTab}
                 onSleepTab={onSleepTab}
                 onSleepGroup={onSleepGroup}
                 onSaveTab={onSaveTab}

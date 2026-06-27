@@ -208,7 +208,7 @@ function FolderMenu({
 
   const dropdownEl = dropdown && (
     <div
-      className="border-border scrollbar-hide z-60 max-w-64 min-w-44 overflow-y-auto overscroll-contain rounded-xl border shadow-lg"
+      className="border-border scrollbar-hide z-60 max-w-64 min-w-44 overflow-y-auto overscroll-none rounded-xl border shadow-lg"
       style={{
         position: 'fixed',
         top: dropdown.top,
@@ -293,7 +293,7 @@ function OverflowMenu({ items, size }: { items: FlatNode[]; size: BookmarksBarSi
 
   const dropdown = open && (
     <div
-      className="border-border scrollbar-hide absolute top-full right-0 z-50 mt-0.5 max-w-64 min-w-44 overflow-y-auto overscroll-contain rounded-xl border p-1.5 shadow-lg backdrop-blur-xl"
+      className="border-border scrollbar-hide absolute top-full right-0 z-50 mt-0.5 max-w-64 min-w-44 overflow-y-auto overscroll-y-none rounded-xl border p-1.5 shadow-lg backdrop-blur-xl"
       style={{
         backgroundColor:
           'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)',
@@ -310,7 +310,7 @@ function OverflowMenu({ items, size }: { items: FlatNode[]; size: BookmarksBarSi
 
   return (
     <div
-      className="relative ml-auto shrink-0 pr-4"
+      className="relative ml-auto shrink-0"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -416,7 +416,7 @@ export function BookmarksBar() {
 
   return (
     <>
-      <div className="blur-bg fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden">
+      <div className="blur-bg fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden px-4">
         <nav
           ref={containerRef}
           className={`flex items-center ${cls.gap} relative`}

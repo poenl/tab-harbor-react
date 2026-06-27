@@ -1,9 +1,7 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from '@/i18n'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
-import { useTheme } from '@/stores/theme'
-import { getTabQuery } from '@/utils/tabs'
-import { normalizeTab, buildDomainGroups } from '@/newtab/utils/domain-grouping'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import type { OpenTab } from '@/newtab/utils/domain-grouping'
 import { Favicon } from '@/components/favicon'
 import { ShortcutIcon } from '@/components/shortcut-icon'
@@ -15,16 +13,16 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 
 export default function Popup() {
   const { t } = useTranslation()
-  const { preferences } = useTheme()
   const shortcuts = useQuickShortcutsStore((s) => s.shortcuts)
 
   const [view, setView] = useState<'shortcuts' | 'tabs'>('shortcuts')
   const [ready, setReady] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
-  const [openTabs, setOpenTabs] = useState<OpenTab[]>([])
-  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [activeGroup, setActiveGroup] = useState<string | null>(null)
+
+  const groups = useOpenTabsStore((s) => s.groups)
+  const loading = useOpenTabsStore((s) => s.loading)
 
   // ── 检测 prefers-reduced-motion ──
   useEffect(() => {
@@ -47,37 +45,12 @@ export default function Popup() {
     return () => cancelAnimationFrame(raf)
   }, [reducedMotion])
 
-  // ── 加载标签页 ──
-  const loadTabs = useCallback(async () => {
+  // ── 手动刷新 ──
+  async function handleRefresh() {
     setRefreshing(true)
-    try {
-      const result = await browser.tabs.query(getTabQuery(preferences.tabScope))
-      setOpenTabs(result.map(normalizeTab))
-    } catch {
-      setOpenTabs([])
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }, [preferences.tabScope])
-
-  useEffect(() => {
-    loadTabs()
-    browser.tabs.onCreated.addListener(loadTabs)
-    browser.tabs.onRemoved.addListener(loadTabs)
-    browser.tabs.onUpdated.addListener(loadTabs)
-    browser.tabs.onAttached.addListener(loadTabs)
-    browser.tabs.onDetached.addListener(loadTabs)
-    return () => {
-      browser.tabs.onCreated.removeListener(loadTabs)
-      browser.tabs.onRemoved.removeListener(loadTabs)
-      browser.tabs.onUpdated.removeListener(loadTabs)
-      browser.tabs.onAttached.removeListener(loadTabs)
-      browser.tabs.onDetached.removeListener(loadTabs)
-    }
-  }, [loadTabs])
-
-  const groups = buildDomainGroups(openTabs)
+    await useOpenTabsStore.getState().fetchTabs()
+    setRefreshing(false)
+  }
 
   // ── 打开快捷方式 ──
   async function handleOpenUrl(url: string) {
@@ -164,7 +137,7 @@ export default function Popup() {
         </div>
         <button
           type="button"
-          onClick={loadTabs}
+          onClick={handleRefresh}
           disabled={refreshing}
           aria-label={t('popupRefreshLabel')}
           className="text-muted-foreground bg-card/80 hover:bg-secondary hover:text-accent flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-all duration-150 active:scale-90 disabled:pointer-events-none disabled:opacity-60"
@@ -220,7 +193,7 @@ export default function Popup() {
         >
           {loading ? (
             <div className="text-muted-foreground py-7 text-center text-xs">{t('loading')}</div>
-          ) : openTabs.length === 0 || groups.length === 0 ? (
+          ) : groups.length === 0 ? (
             <div className="text-muted-foreground px-4 py-7 text-center text-xs">
               {t('popupTabsEmpty')}
             </div>
