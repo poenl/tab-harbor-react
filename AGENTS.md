@@ -15,6 +15,7 @@
 
 ## 重要约束
 
+- **每次修改代码后必须格式化**：运行 `pnpm format`（`npx -y prettier --write .`）。编辑器有 Prettier 插件且确认能自动格式化后可省略。不得在未格式化的情况下提交代码。
 - **`postinstall` 自动运行 `wxt prepare`**，生成 `.wxt/` 目录（含 tsconfig 基础配置和类型定义）。`.wxt/` 已 gitignore，**首次克隆或新增依赖后必须运行 `pnpm install`**。
 - **Prettier 已配置**，配置文件 `.prettierrc` + `.prettierignore`。编辑器插件会自动读取。
 - **WXT 配置入口**：`wxt.config.ts`，目前加载 `@wxt-dev/module-react` 模块，已启用 `srcDir: 'src'` + `entrypointsDir: '.'`。
@@ -61,6 +62,13 @@
 5. **`lucide-react` 是默认图标库**（匹配 `components.json` 的 `"iconLibrary": "lucide"`）。优先用 lucide 图标替代内联 SVG。
 6. **添加新组件**：`npx shadcn@latest add <组件名>`。如果安装失败（超时），手动装 `@radix-ui/react-<primitive>` 并仿照 `src/components/ui/` 下已有组件手写。
 7. **`@radix-ui/*` 包不需要单独装**——`radix-ui` 全量包已经包含所有 Radix primitive 的导出。
+
+## 浏览器调试
+
+- 扩展新标签页 URL: `chrome-extension://<id>/newtab.html`（WXT HMR 开发模式下有效，`<id>` 从 `chrome://extensions` 获取）。
+- 对话开始前服务（`pnpm dev`）已经启动，不需要再启动新的服务进程，不需要询问。
+
+---
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence

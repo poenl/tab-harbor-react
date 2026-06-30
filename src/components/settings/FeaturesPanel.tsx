@@ -101,7 +101,7 @@ export function FeaturesPanel() {
         </div>
 
         {preferences.bookmarksBarEnabled && (
-          <div className="theme-menu-section">
+          <>
             <div className="flex items-center justify-between gap-2.5">
               <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
                 {t('bookmarksBarSizeLabel')}
@@ -116,7 +116,6 @@ export function FeaturesPanel() {
                 onChange={(v) => updatePreferences({ bookmarksBarSize: v as BookmarksBarSize })}
               />
             </div>
-            <Separator className="my-3.5" />
             <div className="flex items-center justify-between gap-2.5">
               <Label className="text-muted-foreground pt-1 pl-0.5 text-xs font-bold tracking-[0.16em] uppercase">
                 {t('bookmarkOpenModeLabel')}
@@ -130,7 +129,7 @@ export function FeaturesPanel() {
                 onChange={(v) => updatePreferences({ bookmarkOpenMode: v as BookmarkOpenMode })}
               />
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
