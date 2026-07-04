@@ -7,26 +7,14 @@ import { playCloseSound } from '@/newtab/utils/sound'
 
 export function TabOutDupeBanner() {
   const { t } = useTranslation()
-  const tabOutCount = useOpenTabsStore((s) => s.tabOutCount)
+  const tabOutCount = useOpenTabsStore((s) => s.allTabs.filter((t) => t.url === s.newTabUrl).length)
 
   async function handleCloseExtras() {
-    const { rawTabs } = useOpenTabsStore.getState()
-    const extensionUrl = browser.runtime.getURL('/newtab.html')
-    const tabOutTabs = rawTabs.filter(
-      (tab) => tab.url === extensionUrl || tab.url === 'chrome://newtab/'
-    )
-    if (tabOutTabs.length <= 1) return
-    const currentWindow = await browser.windows.getCurrent()
-    const keep =
-      tabOutTabs.find((t) => t.active && t.windowId === currentWindow.id) ||
-      tabOutTabs.find((t) => t.active) ||
-      tabOutTabs[0]
-    const toClose = tabOutTabs.filter((t) => t.id !== keep.id).map((t) => t.id!)
-    if (toClose.length > 0) {
-      await browser.tabs.remove(toClose)
+    const count = await useOpenTabsStore.getState().closeDuplicateExtras()
+    if (count > 0) {
       playCloseSound()
+      toast(t('toastClosedExtraTabHarborTabs'))
     }
-    toast(t('toastClosedExtraTabHarborTabs'))
   }
 
   if (tabOutCount <= 1) return null

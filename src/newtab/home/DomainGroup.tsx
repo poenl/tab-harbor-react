@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useTranslation } from '@/i18n'
 import { toast } from 'sonner'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import type { SavedTabSession } from '@/stores/savedSessions'
 import { cn } from '@/lib/utils'
@@ -131,7 +132,9 @@ export function DomainGroupCard({
 
   async function closeGroupDuplicates(urls: string[]) {
     const currentWindow = await browser.windows.getCurrent()
-    const allTabs = await browser.tabs.query({ windowId: currentWindow.id })
+    const allTabs = useOpenTabsStore
+      .getState()
+      .allTabs.filter((t) => t.windowId === currentWindow.id)
     const toClose: number[] = []
     for (const url of urls) {
       const matching = allTabs.filter((t) => t.url === url)

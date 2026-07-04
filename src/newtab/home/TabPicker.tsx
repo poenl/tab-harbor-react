@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from '@/i18n'
-import { useTheme } from '@/stores/theme'
-import { getTabQuery } from '@/utils/tabs'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { Input } from '@/components/ui/input'
@@ -94,33 +93,28 @@ function TabRow({
 
 export function TabPicker({ onClose }: TabPickerProps) {
   const { t } = useTranslation()
-  const { preferences } = useTheme()
   const shortcuts = useQuickShortcutsStore((s) => s.shortcuts)
   const add = useQuickShortcutsStore((s) => s.add)
   const [mode, setMode] = useState<'tabs' | 'url'>('tabs')
-  const [tabs, setTabs] = useState<BrowserTab[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    ;(async () => {
-      const result = await browser.tabs.query(getTabQuery(preferences.tabScope))
-      setTabs(
-        result
-          .filter(
-            (tab) => tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('about:')
-          )
-          .map((tab) => ({
-            id: tab.id!,
-            url: tab.url!,
-            title: tab.title || '',
-            favIconUrl: tab.favIconUrl
-          }))
-      )
-      setLoading(false)
-    })()
-  }, [])
+  const storeTabs = useOpenTabsStore((s) => s.allTabs)
+  const loading = useOpenTabsStore((s) => s.loading)
+  const tabs = useMemo(
+    () =>
+      storeTabs
+        .filter(
+          (tab) => tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('about:')
+        )
+        .map((tab) => ({
+          id: tab.id!,
+          url: tab.url!,
+          title: tab.title || '',
+          favIconUrl: tab.favIconUrl
+        })),
+    [storeTabs]
+  )
 
   const filteredTabs = useMemo(() => {
     if (!search.trim()) return tabs

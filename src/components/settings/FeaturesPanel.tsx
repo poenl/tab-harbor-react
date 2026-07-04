@@ -1,8 +1,8 @@
 import { useTranslation } from '@/i18n'
 import { useTheme } from '@/stores/theme'
+import { useOpenTabsStore } from '@/stores/openTabs'
 import type { TabScope, BookmarksBarSize, BookmarkOpenMode } from '@/constants/preferences'
 import { toast } from 'sonner'
-import { closeDuplicateNewTabs } from '@/utils/close-duplicate-tabs'
 import { InlineSelect } from './AppearancePanel'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
@@ -54,7 +54,7 @@ export function FeaturesPanel() {
               const next = !preferences.closeDuplicateNewTabsEnabled
               await updatePreferences({ closeDuplicateNewTabsEnabled: next })
               if (next) {
-                const count = await closeDuplicateNewTabs()
+                const count = await useOpenTabsStore.getState().closeDuplicateExtras()
                 if (count > 0) toast(t('toastClosedDuplicatesKeptOne'))
               }
             }}

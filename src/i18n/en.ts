@@ -209,7 +209,8 @@ export const en = {
   bookmarksBarSizeCompact: 'Compact',
   bookmarksBarSizeNormal: 'Normal',
   bookmarksBarSizeLarge: 'Large',
-  bookmarkOpenModeLabel: 'Open bookmarks'
+  bookmarkOpenModeLabel: 'Open bookmarks',
+  internalPagesLabel: 'Internal Pages'
 } as const
 
 export type TranslationKey = keyof typeof en

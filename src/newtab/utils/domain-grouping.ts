@@ -1,3 +1,5 @@
+import i18n from '@/i18n'
+
 // 标准化的标签页数据
 export interface OpenTab {
   id: number
@@ -7,6 +9,7 @@ export interface OpenTab {
   windowId: number
   active: boolean
   discarded: boolean
+  pinned: boolean
 }
 
 // 按域名分组后的集合
@@ -48,6 +51,7 @@ interface ChromeTab {
   windowId?: number
   active?: boolean
   discarded?: boolean
+  pinned?: boolean
 }
 
 // 提取主域名（处理 .co.uk 等双段 TLD）
@@ -62,18 +66,6 @@ function getPrimaryDomain(hostname: string): string {
   return parts.slice(-2).join('.')
 }
 
-// 排除浏览器内部页面
-function isRealTab(tab: OpenTab): boolean {
-  const url = tab.url || ''
-  return (
-    !url.startsWith('chrome://') &&
-    !url.startsWith('chrome-extension://') &&
-    !url.startsWith('about:') &&
-    !url.startsWith('edge://') &&
-    !url.startsWith('brave://')
-  )
-}
-
 // 补全标签页缺失字段
 export function normalizeTab(t: ChromeTab): OpenTab {
   return {
@@ -83,7 +75,8 @@ export function normalizeTab(t: ChromeTab): OpenTab {
     favIconUrl: t.favIconUrl || '',
     windowId: t.windowId ?? 0,
     active: t.active ?? false,
-    discarded: t.discarded ?? false
+    discarded: t.discarded ?? false,
+    pinned: t.pinned ?? false
   }
 }
 
@@ -93,7 +86,7 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   const realTabs = tabs.filter((t) => {
     if (t.id == null || seen.has(t.id)) return false
     seen.add(t.id)
-    return isRealTab(t)
+    return true
   })
 
   const groupMap: Record<string, DomainGroup> = {}
@@ -103,10 +96,17 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   for (const tab of realTabs) {
     try {
       let hostname: string
-      if (tab.url.startsWith('file://')) {
-        hostname = 'local-files'
+      if (
+        tab.url.startsWith('file://') ||
+        tab.url.startsWith('chrome://') ||
+        tab.url.startsWith('chrome-extension://') ||
+        tab.url.startsWith('about:') ||
+        tab.url.startsWith('edge://') ||
+        tab.url.startsWith('brave://')
+      ) {
+        hostname = 'internal'
         if (!groupMap[hostname]) {
-          groupMap[hostname] = { domain: hostname, tabs: [], label: 'Local Files' }
+          groupMap[hostname] = { domain: hostname, tabs: [], label: i18n.t('internalPagesLabel') }
           domainOrder.set(hostname, orderIdx++)
         }
         groupMap[hostname].tabs.push(tab)

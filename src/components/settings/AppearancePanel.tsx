@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from '@/i18n'
+import i18n from '@/i18n'
 import { useTheme } from '@/stores/theme'
 import { THEME_PALETTES } from '@/constants/preferences'
 import type { ThemePaletteId, ThemeMode } from '@/constants/preferences'
@@ -88,10 +89,14 @@ export function AppearancePanel() {
   const [currentLang, setCurrentLang] = useState<string>('auto')
 
   useEffect(() => {
-    browser.storage.local.get('languagePreference').then((result) => {
-      const pref = result.languagePreference as string | undefined
-      setCurrentLang(pref || 'auto')
-    })
+    function updateFromStorage() {
+      browser.storage.local.get('languagePreference').then((result) => {
+        setCurrentLang((result.languagePreference as string) || 'auto')
+      })
+    }
+    updateFromStorage()
+    i18n.on('languageChanged', updateFromStorage)
+    return () => i18n.off('languageChanged', updateFromStorage)
   }, [])
 
   return (
@@ -198,7 +203,7 @@ export function AppearancePanel() {
                 onClick={async () => {
                   const pref = lang.key === 'auto' ? '' : lang.key
                   await browser.storage.local.set({ languagePreference: pref })
-                  window.location.reload()
+                  i18n.changeLanguage(pref || undefined)
                 }}
                 className={`min-h-auto cursor-pointer border-none bg-transparent p-0 text-xs font-semibold transition-colors duration-150 ${
                   currentLang === lang.key

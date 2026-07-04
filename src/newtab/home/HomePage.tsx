@@ -5,7 +5,7 @@ import { useOpenTabsStore } from '@/stores/openTabs'
 import { useTheme } from '@/stores/theme'
 import { toast } from 'sonner'
 import { Moon, Archive, X } from 'lucide-react'
-import { getTabQuery, discardTabs } from '@/utils/tabs'
+import { discardTabs } from '@/utils/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   AlertDialog,
@@ -32,15 +32,15 @@ export function HomePage() {
   const { t } = useTranslation()
   const groups = useOpenTabsStore((s) => s.groups)
   const loading = useOpenTabsStore((s) => s.loading)
-  const totalTabs = useOpenTabsStore((s) => s.totalTabs)
+  const totalTabs = useOpenTabsStore((s) => s.tabs.length)
   const { preferences } = useTheme()
   const { sleepControlEnabled } = preferences
   const [selectTarget, setSelectTarget] = useState<string | null>(null)
   const [selectedTabIds, setSelectedTabIds] = useState<Set<number>>(new Set())
 
   async function handleSleepAllTabs() {
-    const tabs = await browser.tabs.query(getTabQuery(preferences.tabScope))
-    const ids = tabs.filter((t) => !t.discarded && t.id).map((t) => t.id!)
+    const realTabs = useOpenTabsStore.getState().tabs
+    const ids = realTabs.filter((t) => !t.discarded && t.id).map((t) => t.id)
     const count = await discardTabs(ids)
     toast(t('toastTabsDiscarded', { count }))
   }
@@ -129,8 +129,8 @@ export function HomePage() {
   }
 
   async function handleCloseAllTabs() {
-    const tabs = await browser.tabs.query(getTabQuery(preferences.tabScope))
-    const toClose = tabs.filter((t) => !t.pinned && t.id).map((t) => t.id!)
+    const realTabs = useOpenTabsStore.getState().tabs
+    const toClose = realTabs.filter((t) => !t.pinned && t.id).map((t) => t.id)
     if (toClose.length > 0) {
       await browser.tabs.remove(toClose)
     }

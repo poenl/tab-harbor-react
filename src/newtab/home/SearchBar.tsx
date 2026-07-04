@@ -9,11 +9,10 @@ async function runDefaultSearch(query: string) {
 
   const fallbackUrl = `https://www.google.com/search?q=${encodeURIComponent(text)}`
   try {
-    const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
-    if (tab?.id) {
-      await browser.tabs.update(tab.id, { url: fallbackUrl })
-    }
-  } catch {}
+    await browser.search.query({ text })
+  } catch {
+    await browser.tabs.create({ url: fallbackUrl })
+  }
 }
 
 export function SearchBar() {

@@ -1,8 +1,8 @@
 import { useHitokoto } from '../hooks/useHitokoto'
 
 export function Hitokoto() {
-  const { entry, loading } = useHitokoto()
-  if (loading || !entry) return null
+  const { entry } = useHitokoto()
+  if (!entry) return null
 
   const from = [entry.from_who, entry.from].filter(Boolean).join(' · ')
   const attribution = from ? ` — ${from}` : ''

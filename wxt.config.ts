@@ -11,7 +11,7 @@ export default defineConfig({
   },
   manifest: ({ mode }) => ({
     name: mode === 'development' ? 'Tab Harbor Dev' : 'Tab Harbor',
-    permissions: ['tabs', 'storage', 'tabGroups', 'bookmarks', 'favicon'],
+    permissions: ['tabs', 'storage', 'tabGroups', 'bookmarks', 'favicon', 'search'],
     host_permissions: ['<all_urls>']
   }),
   vite: () => ({

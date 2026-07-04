@@ -3,7 +3,7 @@ import { useOpenTabsStore } from '@/stores/openTabs'
 
 export function Footer() {
   const { t } = useTranslation()
-  const totalTabs = useOpenTabsStore((s) => s.totalTabs)
+  const totalTabs = useOpenTabsStore((s) => s.tabs.length)
 
   return (
     // ── 页脚：标签总数 + 版权信息 ──
