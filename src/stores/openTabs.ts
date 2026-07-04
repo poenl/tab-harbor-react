@@ -5,8 +5,10 @@ import {
   normalizeTab,
   buildDomainGroups
 } from '@/newtab/utils/domain-grouping'
-import { getTabQuery } from '@/utils/tabs'
+import { getTabQuery, discardTabs } from '@/utils/tabs'
 import { useThemeStore } from '@/stores/theme'
+import { toast } from 'sonner'
+import i18n from '@/i18n'
 
 interface OpenTabsState {
   allTabs: OpenTab[]
@@ -19,6 +21,10 @@ interface OpenTabsState {
   fetchTabs: () => Promise<void>
   closeTab: (tabId: number) => Promise<void>
   focusTab: (tab: { id: number; windowId: number }) => Promise<void>
+  sleepTab: (id: number) => Promise<void>
+  sleepGroup: (domain: string) => Promise<void>
+  sleepAllTabs: () => Promise<void>
+  closeAllTabs: () => Promise<void>
 }
 
 export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
@@ -76,6 +82,42 @@ export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
     } catch {}
   }
 
+  const sleepTab = async (id: number) => {
+    try {
+      await browser.tabs.discard(id)
+      toast(i18n.t('toastTabDiscarded'))
+    } catch {
+      toast(i18n.t('toastTabDiscardFailed'))
+    }
+  }
+
+  const sleepGroup = async (domain: string) => {
+    const ids = get()
+      .groups.filter((g) => g.domain === domain)
+      .flatMap((g) => g.tabs.filter((t) => !t.discarded && t.id))
+      .map((t) => t.id!)
+    const count = await discardTabs(ids)
+    toast(i18n.t('toastTabsDiscarded', { count }))
+  }
+
+  const sleepAllTabs = async () => {
+    const ids = get()
+      .tabs.filter((t) => !t.discarded && t.id)
+      .map((t) => t.id)
+    const count = await discardTabs(ids)
+    toast(i18n.t('toastTabsDiscarded', { count }))
+  }
+
+  const closeAllTabs = async () => {
+    const ids = get()
+      .tabs.filter((t) => !t.pinned && t.id)
+      .map((t) => t.id)
+    if (ids.length > 0) {
+      await browser.tabs.remove(ids)
+    }
+    toast(i18n.t('toastAllTabsClosed'))
+  }
+
   return {
     allTabs,
     groups,
@@ -85,7 +127,11 @@ export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
     closeDuplicateExtras,
     fetchTabs,
     closeTab,
-    focusTab
+    focusTab,
+    sleepTab,
+    sleepGroup,
+    sleepAllTabs,
+    closeAllTabs
   }
 })
 

@@ -3,8 +3,8 @@ import { useTranslation } from '@/i18n'
 import { toast } from 'sonner'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { useOpenTabsStore } from '@/stores/openTabs'
+import { useThemeStore } from '@/stores/theme'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
-import type { SavedTabSession } from '@/stores/savedSessions'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -19,48 +19,32 @@ import {
 import { Badge } from '@/components/ui/badge.tsx'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Moon, Archive, X } from 'lucide-react'
+import { useSelectMode } from './SelectModeContext.tsx'
 import { TabChip } from './TabChip.tsx'
 import { playCloseSound } from '@/newtab/utils/sound'
 
 const INITIAL_VISIBLE = 8
 
 interface DomainGroupCardProps {
-  mode: 'view' | 'select'
   groups: DomainGroup[]
-
-  // View mode callbacks
-  onSleepTab?: (id: number) => void
-  onSleepGroup?: (domain: string) => void
-  onSaveTab?: (tab: any) => void
-  onSaveGroup?: (domain: string) => void
-  sleepControlEnabled?: boolean
-
-  // Select mode callbacks
-  selectedTabIds?: Set<number>
-  onToggleTab?: (id: number) => void
-  onToggleGroup?: (domain: string) => void
-  onSelectCancel?: () => void
-  showSelectAll?: boolean
-  onSelectAll?: () => void
 }
 
-export function DomainGroupCard({
-  mode,
-  groups,
-  onSleepTab,
-  onSleepGroup,
-  onSaveTab,
-  onSaveGroup,
-  sleepControlEnabled,
-  selectedTabIds,
-  onToggleTab,
-  onToggleGroup,
-  onSelectCancel,
-  showSelectAll,
-  onSelectAll
-}: DomainGroupCardProps) {
+function getMode(selectTarget: string | null, groups: DomainGroup[]): 'view' | 'select' {
+  if (!selectTarget) return 'view'
+  if (selectTarget === '*') return 'select'
+  if (groups.length === 1 && selectTarget === groups[0].domain) return 'select'
+  return 'view'
+}
+
+export function DomainGroupCard({ groups }: DomainGroupCardProps) {
   const { t } = useTranslation()
   const { addSession, sessions, setSessions } = useSavedSessionsStore()
+  const { selectTarget, selectedTabIds, toggleGroup, exitSelectMode, selectAll, saveGroup } =
+    useSelectMode()
+  const mode = getMode(selectTarget, groups)
+  const showSelectAll = selectTarget === '*'
+  const sleepControlEnabled = useThemeStore((s) => s.preferences.sleepControlEnabled)
+  const sleepGroup = useOpenTabsStore((s) => s.sleepGroup)
   const [expanded, setExpanded] = useState(false)
 
   // ── 选择模式 footer 状态 ──
@@ -70,7 +54,7 @@ export function DomainGroupCard({
 
   function getGroupState(group: DomainGroup): boolean | 'indeterminate' {
     const ids = group.tabs.map((t) => t.id)
-    const sel = ids.filter((id) => selectedTabIds?.has(id)).length
+    const sel = ids.filter((id) => selectedTabIds.has(id)).length
     if (sel === 0) return false
     if (sel === ids.length) return true
     return 'indeterminate'
@@ -79,10 +63,10 @@ export function DomainGroupCard({
   const visibleGroups = groups.filter((g) => g.tabs.length > 0)
 
   const allIds = visibleGroups.flatMap((g) => g.tabs.map((t) => t.id))
-  const selectedCount = allIds.filter((id) => selectedTabIds?.has(id)).length
+  const selectedCount = allIds.filter((id) => selectedTabIds.has(id)).length
 
   const handleSelectSave = useCallback(async () => {
-    const selectedTabs = groups.flatMap((g) => g.tabs.filter((t) => selectedTabIds?.has(t.id)))
+    const selectedTabs = groups.flatMap((g) => g.tabs.filter((t) => selectedTabIds.has(t.id)))
     if (selectedTabs.length === 0) return
 
     const tabData = selectedTabs.map((t) => ({
@@ -117,7 +101,7 @@ export function DomainGroupCard({
       } catch {}
     }
 
-    onSelectCancel?.()
+    exitSelectMode()
   }, [
     groups,
     selectedTabIds,
@@ -127,7 +111,7 @@ export function DomainGroupCard({
     addSession,
     sessions,
     setSessions,
-    onSelectCancel
+    exitSelectMode
   ])
 
   async function closeGroupDuplicates(urls: string[]) {
@@ -166,7 +150,7 @@ export function DomainGroupCard({
                       ? false
                       : 'indeterminate'
                 }
-                onCheckedChange={onSelectAll}
+                onCheckedChange={selectAll}
               />
             )}
             <div className="text-foreground text-sm font-semibold">{t('sessionPickerTitle')}</div>
@@ -174,7 +158,7 @@ export function DomainGroupCard({
           <Button
             variant="ghost"
             size="icon"
-            onClick={onSelectCancel}
+            onClick={exitSelectMode}
             className="text-muted-foreground hover:text-destructive shrink-0"
           >
             <X strokeWidth={2} className="size-4" />
@@ -196,7 +180,7 @@ export function DomainGroupCard({
               {mode === 'select' && (
                 <Checkbox
                   checked={getGroupState(group)}
-                  onCheckedChange={() => onToggleGroup?.(group.domain)}
+                  onCheckedChange={() => toggleGroup(group.domain)}
                 />
               )}
               <span className="min-w-0 flex-1 truncate">
@@ -214,14 +198,13 @@ export function DomainGroupCard({
               </span>
               {mode === 'view' &&
                 sleepControlEnabled &&
-                onSleepGroup &&
                 group.tabs.some((t) => !t.discarded && !t.active) && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => onSleepGroup(group.domain)}
+                        onClick={() => sleepGroup(group.domain)}
                         aria-label={t('sleepAllTabsButton')}
                         className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                       >
@@ -231,13 +214,13 @@ export function DomainGroupCard({
                     <TooltipContent side="top">{t('sleepAllTabsButton')}</TooltipContent>
                   </Tooltip>
                 )}
-              {mode === 'view' && onSaveGroup && (
+              {mode === 'view' && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      onClick={() => onSaveGroup(group.domain)}
+                      onClick={() => saveGroup(group.domain)}
                       aria-label={t('saveGroupSession')}
                       className="text-muted-foreground border-border hover:bg-secondary hover:text-primary"
                     >
@@ -265,17 +248,7 @@ export function DomainGroupCard({
                   ? group.tabs
                   : group.tabs.slice(0, INITIAL_VISIBLE)
               ).map((tab) => (
-                <TabChip
-                  key={tab.id}
-                  tab={tab}
-                  mode={mode}
-                  onSleepTab={onSleepTab}
-                  onSaveTab={onSaveTab}
-                  sleepControlEnabled={sleepControlEnabled}
-                  selected={selectedTabIds?.has(tab.id)}
-                  onToggle={onToggleTab}
-                  dupeCount={urlCounts[tab.url]}
-                />
+                <TabChip key={tab.id} tab={tab} dupeCount={urlCounts[tab.url]} />
               ))}
             </div>
 
