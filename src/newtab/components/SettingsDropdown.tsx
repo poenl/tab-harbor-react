@@ -1,14 +1,13 @@
-import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { AppearancePanel } from '@/components/settings/AppearancePanel'
 import { FeaturesPanel } from '@/components/settings/FeaturesPanel'
 
 export function SettingsDropdown() {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'appearance' | 'features'>('appearance')
 
   return (
     <Popover>
@@ -45,7 +44,7 @@ export function SettingsDropdown() {
         side="bottom"
         align="end"
         sideOffset={10}
-        className="border-border w-80 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl data-closed:animate-none data-open:animate-none"
+        className="border-border w-80 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl"
         style={
           {
             backgroundColor:
@@ -53,31 +52,33 @@ export function SettingsDropdown() {
           } as React.CSSProperties
         }
       >
-        {/* ── 标签栏 ── */}
-        <div className="border-border/18 mb-4 flex items-center gap-4.5 border-b pb-2.5">
-          <button
-            onClick={() => setActiveTab('appearance')}
-            className={`cursor-pointer border-none bg-transparent p-0 pb-0.75 text-xs font-bold transition-colors duration-150 ${
-              activeTab === 'appearance'
-                ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-1 underline-offset-[0.28em]'
-                : 'hover:text-foreground text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)]'
-            }`}
+        <Tabs defaultValue="appearance" className="flex flex-col">
+          {/* ── 标签栏 ── */}
+          <TabsList
+            variant="line"
+            className="border-border/18 mb-4 justify-start gap-4.5 border-b pb-2.5 h-auto"
           >
-            {t('settingsTabAppearance')}
-          </button>
-          <button
-            onClick={() => setActiveTab('features')}
-            className={`cursor-pointer border-none bg-transparent p-0 pb-0.75 text-xs font-bold transition-colors duration-150 ${
-              activeTab === 'features'
-                ? 'text-accent underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-1 underline-offset-[0.28em]'
-                : 'hover:text-foreground text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)]'
-            }`}
-          >
-            {t('settingsTabFeatures')}
-          </button>
-        </div>
+            <TabsTrigger
+              value="appearance"
+              className="cursor-pointer border-none bg-transparent p-0 pb-0.75 text-xs font-bold data-active:bg-transparent data-active:text-accent data-active:shadow-none data-[state=inactive]:text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)] hover:text-foreground after:bg-accent after:inset-x-0 after:-bottom-1.25 after:h-0.5 after:opacity-0 data-active:after:opacity-100"
+            >
+              {t('settingsTabAppearance')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="features"
+              className="cursor-pointer border-none bg-transparent p-0 pb-0.75 text-xs font-bold data-active:bg-transparent data-active:text-accent data-active:shadow-none data-[state=inactive]:text-[color-mix(in_srgb,var(--muted)_74%,var(--foreground)_26%)] hover:text-foreground after:bg-accent after:inset-x-0 after:-bottom-1.25 after:h-0.5 after:opacity-0 data-active:after:opacity-100"
+            >
+              {t('settingsTabFeatures')}
+            </TabsTrigger>
+          </TabsList>
 
-        {activeTab === 'appearance' ? <AppearancePanel /> : <FeaturesPanel />}
+          <TabsContent value="appearance" className="flex-none">
+            <AppearancePanel />
+          </TabsContent>
+          <TabsContent value="features" className="flex-none">
+            <FeaturesPanel />
+          </TabsContent>
+        </Tabs>
       </PopoverContent>
     </Popover>
   )

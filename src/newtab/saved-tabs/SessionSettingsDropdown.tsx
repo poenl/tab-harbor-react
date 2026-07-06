@@ -40,7 +40,7 @@ export function SessionSettingsDropdown() {
         side="bottom"
         align="end"
         sideOffset={8}
-        className="border-border w-62 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl data-closed:animate-none data-open:animate-none"
+        className="border-border w-62 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl"
         style={
           {
             backgroundColor:

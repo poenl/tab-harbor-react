@@ -187,6 +187,8 @@ export const zhCN: Record<TranslationKey, string> = {
   addByUrlTitle: '通过 URL 添加',
   tabPickerTitle: '添加打开的标签页',
   tabPickerSearchPlaceholder: '搜索标签页...',
+  tabPickerSelectedCount: '已选 {{count}} 个',
+  tabPickerNoTabsFound: '未找到标签页',
   shortcutIconWebsite: '网站图标',
   shortcutIconEmoji: 'Emoji',
   shortcutIconImage: '图片',

@@ -12,7 +12,7 @@ export function Hitokoto() {
     <div
       aria-live="polite"
       role="note"
-      className="text-muted-foreground max-w-130 font-serif text-sm leading-[1.6]"
+      className="animate-in fade-in-0 duration-700 fill-mode-both text-muted-foreground max-w-130 font-serif text-sm leading-[1.6]"
     >
       <span className="italic">{entry.hitokoto}</span>
       {attribution && (

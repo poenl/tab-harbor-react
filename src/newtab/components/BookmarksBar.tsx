@@ -925,76 +925,78 @@ function BookmarksBarContent() {
     return () => ro.disconnect()
   }, [enabled, items.length, items, cls.gapPx])
 
-  if (!enabled || items.length === 0) return null
+  if (!enabled) return null
 
   const rootIndicatorLeft = dropIndicatorLeft()
 
   return (
     <>
-      {/* ── 书签栏容器 ── */}
-      <div className="blur-bg fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden px-4">
-        {/* ── 书签导航 ── */}
-        {/* ── 根层拖拽放置区 ── */}
-        <nav
-          ref={containerRef}
-          className={`flex items-center ${cls.gap} relative`}
-          role="navigation"
-          aria-label="Bookmarks bar"
-          onDragOver={handleDragOver}
-          onDragLeave={handleRootDragLeave}
-          onDrop={handleDrop}
-        >
-          {/* ── 可拖拽书签项 ── */}
-          {items.map((node, i) => (
-            <div
-              key={node.id}
-              draggable={i < visibleCount}
-              className={`shrink-0 ${draggedId === node.id ? 'opacity-40' : ''}`}
-              style={
-                i >= visibleCount
-                  ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' as const }
-                  : undefined
-              }
-              onDragStart={i < visibleCount ? ctxStartDrag(node.id, bookmarksBarId) : undefined}
-              onDragEnd={i < visibleCount ? clearDrag : undefined}
-              ref={(el) => {
-                if (el) {
-                  const w = el.getBoundingClientRect().width
-                  if (w > 0) widthsRef.current.set(node.id, w)
+      {items.length > 0 && (
+        /* ── 书签栏容器 ── */
+        <div className="animate-in fade-in-0 slide-in-from-top-2 duration-300 blur-bg fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden px-4">
+          {/* ── 书签导航 ── */}
+          {/* ── 根层拖拽放置区 ── */}
+          <nav
+            ref={containerRef}
+            className={`flex items-center ${cls.gap} relative`}
+            role="navigation"
+            aria-label="Bookmarks bar"
+            onDragOver={handleDragOver}
+            onDragLeave={handleRootDragLeave}
+            onDrop={handleDrop}
+          >
+            {/* ── 可拖拽书签项 ── */}
+            {items.map((node, i) => (
+              <div
+                key={node.id}
+                draggable={i < visibleCount}
+                className={`shrink-0 ${draggedId === node.id ? 'opacity-40' : ''}`}
+                style={
+                  i >= visibleCount
+                    ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' as const }
+                    : undefined
                 }
-              }}
-            >
-              {node.type === 'folder' ? (
-                <FolderMenu
-                  node={node}
-                  size={size}
-                  depth={0}
-                  onOverTrigger={() => setDropIndex(null)}
-                />
-              ) : (
-                <BookmarkItem title={node.title} url={node.url} size={size} variant="inline" />
-              )}
-            </div>
-          ))}
-          {/* ── 竖线指示器 ── */}
-          {rootIndicatorLeft !== null && (
-            <div
-              className="pointer-events-none absolute top-0 z-10 w-0.5 rounded-full bg-primary transition-none"
-              style={{ left: `${rootIndicatorLeft}px`, bottom: 0 }}
-            />
-          )}
-          {/* ── 溢出菜单 ── */}
-          {visibleCount < items.length && (
-            <OverflowMenu
-              items={items.slice(visibleCount)}
-              size={size}
-              visibleOffset={visibleCount}
-              bookmarksBarId={bookmarksBarId}
-              onDragEnter={() => setDropIndex(null)}
-            />
-          )}
-        </nav>
-      </div>
+                onDragStart={i < visibleCount ? ctxStartDrag(node.id, bookmarksBarId) : undefined}
+                onDragEnd={i < visibleCount ? clearDrag : undefined}
+                ref={(el) => {
+                  if (el) {
+                    const w = el.getBoundingClientRect().width
+                    if (w > 0) widthsRef.current.set(node.id, w)
+                  }
+                }}
+              >
+                {node.type === 'folder' ? (
+                  <FolderMenu
+                    node={node}
+                    size={size}
+                    depth={0}
+                    onOverTrigger={() => setDropIndex(null)}
+                  />
+                ) : (
+                  <BookmarkItem title={node.title} url={node.url} size={size} variant="inline" />
+                )}
+              </div>
+            ))}
+            {/* ── 竖线指示器 ── */}
+            {rootIndicatorLeft !== null && (
+              <div
+                className="pointer-events-none absolute top-0 z-10 w-0.5 rounded-full bg-primary transition-none"
+                style={{ left: `${rootIndicatorLeft}px`, bottom: 0 }}
+              />
+            )}
+            {/* ── 溢出菜单 ── */}
+            {visibleCount < items.length && (
+              <OverflowMenu
+                items={items.slice(visibleCount)}
+                size={size}
+                visibleOffset={visibleCount}
+                bookmarksBarId={bookmarksBarId}
+                onDragEnter={() => setDropIndex(null)}
+              />
+            )}
+          </nav>
+        </div>
+      )}
       {/* ── 占位间距 ── */}
       <div
         className="shrink-0 max-[960px]:hidden"

@@ -21,7 +21,7 @@ export function TabOutDupeBanner() {
 
   return (
     // ── 多余 Tab Harbor 标签页横幅 ──
-    <div className="bg-accent/5 border-accent/15 mb-4 flex items-center justify-between gap-3 rounded-xl border px-5 py-4">
+    <div className="animate-in fade-in-0 slide-in-from-top-2 bg-accent/5 border-accent/15 mb-4 flex items-center justify-between gap-3 rounded-xl border px-5 py-4">
       <div className="flex items-center gap-3">
         <div className="bg-accent/10 flex size-9 shrink-0 items-center justify-center rounded-full">
           <Copy strokeWidth={1.5} className="text-accent size-4.5 shrink-0" />

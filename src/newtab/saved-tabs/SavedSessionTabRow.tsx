@@ -62,7 +62,7 @@ export function SavedSessionTabRow({
             ...(provided.draggableProps.style as React.CSSProperties),
             ...(snapshot.isDropAnimating ? { transitionDuration: '0.001s' } : {})
           }}
-          className="border-border/50 flex items-center gap-2 border-b py-1.5 text-sm leading-[1.4] last:border-b-0"
+          className="border-border/50 group flex items-center gap-2 border-b py-1.5 text-sm leading-[1.4] transition-colors duration-150 last:border-b-0 hover:bg-secondary/20 -mx-0.5 px-0.5"
         >
           <span
             {...provided.dragHandleProps}
@@ -84,7 +84,7 @@ export function SavedSessionTabRow({
             <TooltipTrigger asChild>
               <button
                 onClick={() => onDeleteTab(sessionId, index)}
-                className="text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border-none bg-none p-0 transition-all duration-150"
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border-none bg-none p-0 opacity-0 transition-all duration-150 group-hover:opacity-100"
                 aria-label={t('removeTabFromSession')}
               >
                 <X strokeWidth={1.8} className="h-3 w-3" />

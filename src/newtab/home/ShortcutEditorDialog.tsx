@@ -5,7 +5,9 @@ import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { X } from 'lucide-react'
+import { Field, FieldDescription } from '@/components/ui/field'
 
 export interface ShortcutEditorData {
   url: string
@@ -113,10 +115,10 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
     onSave({ url: url.trim(), label: label.trim(), icon: finalIcon, iconKind: finalKind })
   }
 
-  const labelClass = 'text-[10px] font-bold text-muted-foreground uppercase tracking-[0.16em]'
+  const labelClass = 'text-xs font-bold text-muted-foreground uppercase tracking-[0.16em]'
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+    <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden h-full">
       <div className="flex-1 space-y-4 overflow-auto px-4 py-3">
         <label className="flex flex-col gap-1.5">
           <span className={labelClass}>{t('urlLabel')}</span>
@@ -130,7 +132,6 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
             required
             autoFocus
             placeholder="https://example.com"
-            className="h-10 rounded-xl px-3 text-xs"
           />
         </label>
 
@@ -141,11 +142,14 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
             onChange={(e) => setLabel(e.target.value)}
             type="text"
             placeholder={t('optionalPlaceholder')}
-            className="h-10 rounded-xl px-3 text-xs"
           />
         </label>
 
-        <div className="flex flex-col gap-3">
+        <Tabs
+          value={iconKind}
+          onValueChange={(v) => setIconKind(v as QuickShortcut['iconKind'])}
+          className="flex flex-col gap-3"
+        >
           <div className="flex items-center gap-3">
             <div className="border-border/40 bg-secondary/30 flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border">
               {iconKind === 'emoji' && emojiInput ? (
@@ -163,79 +167,53 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
                 </span>
               )}
             </div>
-            <div className="border-border/50 bg-secondary/20 flex min-w-0 flex-1 items-center rounded-xl border p-0.75">
+            <TabsList className="w-full flex-1 min-w-0 rounded-xl border border-border/50 bg-secondary/20 p-0.75">
               {ICON_CHIPS.map((kind) => (
-                <button
+                <TabsTrigger
                   key={kind}
-                  type="button"
-                  onClick={() => setIconKind(kind)}
-                  className={`flex-1 rounded-[9px] px-2.5 py-1.75 text-[11px] font-semibold transition-colors ${
-                    iconKind === kind
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  value={kind}
+                  className="flex-1 rounded-[9px] px-2.5 py-1.75 text-xs font-semibold data-active:bg-card"
                 >
                   {t(`shortcutIcon${kind.charAt(0).toUpperCase() + kind.slice(1)}` as any)}
-                </button>
+                </TabsTrigger>
               ))}
-            </div>
+            </TabsList>
           </div>
 
-          <div>
-            {iconKind === 'emoji' && (
-              <Input
-                value={emojiInput}
-                onChange={(e) => setEmojiInput(e.target.value.slice(0, 4))}
-                placeholder={t('shortcutEmojiInput')}
-                className="h-10 rounded-xl px-3 text-xs"
-              />
-            )}
-            {iconKind === 'image' && (
-              <div className="flex flex-col gap-2">
-                <input
+          <TabsContent value="emoji">
+            <Input
+              value={emojiInput}
+              onChange={(e) => setEmojiInput(e.target.value.slice(0, 4))}
+              placeholder={t('shortcutEmojiInput')}
+            />
+          </TabsContent>
+          <TabsContent value="image">
+            <div className="flex flex-col gap-2">
+              <Field>
+                <Input
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   onChange={handleFileUpload}
-                  hidden
+                  className="h-7 py-0.5 px-3 text-muted-foreground text-xs! file:text-xs"
                 />
-                <div className="flex items-center gap-2">
-                  <div className="flex-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="h-9 rounded-xl text-xs"
-                    >
-                      {t('shortcutUploadImage')}
-                    </Button>
-                  </div>
-                </div>
-                <span className="text-muted-foreground text-[11px]">{t('shortcutPasteImage')}</span>
-              </div>
-            )}
-            {iconKind === 'svg' && (
-              <Textarea
-                value={svgCode}
-                onChange={(e) => setSvgCode(e.target.value)}
-                placeholder={t('shortcutSvgCode')}
-                rows={4}
-                className="bg-card border-border/50 text-foreground focus:border-primary/50 focus-visible:border-primary/50 min-h-0 w-full resize-none rounded-xl px-3 py-2.5 font-mono text-xs shadow-none outline-none focus-visible:ring-0"
-              />
-            )}
-          </div>
-        </div>
+                <FieldDescription className="text-xs">{t('shortcutPasteImage')}</FieldDescription>
+              </Field>
+            </div>
+          </TabsContent>
+          <TabsContent value="svg">
+            <Textarea
+              value={svgCode}
+              onChange={(e) => setSvgCode(e.target.value)}
+              placeholder={t('shortcutSvgCode')}
+              rows={4}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <div className="border-border/30 flex shrink-0 justify-end border-t px-4 py-3">
-        <Button
-          variant="default"
-          size="sm"
-          type="submit"
-          disabled={!url.trim()}
-          className="h-9 min-w-[9em] rounded-xl text-xs"
-        >
+        <Button variant="default" size="lg" type="submit" disabled={!url.trim()} className="">
           {t('saveButton')}
         </Button>
       </div>
@@ -248,7 +226,7 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
 
   return (
     <>
-      <div className="bg-foreground/8 fixed inset-0 z-50" onClick={onCancel} />
+      <div className="bg-foreground/6 fixed inset-0 z-50" onClick={onCancel} />
       <div
         className="border-border shadow-accent/10 fixed right-22 bottom-6 z-50 flex w-90 max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-[20px] border shadow-[0_20px_42px_var(--tw-shadow-color)] backdrop-blur-xl"
         style={{
@@ -258,7 +236,7 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
       >
         <div className="shrink-0 px-4 pt-4 pb-2">
           <div className="flex items-start justify-between gap-4">
-            <h2 className="text-foreground font-serif text-2xl leading-[1.05] font-normal">
+            <h2 className="text-foreground font-serif text-lg leading-[1.05] font-normal">
               {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
             </h2>
             <Button

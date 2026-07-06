@@ -1,12 +1,15 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from '@/i18n'
 import { useOpenTabsStore } from '@/stores/openTabs'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
-import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ShortcutEditorForm } from './ShortcutEditorDialog.tsx'
 import { X, Plus, Search, Check } from 'lucide-react'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import { cn } from '@/lib/utils'
 
 interface BrowserTab {
   id: number
@@ -77,15 +80,17 @@ function TabRow({
       {alreadyAdded ? (
         <Check strokeWidth={2.5} className="text-accent/70 size-4 shrink-0" />
       ) : (
-        <button
+        <Button
+          variant="secondary"
+          size="icon-xs"
+          className="rounded-full opacity-0 group-hover:opacity-100"
           onClick={(e) => {
             e.stopPropagation()
             onAddSingle?.(tab)
           }}
-          className="bg-accent/10 text-accent flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full border-none p-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
         >
           <Plus strokeWidth={2.5} className="size-3.5" />
-        </button>
+        </Button>
       )}
     </div>
   )
@@ -95,9 +100,9 @@ export function TabPicker({ onClose }: TabPickerProps) {
   const { t } = useTranslation()
   const shortcuts = useQuickShortcutsStore((s) => s.shortcuts)
   const add = useQuickShortcutsStore((s) => s.add)
-  const [mode, setMode] = useState<'tabs' | 'url'>('tabs')
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [search, setSearch] = useState('')
+  const [closing, setClosing] = useState(false)
 
   const storeTabs = useOpenTabsStore((s) => s.allTabs)
   const loading = useOpenTabsStore((s) => s.loading)
@@ -138,6 +143,17 @@ export function TabPicker({ onClose }: TabPickerProps) {
     setSelectedIds(next)
   }
 
+  function handleClose() {
+    setClosing(true)
+  }
+
+  useEffect(() => {
+    if (closing) {
+      const timer = setTimeout(onClose, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [closing])
+
   async function handleAddSelected() {
     for (const tab of tabs.filter((t) => selectedIds.has(t.id))) {
       await add({
@@ -147,7 +163,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
         iconKind: tab.favIconUrl ? 'image' : 'website'
       })
     }
-    onClose()
+    handleClose()
   }
 
   function handleClearSelection() {
@@ -163,7 +179,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
       icon: tab.favIconUrl || '',
       iconKind: tab.favIconUrl ? 'image' : 'website'
     })
-    onClose()
+    handleClose()
   }
 
   async function handleSaveFromUrl(data: {
@@ -173,122 +189,116 @@ export function TabPicker({ onClose }: TabPickerProps) {
     iconKind: any
   }) {
     await add(data)
-    onClose()
+    handleClose()
   }
 
   return (
     <>
       {/* ── 遮罩 ── */}
-      <div className="bg-foreground/6 fixed inset-0 z-50" onClick={onClose} />
+      <div
+        className={cn(
+          'fixed inset-0 z-50 bg-foreground/6',
+          closing ? 'animate-out fade-out-0 duration-200' : 'animate-in fade-in-0 duration-200'
+        )}
+        onClick={handleClose}
+      />
 
       {/* ── 面板 ── */}
       <div
-        className="border-border shadow-accent/10 fixed right-6 bottom-6 z-50 flex h-[min(480px,calc(100vh-80px))] w-80 flex-col overflow-hidden rounded-[18px] border shadow-[0_20px_42px_var(--tw-shadow-color)] backdrop-blur-xl"
+        className={cn(
+          'border-border shadow-accent/10 fixed right-6 bottom-6 z-50 flex h-[min(480px,calc(100vh-80px))] w-80 flex-col overflow-hidden rounded-[18px] border shadow-[0_20px_42px_var(--tw-shadow-color)] backdrop-blur-xl',
+          closing
+            ? 'animate-out fade-out-0 slide-out-to-bottom-4 duration-200'
+            : 'animate-in fade-in-0 slide-in-from-bottom-4 duration-200'
+        )}
         style={{
           backgroundColor:
             'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
         }}
       >
-        {/* ── 头部 ── */}
-        <div className="flex shrink-0 items-center justify-between gap-3 px-4 pt-2.5 pb-2">
-          <div className="tab-picker-view-switch flex gap-4" role="tablist">
-            <button
-              onClick={() => setMode('tabs')}
-              role="tab"
-              aria-selected={mode === 'tabs'}
-              className={`cursor-pointer border-none bg-transparent p-0 font-serif text-base leading-[1.05] transition-colors ${mode === 'tabs' ? 'text-foreground underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-[1.5px] underline-offset-[0.24em]' : 'text-muted-foreground/60 hover:text-foreground'}`}
-            >
-              {t('tabPickerTitle')}
-            </button>
-            <button
-              onClick={() => setMode('url')}
-              role="tab"
-              aria-selected={mode === 'url'}
-              className={`cursor-pointer border-none bg-transparent p-0 font-serif text-base leading-[1.05] transition-colors ${mode === 'url' ? 'text-foreground underline decoration-[color-mix(in_srgb,var(--accent)_68%,transparent)] decoration-[1.5px] underline-offset-[0.24em]' : 'text-muted-foreground/60 hover:text-foreground'}`}
-            >
-              {t('addByUrlTitle')}
-            </button>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground hover:bg-muted/30 hover:text-foreground flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0 transition-colors"
+        <Tabs defaultValue="tabs" className="w-full h-full relative">
+          <Button
+            value=""
+            onClick={handleClose}
+            variant="link"
+            className="hover:text-destructive absolute top-2 right-2 max-h-0 p-2 min-h-fit"
           >
             <X strokeWidth={2} className="size-3.5" />
-          </button>
-        </div>
-
-        {/* ── 内容 ── */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {mode === 'tabs' && (
-            <>
-              {/* ── 搜索栏 ── */}
-              <div className="flex shrink-0 items-center gap-2 px-3.5 pb-2.5">
-                <Search strokeWidth={1.8} className="text-muted-foreground size-3.5 shrink-0" />
-                <Input
+          </Button>
+          <TabsList variant="line" className="self-center min-h-fit px-4 pt-3 pb-2 font-serif">
+            <TabsTrigger value="tabs"> {t('tabPickerTitle')}</TabsTrigger>
+            <TabsTrigger value="url"> {t('addByUrlTitle')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tabs" className="flex-1 min-h-0 flex flex-col">
+            {/* ── 搜索栏 ── */}
+            <div className="flex shrink-0 items-center gap-2 px-3.5 pb-2.5 pt-1">
+              <InputGroup>
+                <InputGroupAddon>
+                  <Search strokeWidth={1.8} className="text-muted-foreground size-3.5 shrink-0" />
+                </InputGroupAddon>
+                <InputGroupInput
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={t('tabPickerSearchPlaceholder')}
-                  className="text-foreground placeholder:text-muted-foreground h-auto flex-1 border-none bg-transparent p-0 text-xs shadow-none outline-none focus-visible:ring-0"
+                  className="placeholder:text-xs"
                 />
-              </div>
-
-              {/* ── 标签列表 ── */}
-              <div className="flex-1 overflow-y-auto overscroll-contain px-1.5 pb-1">
-                {loading ? (
-                  <div className="text-muted-foreground p-6 text-center text-xs">
-                    {t('loading')}
-                  </div>
-                ) : groupedTabs.length === 0 ? (
-                  <div className="text-muted-foreground p-6 text-center text-xs">No tabs found</div>
-                ) : (
-                  groupedTabs.map((group) => (
-                    <div key={group.domain}>
-                      <div className="text-muted-foreground bg-card/95 sticky top-0 z-1 px-2.5 py-2 text-[10px] font-bold tracking-[0.14em] uppercase">
-                        {group.domain}
-                      </div>
-                      {group.tabs.map((tab) => (
-                        <TabRow
-                          key={tab.id}
-                          tab={tab}
-                          selected={selectedIds.has(tab.id)}
-                          onToggle={toggleTab}
-                          onAddSingle={handleAddSingle}
-                          alreadyAdded={shortcutUrls.has(tab.url)}
-                        />
-                      ))}
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* ── 底部栏 ── */}
-              {selectedIds.size > 0 && (
-                <div className="flex shrink-0 items-center gap-2 border-t border-[color-mix(in_srgb,var(--accent)_16%,transparent)] px-3.5 py-2.5">
-                  <span className="text-muted-foreground flex-1 text-xs">
-                    {selectedIds.size} selected
-                  </span>
-                  <button
-                    onClick={handleClearSelection}
-                    className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md border-none bg-transparent p-1.5 text-xs font-medium transition-colors"
-                  >
-                    {t('clearSelection')}
-                  </button>
-                  <button
-                    onClick={handleAddSelected}
-                    className="bg-primary text-primary-foreground cursor-pointer rounded-full border-none px-3.5 py-1.5 text-xs font-semibold transition-all hover:opacity-85"
-                  >
-                    {t('addLink')}
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-          {mode === 'url' && (
-            <div className="flex flex-1 flex-col overflow-hidden">
-              <ShortcutEditorForm shortcut={null} onSave={handleSaveFromUrl} />
+              </InputGroup>
             </div>
-          )}
-        </div>
+
+            {/* ── 标签列表 ── */}
+            <div className="flex-1 overflow-y-auto overscroll-contain pb-1">
+              {loading ? (
+                <div className="text-muted-foreground p-6 text-center text-xs">{t('loading')}</div>
+              ) : groupedTabs.length === 0 ? (
+                <div className="text-muted-foreground p-6 text-center text-xs">
+                  {t('tabPickerNoTabsFound')}
+                </div>
+              ) : (
+                groupedTabs.map((group) => (
+                  <div key={group.domain}>
+                    <div className="text-muted-foreground bg-card/95 sticky top-0 z-1 px-2.5 py-2 text-[10px] font-bold tracking-[0.14em] uppercase">
+                      {group.domain}
+                    </div>
+                    {group.tabs.map((tab) => (
+                      <TabRow
+                        key={tab.id}
+                        tab={tab}
+                        selected={selectedIds.has(tab.id)}
+                        onToggle={toggleTab}
+                        onAddSingle={handleAddSingle}
+                        alreadyAdded={shortcutUrls.has(tab.url)}
+                      />
+                    ))}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* ── 底部栏 ── */}
+            {selectedIds.size > 0 && (
+              <div className="flex shrink-0 items-center gap-2 border-t border-[color-mix(in_srgb,var(--accent)_16%,transparent)] px-3.5 py-2.5">
+                <span className="text-muted-foreground flex-1 text-xs">
+                  {t('tabPickerSelectedCount', { count: selectedIds.size })}
+                </span>
+                <button
+                  onClick={handleClearSelection}
+                  className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md border-none bg-transparent p-1.5 text-xs font-medium transition-colors"
+                >
+                  {t('clearSelection')}
+                </button>
+                <button
+                  onClick={handleAddSelected}
+                  className="bg-primary text-primary-foreground cursor-pointer rounded-full border-none px-3.5 py-1.5 text-xs font-semibold transition-all hover:opacity-85"
+                >
+                  {t('addLink')}
+                </button>
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="url" className="h-full min-h-0">
+            <ShortcutEditorForm shortcut={null} onSave={handleSaveFromUrl} />
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   )

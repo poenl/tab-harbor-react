@@ -30,7 +30,7 @@ export default function App() {
 
   return (
     <TooltipProvider disableHoverableContent>
-      <div className="flex h-screen flex-col">
+      <div className="flex h-screen flex-col overflow-auto">
         {/* ── 书签栏（页面顶部全宽） ── */}
         <BookmarksBar />
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Trash2, RotateCcw, GripVertical } from 'lucide-react'
+import { ChevronDown, Trash2, RotateCcw, GripVertical } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { TFunction } from 'i18next'
 import { useTranslation } from '@/i18n'
@@ -63,9 +63,12 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
         <article
           ref={provided.innerRef}
           {...provided.draggableProps}
-          style={provided.draggableProps.style as React.CSSProperties}
+          className="animate-in fade-in-0 slide-in-from-top-3 bg-card border-border shadow-primary/5 rounded-2xl border p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] transition-all duration-250 fill-mode-both hover:-translate-y-px hover:shadow-[0_16px_30px_var(--tw-shadow-color)]"
           data-session-id={session.id}
-          className="bg-card border-border shadow-primary/5 rounded-2xl border p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)]"
+          style={{
+            ...(provided.draggableProps.style as React.CSSProperties),
+            animationDelay: `${index * 80}ms`
+          }}
         >
           {/* ── 卡片顶部：名称 + 摘要 + 操作按钮 ── */}
           <div className="flex items-center gap-2">
@@ -118,11 +121,10 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                     className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border bg-transparent p-0 transition-all duration-150"
                     aria-label={isCollapsed ? t('expand') || 'Expand' : t('collapse') || 'Collapse'}
                   >
-                    {isCollapsed ? (
-                      <ChevronDown strokeWidth={1.8} className="h-4 w-4" />
-                    ) : (
-                      <ChevronUp strokeWidth={1.8} className="h-4 w-4" />
-                    )}
+                    <ChevronDown
+                      strokeWidth={1.8}
+                      className={`h-4 w-4 transition-transform duration-200 ${isCollapsed ? '' : 'rotate-180'}`}
+                    />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="top">
@@ -159,29 +161,36 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
           </div>
 
           {/* ── Tab 列表（可折叠） ── */}
-          {!isCollapsed && session.tabs.length > 0 && (
-            <Droppable droppableId={session.id} type="TAB">
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="border-border/50 mt-3 border-t pt-3"
-                >
-                  {session.tabs.map((tab, i) => (
-                    <SavedSessionTabRow
-                      key={tab.url}
-                      tab={tab}
-                      sessionId={session.id}
-                      index={i}
-                      onRestoreTab={restoreTab}
-                      onDeleteTab={removeTabFromSession}
-                    />
-                  ))}
-                  {provided.placeholder}
-                </div>
+          <div
+            className="grid transition-[grid-template-rows] duration-300"
+            style={{ gridTemplateRows: isCollapsed ? '0fr' : '1fr' }}
+          >
+            <div className="overflow-hidden min-h-0">
+              {session.tabs.length > 0 && (
+                <Droppable droppableId={session.id} type="TAB">
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="border-border/50 mt-3 border-t pt-3"
+                    >
+                      {session.tabs.map((tab, i) => (
+                        <SavedSessionTabRow
+                          key={tab.url}
+                          tab={tab}
+                          sessionId={session.id}
+                          index={i}
+                          onRestoreTab={restoreTab}
+                          onDeleteTab={removeTabFromSession}
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               )}
-            </Droppable>
-          )}
+            </div>
+          </div>
         </article>
       )}
     </Draggable>

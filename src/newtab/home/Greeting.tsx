@@ -13,7 +13,7 @@ export function Greeting() {
 
   return (
     // ── 问候语 + 日期 ──
-    <div>
+    <div className="animate-in fade-in-0 duration-700 fill-mode-both">
       <h1 className="text-foreground m-0 font-serif text-4xl leading-none font-normal tracking-[-0.02em] whitespace-nowrap">
         {t(GREETING_KEY[greeting] as any)}
       </h1>

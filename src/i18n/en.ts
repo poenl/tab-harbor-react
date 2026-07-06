@@ -189,6 +189,8 @@ export const en = {
   addByUrlTitle: 'Add by URL',
   tabPickerTitle: 'Add open tabs',
   tabPickerSearchPlaceholder: 'Search tabs...',
+  tabPickerSelectedCount: '{{count}} selected',
+  tabPickerNoTabsFound: 'No tabs found',
   shortcutIconWebsite: 'Website',
   shortcutIconEmoji: 'Emoji',
   shortcutIconImage: 'Image',

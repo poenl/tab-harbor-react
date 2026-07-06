@@ -26,8 +26,13 @@ export function TabGroupList({ groups, loading }: TabGroupListProps) {
       {selectTarget === '*' ? (
         <DomainGroupCard groups={groups} />
       ) : (
-        groups.map((group) => (
-          <div key={group.domain} data-domain={group.domain} className="rounded-2xl">
+        groups.map((group, i) => (
+          <div
+            key={group.domain}
+            data-domain={group.domain}
+            className="animate-in fade-in-0 slide-in-from-top-3 rounded-2xl fill-mode-both"
+            style={{ animationDelay: `${i * 80}ms` }}
+          >
             <DomainGroupCard groups={[group]} />
           </div>
         ))
