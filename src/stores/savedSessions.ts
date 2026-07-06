@@ -6,7 +6,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 export interface SavedTabTab {
   url: string
   title: string
-  favIconUrl?: string
+  faviconUrl?: string
 }
 
 export interface SavedTabSession {
@@ -15,20 +15,13 @@ export interface SavedTabSession {
   tabs: SavedTabTab[]
   savedAt: string
   source: 'manual' | 'current-window' | 'selected' | 'single-tab' | 'group'
+  faviconUrl: string
 }
 
 export function createSessionId(): string {
   const ts = Date.now().toString(36)
   const rand = Math.random().toString(36).slice(2, 8)
   return `tab-session-${ts}-${rand}`
-}
-
-function isRestorable(url: string): boolean {
-  return (
-    !url.startsWith('chrome://') &&
-    !url.startsWith('about:') &&
-    !url.startsWith('chrome-extension://')
-  )
 }
 
 interface SavedSessionsStore {
@@ -63,9 +56,10 @@ export const useSavedSessionsStore = create<SavedSessionsStore>()(
         const session: SavedTabSession = {
           id,
           name: input.name || new Date().toLocaleString(),
-          tabs: input.tabs.filter((t) => isRestorable(t.url)),
+          tabs: input.tabs,
           savedAt: new Date().toISOString(),
-          source: 'selected'
+          source: 'selected',
+          faviconUrl: input.tabs[0].faviconUrl || ''
         }
         set({ sessions: [...get().sessions, session] })
         return id

@@ -42,13 +42,19 @@ export default function App() {
                 items={groups.map((g) => ({
                   id: g.domain,
                   label: g.label || g.domain,
-                  tabs: g.tabs
+                  tabs: g.tabs,
+                  faviconUrl: g.faviconUrl
                 }))}
                 onNavigate={(id) => scrollToAndHighlight(`[data-domain="${id}"]`)}
               />
             ) : (
               <GroupNav
-                items={sessions.map((s) => ({ id: s.id, label: s.name, tabs: s.tabs }))}
+                items={sessions.map((s) => ({
+                  id: s.id,
+                  label: s.name,
+                  tabs: s.tabs,
+                  faviconUrl: s.faviconUrl
+                }))}
                 onNavigate={(id) => scrollToAndHighlight(`[data-session-id="${id}"]`)}
                 variant={preferences.savedSessionNavDisplayMode}
               />

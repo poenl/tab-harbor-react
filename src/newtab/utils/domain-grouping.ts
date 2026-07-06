@@ -1,11 +1,12 @@
 import i18n from '@/i18n'
+import { getFaviconUrl } from '@/utils/favicon'
 
 // 标准化的标签页数据
 export interface OpenTab {
   id: number
   url: string
   title: string
-  favIconUrl: string
+  faviconUrl: string
   windowId: number
   active: boolean
   discarded: boolean
@@ -18,6 +19,7 @@ export interface DomainGroup {
   label?: string
   tabs: OpenTab[]
   isManual?: boolean
+  faviconUrl: string
 }
 
 // 将 hostname 转为可读标签
@@ -47,7 +49,6 @@ interface ChromeTab {
   id?: number
   url?: string
   title?: string
-  favIconUrl?: string
   windowId?: number
   active?: boolean
   discarded?: boolean
@@ -67,17 +68,22 @@ function getPrimaryDomain(hostname: string): string {
 }
 
 // 补全标签页缺失字段
-export function normalizeTab(t: ChromeTab): OpenTab {
+export function normalizeTab(t: Browser.tabs.Tab): OpenTab {
+  const url = t.url || ''
   return {
     id: t.id ?? 0,
-    url: t.url || '',
+    url,
     title: t.title || '',
-    favIconUrl: t.favIconUrl || '',
+    faviconUrl: !isInternalUrl(url) ? getFaviconUrl(url) : '',
     windowId: t.windowId ?? 0,
     active: t.active ?? false,
     discarded: t.discarded ?? false,
     pinned: t.pinned ?? false
   }
+}
+
+function isInternalUrl(url: string): boolean {
+  return !!url && !url.startsWith('http://') && !url.startsWith('https://')
 }
 
 // 按主域名分组，组间按浏览器标签栏顺序排列
@@ -96,17 +102,15 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
   for (const tab of realTabs) {
     try {
       let hostname: string
-      if (
-        tab.url.startsWith('file://') ||
-        tab.url.startsWith('chrome://') ||
-        tab.url.startsWith('chrome-extension://') ||
-        tab.url.startsWith('about:') ||
-        tab.url.startsWith('edge://') ||
-        tab.url.startsWith('brave://')
-      ) {
+      if (isInternalUrl(tab.url)) {
         hostname = 'internal'
         if (!groupMap[hostname]) {
-          groupMap[hostname] = { domain: hostname, tabs: [], label: i18n.t('internalPagesLabel') }
+          groupMap[hostname] = {
+            domain: hostname,
+            tabs: [],
+            label: i18n.t('internalPagesLabel'),
+            faviconUrl: ''
+          }
           domainOrder.set(hostname, orderIdx++)
         }
         groupMap[hostname].tabs.push(tab)
@@ -116,7 +120,7 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
       }
 
       if (!groupMap[hostname]) {
-        groupMap[hostname] = { domain: hostname, tabs: [] }
+        groupMap[hostname] = { domain: hostname, tabs: [], faviconUrl: '' }
         domainOrder.set(hostname, orderIdx++)
       }
       groupMap[hostname].tabs.push(tab)
@@ -133,6 +137,7 @@ export function buildDomainGroups(tabs: OpenTab[]): DomainGroup[] {
     if (!group.label) {
       group.label = friendlyDomain(group.domain)
     }
+    group.faviconUrl = group.tabs.reduce((acc, tab) => acc || tab.faviconUrl, '')
   }
 
   return groups

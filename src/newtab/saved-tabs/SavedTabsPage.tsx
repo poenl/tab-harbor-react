@@ -54,7 +54,8 @@ export function SavedTabsPage() {
               name: movedTab.title || movedTab.url,
               tabs: [movedTab],
               savedAt: new Date().toISOString(),
-              source: 'manual'
+              source: 'manual',
+              faviconUrl: movedTab.faviconUrl || ''
             }
           ]
         })

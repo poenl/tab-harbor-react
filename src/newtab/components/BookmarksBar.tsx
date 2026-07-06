@@ -4,10 +4,10 @@ import type { BookmarksBarSize } from '@/constants/preferences'
 import type { Browser } from 'wxt/browser'
 import { ChevronRight, Folder, ChevronsRight } from 'lucide-react'
 import { DndProvider, useBookmarkDnd } from './BookmarkDndContext'
+import { FaviconImage } from '@/components/FaviconImage'
+import { getFaviconUrl } from '@/utils/favicon'
 
 const MAX_DEPTH = 5
-const MAX_FAVICON_CACHE = 1000
-const FAVICON_CACHE = new Map<string, string>()
 const DEBOUNCE_MS = 100
 
 const SIZE_CLASSES = {
@@ -40,22 +40,6 @@ export type FlatNode =
   | { id: string; title: string; type: 'bookmark'; url: string }
   | { id: string; title: string; type: 'folder'; children: FlatNode[] }
 
-function cacheFavicon(url: string, href: string) {
-  if (FAVICON_CACHE.size >= MAX_FAVICON_CACHE) FAVICON_CACHE.clear()
-  FAVICON_CACHE.set(url, href)
-}
-
-function getFaviconHref(url: string): string {
-  let cached = FAVICON_CACHE.get(url)
-  if (cached) return cached
-  const faviconUrl = new URL('/_favicon/', browser.runtime.getURL(''))
-  faviconUrl.searchParams.set('pageUrl', url)
-  faviconUrl.searchParams.set('size', '32')
-  const href = faviconUrl.href
-  cacheFavicon(url, href)
-  return href
-}
-
 function toFlatNode(n: Browser.bookmarks.BookmarkTreeNode): FlatNode {
   if (n.url) return { id: n.id, title: n.title, type: 'bookmark', url: n.url }
   return {
@@ -70,22 +54,12 @@ function toFlatNode(n: Browser.bookmarks.BookmarkTreeNode): FlatNode {
 
 function FaviconForUrl({ url, title, cls }: { url: string; title: string; cls: { icon: string } }) {
   return (
-    <span className={`${cls.icon} inline-flex shrink-0 items-center justify-center rounded-xs`}>
-      <img
-        src={getFaviconHref(url)}
-        alt=""
-        className={`${cls.icon} rounded-xs`}
-        onError={(e) => {
-          const img = e.currentTarget
-          img.style.display = 'none'
-          const fb = img.nextElementSibling
-          if (fb) fb.classList.remove('hidden')
-        }}
-      />
-      <span className="text-muted-foreground hidden h-full w-full items-center justify-center text-[8px] font-bold">
-        {title.charAt(0).toUpperCase()}
-      </span>
-    </span>
+    <FaviconImage
+      src={getFaviconUrl(url)}
+      fallback={title}
+      imgCls={cls.icon}
+      fallbackCls={`${cls.icon} rounded-full text-[8px]`}
+    />
   )
 }
 

@@ -6,7 +6,7 @@ import type { OpenTab } from '@/newtab/utils/domain-grouping'
 import { Favicon } from '@/components/favicon'
 import { ShortcutIcon } from '@/components/shortcut-icon'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
-import { GroupIcon } from '@/components/group-icon'
+import { FaviconImage } from '@/components/FaviconImage'
 import { RefreshCw, X } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -220,9 +220,9 @@ export default function Popup() {
                           } ${fadeCls(i)}`}
                           style={fadeStyle(i)}
                         >
-                          <GroupIcon
-                            tabs={g.tabs}
-                            label={g.label || g.domain}
+                          <FaviconImage
+                            src={g.faviconUrl}
+                            fallback={getFallbackLabel(g.label || g.domain, g.tabs[0]?.url || '')}
                             imgCls="w-[14px] h-[14px] rounded-[3px]"
                             fallbackCls="w-4 h-4 text-[8px]"
                           />

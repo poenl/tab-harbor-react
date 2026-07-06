@@ -2,6 +2,7 @@ import { X, GripVertical } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { SavedTabTab } from '@/stores/savedSessions'
+import { FaviconImage } from '@/components/FaviconImage'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
@@ -12,34 +13,6 @@ interface SavedSessionTabRowProps {
   index: number
   onRestoreTab: (sessionId: string, index: number) => void
   onDeleteTab: (sessionId: string, index: number) => void
-}
-
-const failedFavicons = new Set<string>()
-
-function TabFavicon({ tab }: { tab: SavedTabTab }) {
-  const initialError = tab.favIconUrl ? failedFavicons.has(tab.favIconUrl) : true
-  const [imgError, setImgError] = useState(initialError)
-
-  if (tab.favIconUrl && !imgError) {
-    return (
-      <img
-        src={tab.favIconUrl}
-        alt=""
-        className="h-3.5 w-3.5 shrink-0 rounded-xs"
-        onError={() => {
-          failedFavicons.add(tab.favIconUrl!)
-          setImgError(true)
-        }}
-      />
-    )
-  }
-
-  const fallback = getFallbackLabel(tab.title, tab.url)
-  return (
-    <span className="text-primary bg-secondary inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold">
-      {fallback.slice(0, 2)}
-    </span>
-  )
 }
 
 export function SavedSessionTabRow({
@@ -74,7 +47,12 @@ export function SavedSessionTabRow({
             onClick={() => onRestoreTab(sessionId, index)}
             className="group flex min-w-0 flex-1 cursor-pointer items-center gap-2 border-none bg-none p-0 text-left"
           >
-            <TabFavicon tab={tab} />
+            <FaviconImage
+              src={tab.faviconUrl}
+              fallback={getFallbackLabel(tab.title, tab.url)}
+              imgCls="h-3.5 w-3.5 rounded-xs"
+              fallbackCls="text-primary bg-secondary h-3.5 w-3.5 rounded-full text-[9px]"
+            />
             <span className="text-foreground group-hover:text-primary truncate transition-colors duration-150">
               {tab.title || tab.url}
             </span>

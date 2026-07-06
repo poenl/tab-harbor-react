@@ -72,7 +72,7 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
     const tabData = selectedTabs.map((t) => ({
       url: t.url,
       title: t.title,
-      favIconUrl: t.favIconUrl || undefined
+      faviconUrl: t.faviconUrl
     }))
 
     if (footerMode === 'existing' && targetSessionId) {
@@ -248,7 +248,7 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
                   ? group.tabs
                   : group.tabs.slice(0, INITIAL_VISIBLE)
               ).map((tab) => (
-                <TabChip key={tab.id} tab={tab} dupeCount={urlCounts[tab.url]} />
+                <TabChip key={tab.id} tab={tab} dupeCount={urlCounts[tab.url]} mode={mode} />
               ))}
             </div>
 

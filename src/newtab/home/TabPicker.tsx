@@ -3,6 +3,7 @@ import { useTranslation } from '@/i18n'
 import { useOpenTabsStore } from '@/stores/openTabs'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
+import { FaviconImage } from '@/components/FaviconImage'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ShortcutEditorForm } from './ShortcutEditorDialog.tsx'
 import { X, Plus, Search, Check } from 'lucide-react'
@@ -15,33 +16,11 @@ interface BrowserTab {
   id: number
   url: string
   title: string
-  favIconUrl?: string
+  faviconUrl: string
 }
 
 interface TabPickerProps {
   onClose: () => void
-}
-
-function TabFavicon({ tab }: { tab: BrowserTab }) {
-  const [imgError, setImgError] = useState(false)
-  const initial = (tab.title || tab.url || '?').charAt(0).toUpperCase()
-
-  if (tab.favIconUrl && !imgError) {
-    return (
-      <img
-        src={tab.favIconUrl}
-        alt=""
-        className="size-4 shrink-0 rounded-xs"
-        onError={() => setImgError(true)}
-      />
-    )
-  }
-
-  return (
-    <span className="bg-accent/10 text-accent inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold">
-      {initial}
-    </span>
-  )
 }
 
 function extractDomain(url: string): string {
@@ -75,7 +54,12 @@ function TabRow({
         onCheckedChange={() => onToggle(tab.id)}
         className="size-4 rounded-lg border-[1.5px]"
       />
-      <TabFavicon tab={tab} />
+      <FaviconImage
+        src={tab.faviconUrl}
+        fallback={(tab.title || tab.url || '?').charAt(0).toUpperCase()}
+        imgCls="size-4 rounded-xs"
+        fallbackCls="bg-accent/10 text-accent size-4 rounded-full text-[8px]"
+      />
       <span className="text-foreground min-w-0 flex-1 truncate">{tab.title || tab.url}</span>
       {alreadyAdded ? (
         <Check strokeWidth={2.5} className="text-accent/70 size-4 shrink-0" />
@@ -104,22 +88,8 @@ export function TabPicker({ onClose }: TabPickerProps) {
   const [search, setSearch] = useState('')
   const [closing, setClosing] = useState(false)
 
-  const storeTabs = useOpenTabsStore((s) => s.allTabs)
+  const tabs = useOpenTabsStore((s) => s.tabs)
   const loading = useOpenTabsStore((s) => s.loading)
-  const tabs = useMemo(
-    () =>
-      storeTabs
-        .filter(
-          (tab) => tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('about:')
-        )
-        .map((tab) => ({
-          id: tab.id!,
-          url: tab.url!,
-          title: tab.title || '',
-          favIconUrl: tab.favIconUrl
-        })),
-    [storeTabs]
-  )
 
   const filteredTabs = useMemo(() => {
     if (!search.trim()) return tabs
@@ -159,8 +129,8 @@ export function TabPicker({ onClose }: TabPickerProps) {
       await add({
         url: tab.url,
         label: tab.title || getFallbackLabel('', tab.url),
-        icon: tab.favIconUrl || '',
-        iconKind: tab.favIconUrl ? 'image' : 'website'
+        icon: tab.faviconUrl,
+        iconKind: 'website'
       })
     }
     handleClose()
@@ -176,8 +146,8 @@ export function TabPicker({ onClose }: TabPickerProps) {
     await add({
       url: tab.url,
       label: tab.title || getFallbackLabel('', tab.url),
-      icon: tab.favIconUrl || '',
-      iconKind: tab.favIconUrl ? 'image' : 'website'
+      icon: tab.faviconUrl,
+      iconKind: 'website'
     })
     handleClose()
   }

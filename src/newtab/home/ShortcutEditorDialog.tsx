@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from '@/i18n'
 import type { QuickShortcut } from '@/stores/quickShortcuts'
-import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
+import { getFallbackLabel } from '@/newtab/utils/icon-utils'
+import { getFaviconUrl } from '@/utils/favicon'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -46,11 +47,8 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
 
   useEffect(() => {
     if (iconKind === 'website' && url) {
-      const sources = getIconSources(url, 32)
-      if (sources[0]) {
-        setImgSrc(sources[0])
-        setImgError(false)
-      }
+      setImgSrc(getFaviconUrl(url))
+      setImgError(false)
     } else if (iconKind === 'image' && iconData) {
       setImgSrc(iconData)
       setImgError(false)
@@ -111,6 +109,9 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
     } else if (iconKind === 'svg' && svgCode.trim()) {
       finalIcon = svgCode.trim()
       finalKind = 'svg'
+    } else if (iconKind === 'website' && url) {
+      finalIcon = getFaviconUrl(url)
+      finalKind = 'website'
     }
     onSave({ url: url.trim(), label: label.trim(), icon: finalIcon, iconKind: finalKind })
   }
@@ -119,7 +120,7 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden h-full">
-      <div className="flex-1 space-y-4 overflow-auto px-4 py-3">
+      <div className="flex-1 space-y-4 overflow-auto px-4 py-3 min-h-79.5 max-h-79.5">
         <label className="flex flex-col gap-1.5">
           <span className={labelClass}>{t('urlLabel')}</span>
           <Input

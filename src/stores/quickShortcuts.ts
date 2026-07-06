@@ -41,14 +41,11 @@ function normalize(input: Partial<QuickShortcut>): QuickShortcut | null {
   let icon = rawIcon
   let iconKind = rawKind as QuickShortcut['iconKind']
 
-  if (rawKind === 'site' || rawKind === 'website') {
-    iconKind = ''
-    icon = ''
+  if (!iconKind) {
+    const normalized = normalizeShortcutIcon(icon)
+    icon = normalized.icon
+    iconKind = normalized.iconKind || ''
   }
-
-  const normalized = normalizeShortcutIcon(icon)
-  icon = normalized.icon
-  iconKind = normalized.iconKind || iconKind || ''
 
   return {
     id: input.id || generateId(),
@@ -57,11 +54,6 @@ function normalize(input: Partial<QuickShortcut>): QuickShortcut | null {
     icon,
     iconKind
   }
-}
-
-function normalizeAll(input: unknown): QuickShortcut[] {
-  if (!Array.isArray(input)) return []
-  return input.map(normalize).filter(Boolean) as QuickShortcut[]
 }
 
 interface QuickShortcutsStore {

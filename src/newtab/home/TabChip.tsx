@@ -13,17 +13,17 @@ import { useSelectMode } from './SelectModeContext.tsx'
 interface TabChipProps {
   tab: OpenTab
   dupeCount?: number
+  mode: 'select' | 'view'
 }
 
-export function TabChip({ tab, dupeCount }: TabChipProps) {
+export function TabChip({ tab, dupeCount, mode }: TabChipProps) {
   const { t } = useTranslation()
-  const { selectedTabIds, toggleTab, selectTarget, saveTab } = useSelectMode()
+  const { selectedTabIds, toggleTab, saveTab } = useSelectMode()
   const sleepControlEnabled = useThemeStore((s) => s.preferences.sleepControlEnabled)
   const showSleep = sleepControlEnabled && !tab.discarded && !tab.active
   const closeTab = useOpenTabsStore((s) => s.closeTab)
   const focusTab = useOpenTabsStore((s) => s.focusTab)
   const sleepTab = useOpenTabsStore((s) => s.sleepTab)
-  const mode = selectTarget ? 'select' : 'view'
   const selected = selectedTabIds.has(tab.id)
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { QuickShortcut } from '@/stores/quickShortcuts'
-import { getIconSources, getFallbackLabel } from '@/newtab/utils/icon-utils'
+import { getFallbackLabel } from '@/newtab/utils/icon-utils'
+import { getFaviconUrl } from '@/utils/favicon'
 import { svgToDataUrl } from '@/utils/svg'
 
 export function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
@@ -35,27 +36,17 @@ export function ShortcutIcon({ shortcut }: { shortcut: QuickShortcut }) {
     )
   }
 
-  if (!imgError && url) {
-    const sources = getIconSources(url, 32)
-    const firstSrc = sources[0]
-    if (firstSrc) {
-      return (
-        <img
-          src={firstSrc}
-          alt=""
-          draggable={false}
-          data-fallback-src={sources[1]}
-          onError={(e) => {
-            const fb = (e.currentTarget as HTMLImageElement).getAttribute('data-fallback-src')
-            if (fb) {
-              e.currentTarget.src = fb
-              e.currentTarget.removeAttribute('data-fallback-src')
-            } else setImgError(true)
-          }}
-          className="h-5.5 w-5.5 rounded-md object-contain"
-        />
-      )
-    }
+  const src = icon || (url ? getFaviconUrl(url) : '')
+  if (src && !imgError) {
+    return (
+      <img
+        src={src}
+        alt=""
+        draggable={false}
+        onError={() => setImgError(true)}
+        className="h-5.5 w-5.5 rounded-md object-contain"
+      />
+    )
   }
 
   const fallbackText = getFallbackLabel(label, url)

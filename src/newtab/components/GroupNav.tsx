@@ -1,11 +1,13 @@
 import { useTranslation } from '@/i18n'
-import { GroupIcon } from '@/components/group-icon'
+import { FaviconImage } from '@/components/FaviconImage'
+import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 export interface NavItem {
   id: string
   label: string
-  tabs: Array<{ url: string; favIconUrl?: string }>
+  tabs: Array<{ url: string }>
+  faviconUrl: string
 }
 
 interface GroupNavProps {
@@ -43,9 +45,9 @@ export function GroupNav({ items, onNavigate, variant = 'icon' }: GroupNavProps)
                   draggable={false}
                   className="border-border bg-card hover:border-primary inline-flex h-10 w-10 cursor-grab items-center justify-center rounded-full border transition-[transform,border-color] duration-200 ease-out hover:-translate-y-px"
                 >
-                  <GroupIcon
-                    tabs={item.tabs}
-                    label={item.label}
+                  <FaviconImage
+                    src={item.faviconUrl}
+                    fallback={getFallbackLabel(item.label, item.tabs[0]?.url || '')}
                     imgCls="w-5 h-5 rounded-xs"
                     fallbackCls="w-5 h-5 rounded-full text-[9px]"
                   />

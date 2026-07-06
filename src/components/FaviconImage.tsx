@@ -1,24 +1,24 @@
 import { useState } from 'react'
-import type { OpenTab } from '@/newtab/utils/domain-grouping'
-import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { cn } from '@/lib/utils'
 
-export function Favicon({
-  tab,
-  imgCls,
-  fallbackCls
-}: {
-  tab: OpenTab
+interface FaviconImageProps {
+  /** 直接图标 URL */
+  src?: string
+  /** 失败时显示的回退文字（取前 2 个字符） */
+  fallback?: string
+  /** img 标签的 className */
   imgCls?: string
+  /** 回退文字的 className */
   fallbackCls?: string
-}) {
-  const [imgError, setImgError] = useState(false)
-  const fb = getFallbackLabel(tab.title, tab.url)
+}
 
-  if (tab.faviconUrl && !imgError) {
+export function FaviconImage({ src, fallback, imgCls, fallbackCls }: FaviconImageProps) {
+  const [imgError, setImgError] = useState(false)
+
+  if (src && !imgError) {
     return (
       <img
-        src={tab.faviconUrl}
+        src={src}
         alt=""
         className={cn('shrink-0 object-contain', imgCls)}
         onError={() => setImgError(true)}
@@ -33,7 +33,7 @@ export function Favicon({
         fallbackCls
       )}
     >
-      {fb.slice(0, 2)}
+      {(fallback || '?').slice(0, 2)}
     </span>
   )
 }
