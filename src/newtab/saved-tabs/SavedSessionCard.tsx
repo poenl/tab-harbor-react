@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ChevronDown, Trash2, RotateCcw, GripVertical } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { TFunction } from 'i18next'
 import { useTranslation } from '@/i18n'
+import { cn } from '@/lib/utils'
 import type { SavedTabSession } from '@/stores/savedSessions'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
 import { SavedSessionTabRow } from './SavedSessionTabRow.tsx'
@@ -23,9 +25,10 @@ function formatRelativeTime(iso: string, t: TFunction): string {
 interface SavedSessionCardProps {
   session: SavedTabSession
   index: number
+  isDragActive?: boolean
 }
 
-export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
+export function SavedSessionCard({ session, index, isDragActive }: SavedSessionCardProps) {
   const { t } = useTranslation()
   const {
     collapsed,
@@ -63,12 +66,9 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
         <article
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className="animate-in fade-in-0 slide-in-from-top-3 bg-card border-border shadow-primary/5 rounded-2xl border p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] transition-all duration-250 fill-mode-both hover:-translate-y-px hover:shadow-[0_16px_30px_var(--tw-shadow-color)]"
+          className="bg-card border-border shadow-primary/5 rounded-2xl border p-[14px_16px] shadow-[0_14px_28px_var(--tw-shadow-color)] transition-all duration-250 hover:shadow-[0_16px_30px_var(--tw-shadow-color)]"
           data-session-id={session.id}
-          style={{
-            ...(provided.draggableProps.style as React.CSSProperties),
-            animationDelay: `${index * 80}ms`
-          }}
+          style={provided.draggableProps.style as React.CSSProperties}
         >
           {/* ── 卡片顶部：名称 + 摘要 + 操作按钮 ── */}
           <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
 
           {/* ── Tab 列表（可折叠） ── */}
           <div
-            className="grid transition-[grid-template-rows] duration-300"
+            className={cn('grid', !isDragActive && 'transition-[grid-template-rows] duration-200')}
             style={{ gridTemplateRows: isCollapsed ? '0fr' : '1fr' }}
           >
             <div className="overflow-hidden min-h-0">
@@ -174,16 +174,27 @@ export function SavedSessionCard({ session, index }: SavedSessionCardProps) {
                       {...provided.droppableProps}
                       className="border-border/50 mt-3 border-t pt-3"
                     >
-                      {session.tabs.map((tab, i) => (
-                        <SavedSessionTabRow
-                          key={tab.url}
-                          tab={tab}
-                          sessionId={session.id}
-                          index={i}
-                          onRestoreTab={restoreTab}
-                          onDeleteTab={removeTabFromSession}
-                        />
-                      ))}
+                      <AnimatePresence>
+                        {session.tabs.map((tab, i) => (
+                          <motion.div
+                            key={tab.url}
+                            exit={{
+                              opacity: 0,
+                              height: 0,
+                              marginBottom: 0,
+                              transition: { duration: 0.1, ease: 'easeOut' }
+                            }}
+                          >
+                            <SavedSessionTabRow
+                              tab={tab}
+                              sessionId={session.id}
+                              index={i}
+                              onRestoreTab={restoreTab}
+                              onDeleteTab={removeTabFromSession}
+                            />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
                       {provided.placeholder}
                     </div>
                   )}

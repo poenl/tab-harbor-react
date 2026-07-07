@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from '@/i18n'
 import { toast } from 'sonner'
 import { useSavedSessionsStore } from '@/stores/savedSessions'
@@ -45,6 +46,7 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
   const showSelectAll = selectTarget === '*'
   const sleepControlEnabled = useThemeStore((s) => s.preferences.sleepControlEnabled)
   const sleepGroup = useOpenTabsStore((s) => s.sleepGroup)
+  const closeGroup = useOpenTabsStore((s) => s.closeGroup)
   const [expanded, setExpanded] = useState(false)
 
   // ── 选择模式 footer 状态 ──
@@ -230,6 +232,22 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
                   <TooltipContent side="top">{t('saveGroupSession')}</TooltipContent>
                 </Tooltip>
               )}
+              {mode === 'view' && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => closeGroup(group.domain)}
+                      aria-label={t('closeGroup')}
+                      className="text-muted-foreground border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                    >
+                      <X strokeWidth={1.8} className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('closeGroup')}</TooltipContent>
+                </Tooltip>
+              )}
               {group.tabs.length > 1 && (
                 <Badge
                   variant="secondary"
@@ -241,16 +259,27 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
             </div>
 
             {/* ── 标签列表 ── */}
-            <div>
+            <AnimatePresence>
               {(mode === 'select'
                 ? group.tabs
                 : expanded
                   ? group.tabs
                   : group.tabs.slice(0, INITIAL_VISIBLE)
               ).map((tab) => (
-                <TabChip key={tab.id} tab={tab} dupeCount={urlCounts[tab.url]} mode={mode} />
+                <motion.div
+                  key={tab.id}
+                  layout
+                  exit={{
+                    opacity: 0,
+                    height: 0,
+                    marginBottom: 0,
+                    transition: { duration: 0.1, ease: 'easeOut' }
+                  }}
+                >
+                  <TabChip tab={tab} dupeCount={urlCounts[tab.url]} mode={mode} />
+                </motion.div>
               ))}
-            </div>
+            </AnimatePresence>
 
             {/* ── 展开更多（仅展示模式） ── */}
             {mode === 'view' && group.tabs.length > INITIAL_VISIBLE && !expanded && (

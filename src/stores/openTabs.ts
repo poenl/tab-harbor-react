@@ -25,6 +25,7 @@ interface OpenTabsState {
   sleepGroup: (domain: string) => Promise<void>
   sleepAllTabs: () => Promise<void>
   closeAllTabs: () => Promise<void>
+  closeGroup: (domain: string) => Promise<void>
 }
 
 export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
@@ -108,6 +109,22 @@ export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
     toast(i18n.t('toastTabsDiscarded', { count }))
   }
 
+  const closeGroup = async (domain: string) => {
+    const ids = get()
+      .groups.filter((g) => g.domain === domain)
+      .flatMap((g) => g.tabs.filter((t) => !t.pinned && t.id))
+      .map((t) => t.id!)
+    if (ids.length === 0) return
+    await browser.tabs.remove(ids)
+    toast(
+      i18n.t('closedTabsFromGroup', {
+        count: ids.length,
+        groupLabel: domain,
+        tabsWord: ids.length > 1 ? i18n.t('tabsWordPlural') : i18n.t('tabsWordSingular')
+      })
+    )
+  }
+
   const closeAllTabs = async () => {
     const ids = get()
       .tabs.filter((t) => !t.pinned && t.id)
@@ -131,7 +148,8 @@ export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
     sleepTab,
     sleepGroup,
     sleepAllTabs,
-    closeAllTabs
+    closeAllTabs,
+    closeGroup
   }
 })
 

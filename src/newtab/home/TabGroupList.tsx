@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from '@/i18n'
 import type { DomainGroup } from '@/newtab/utils/domain-grouping.ts'
 import { DomainGroupCard } from './DomainGroup.tsx'
@@ -26,16 +27,25 @@ export function TabGroupList({ groups, loading }: TabGroupListProps) {
       {selectTarget === '*' ? (
         <DomainGroupCard groups={groups} />
       ) : (
-        groups.map((group, i) => (
-          <div
-            key={group.domain}
-            data-domain={group.domain}
-            className="animate-in fade-in-0 slide-in-from-top-3 rounded-2xl fill-mode-both"
-            style={{ animationDelay: `${i * 80}ms` }}
-          >
-            <DomainGroupCard groups={[group]} />
-          </div>
-        ))
+        <AnimatePresence>
+          {groups.map((group, i) => (
+            <motion.div
+              key={group.domain}
+              data-domain={group.domain}
+              layout
+              initial={{ opacity: 0, y: -12 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.3, ease: 'easeOut', delay: i * 0.05 }
+              }}
+              exit={{ opacity: 0, transition: { duration: 0.1, ease: 'easeOut' } }}
+              className="rounded-2xl overflow-hidden"
+            >
+              <DomainGroupCard groups={[group]} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       )}
     </div>
   )

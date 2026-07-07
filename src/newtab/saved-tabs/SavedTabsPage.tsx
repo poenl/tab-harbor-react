@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from '@/i18n'
 import { createSessionId, useSavedSessionsStore } from '@/stores/savedSessions'
 import { SectionHeader } from '@/newtab/home/SectionHeader.tsx'
@@ -16,9 +17,11 @@ import {
 export function SavedTabsPage() {
   const { t } = useTranslation()
   const { sessions, ready, setSessions, toggleCollapse } = useSavedSessionsStore()
+  const [isDragActive, setIsDragActive] = useState(false)
   const [isDraggingOutside, setIsDraggingOutside] = useState(false)
 
   function handleBeforeCapture(before: BeforeCapture) {
+    setIsDragActive(true)
     toggleCollapse(before.draggableId, true)
   }
 
@@ -27,6 +30,7 @@ export function SavedTabsPage() {
   }
 
   function handleDragEnd(result: DropResult) {
+    setIsDragActive(false)
     toggleCollapse(result.draggableId, false)
     setIsDraggingOutside(false)
 
@@ -136,9 +140,27 @@ export function SavedTabsPage() {
                     {...provided.droppableProps}
                     className="flex flex-col gap-3"
                   >
-                    {sessions.map((session, i) => (
-                      <SavedSessionCard key={session.id} session={session} index={i} />
-                    ))}
+                    <AnimatePresence>
+                      {sessions.map((session, i) => (
+                        <motion.div
+                          key={session.id}
+                          initial={{ opacity: 0, marginTop: -12 }}
+                          animate={{ opacity: 1, marginTop: 0, transition: { delay: i * 0.05 } }}
+                          exit={{
+                            opacity: 0,
+                            height: 0,
+                            marginBottom: 0,
+                            transition: { duration: 0.1, ease: 'easeOut' }
+                          }}
+                        >
+                          <SavedSessionCard
+                            session={session}
+                            index={i}
+                            isDragActive={isDragActive}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                     {provided.placeholder}
                   </div>
                 )}

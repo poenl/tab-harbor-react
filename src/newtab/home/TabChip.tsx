@@ -28,7 +28,7 @@ export function TabChip({ tab, dupeCount, mode }: TabChipProps) {
 
   return (
     // ── 标签行（外层容器，无点击事件） ──
-    <div className="border-border/50 hover:bg-secondary/50 -mx-2 flex min-h-11 items-center gap-2 overflow-hidden rounded-md border-b px-2.5 py-2 text-sm leading-[1.4] transition-colors duration-150 last:border-b-0">
+    <div className="border-border/50 hover:bg-secondary/50 -mx-2 flex min-h-11 items-center gap-2 overflow-hidden rounded-md border-b px-2.5 py-2 text-sm leading-[1.4] transition-colors duration-150 last:border-b-0 group">
       {/* ── 文案区域（绑定跳转/勾选事件） ── */}
       <div
         onClick={() => (mode === 'view' ? focusTab(tab) : toggleTab(tab.id))}
@@ -49,51 +49,36 @@ export function TabChip({ tab, dupeCount, mode }: TabChipProps) {
 
       {/* ── 操作按钮组（仅展示模式） ── */}
       {mode === 'view' && (
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           {showSleep && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => sleepTab(tab.id)}
-                  aria-label={t('discardTab')}
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
-                >
-                  <Moon strokeWidth={1.8} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">{t('discardTab')}</TooltipContent>
-            </Tooltip>
+            <Button
+              onClick={() => sleepTab(tab.id)}
+              aria-label={t('discardTab')}
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
+            >
+              <Moon strokeWidth={1.8} />
+            </Button>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={() => saveTab(tab)}
-                aria-label={t('saveTabSession')}
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
-              >
-                <Archive strokeWidth={1.8} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">{t('saveTabSession')}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                onClick={() => closeTab(tab.id)}
-                aria-label={t('closeThisTab')}
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
-              >
-                <X strokeWidth={1.8} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">{t('closeThisTab')}</TooltipContent>
-          </Tooltip>
+          <Button
+            onClick={() => saveTab(tab)}
+            aria-label={t('saveTabSession')}
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground/50 hover:bg-secondary/60 hover:text-primary"
+          >
+            <Archive strokeWidth={1.8} />
+          </Button>
+          <Button
+            onClick={() => closeTab(tab.id)}
+            aria-label={t('closeThisTab')}
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          >
+            <X strokeWidth={1.8} />
+          </Button>
         </div>
       )}
     </div>
