@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import { useOpenTabsStore } from '@/stores/openTabs'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
@@ -91,13 +91,12 @@ export function TabPicker({ onClose }: TabPickerProps) {
   const tabs = useOpenTabsStore((s) => s.tabs)
   const loading = useOpenTabsStore((s) => s.loading)
 
-  const filteredTabs = useMemo(() => {
-    if (!search.trim()) return tabs
-    const q = search.toLowerCase()
-    return tabs.filter((t) => t.title.toLowerCase().includes(q) || t.url.toLowerCase().includes(q))
-  }, [tabs, search])
+  const q = search.toLowerCase()
+  const filteredTabs = !search.trim()
+    ? tabs
+    : tabs.filter((t) => t.title.toLowerCase().includes(q) || t.url.toLowerCase().includes(q))
 
-  const groupedTabs = useMemo(() => {
+  const groupedTabs = (() => {
     const groups = new Map<string, BrowserTab[]>()
     for (const tab of filteredTabs) {
       const domain = extractDomain(tab.url)
@@ -105,7 +104,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
       groups.get(domain)!.push(tab)
     }
     return Array.from(groups.entries()).map(([domain, tabs]) => ({ domain, tabs }))
-  }, [filteredTabs])
+  })()
 
   function toggleTab(id: number) {
     const next = new Set(selectedIds)
@@ -116,13 +115,6 @@ export function TabPicker({ onClose }: TabPickerProps) {
   function handleClose() {
     setClosing(true)
   }
-
-  useEffect(() => {
-    if (closing) {
-      const timer = setTimeout(onClose, 200)
-      return () => clearTimeout(timer)
-    }
-  }, [closing])
 
   async function handleAddSelected() {
     for (const tab of tabs.filter((t) => selectedIds.has(t.id))) {
@@ -140,7 +132,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
     setSelectedIds(new Set())
   }
 
-  const shortcutUrls = useMemo(() => new Set(shortcuts.map((s) => s.url)), [shortcuts])
+  const shortcutUrls = new Set(shortcuts.map((s) => s.url))
 
   async function handleAddSingle(tab: BrowserTab) {
     await add({
@@ -167,8 +159,10 @@ export function TabPicker({ onClose }: TabPickerProps) {
       {/* ── 遮罩 ── */}
       <div
         className={cn(
-          'fixed inset-0 z-50 bg-foreground/6',
-          closing ? 'animate-out fade-out-0 duration-200' : 'animate-in fade-in-0 duration-200'
+          'fixed inset-0 z-50',
+          closing
+            ? 'animate-out fade-out-0 duration-200 fill-mode-forwards'
+            : 'animate-in fade-in-0 duration-200'
         )}
         onClick={handleClose}
       />
@@ -176,15 +170,12 @@ export function TabPicker({ onClose }: TabPickerProps) {
       {/* ── 面板 ── */}
       <div
         className={cn(
-          'border-border shadow-accent/10 fixed right-6 bottom-6 z-50 flex h-[min(480px,calc(100vh-80px))] w-80 flex-col overflow-hidden rounded-[18px] border shadow-[0_20px_42px_var(--tw-shadow-color)] backdrop-blur-xl',
+          'border-border shadow-accent/10 fixed right-6 bottom-6 z-50 flex h-[min(480px,calc(100vh-80px))] w-80 flex-col overflow-hidden rounded-[18px] border shadow-[0_20px_42px_var(--tw-shadow-color)] blur-bg',
           closing
-            ? 'animate-out fade-out-0 slide-out-to-bottom-4 duration-200'
+            ? 'animate-out fade-out-0 slide-out-to-bottom-4 duration-200 fill-mode-forwards'
             : 'animate-in fade-in-0 slide-in-from-bottom-4 duration-200'
         )}
-        style={{
-          backgroundColor:
-            'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
-        }}
+        onAnimationEnd={() => closing && onClose()}
       >
         <Tabs defaultValue="tabs" className="w-full h-full relative">
           <Button

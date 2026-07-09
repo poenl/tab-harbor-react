@@ -210,5 +210,6 @@ export const zhCN: Record<TranslationKey, string> = {
   bookmarksBarSizeNormal: '适中',
   bookmarksBarSizeLarge: '大',
   bookmarkOpenModeLabel: '打开书签',
-  internalPagesLabel: '内部页面'
+  internalPagesLabel: '内部页面',
+  openInNewTab: '在新标签页打开'
 }

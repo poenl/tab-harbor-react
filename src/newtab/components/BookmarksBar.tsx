@@ -375,7 +375,7 @@ function FolderMenu({
       {/* ── 文件夹内部拖拽放置区 ── */}
       <div
         ref={innerRef}
-        className="blur-bg relative p-1.5"
+        className="relative p-1.5 before:absolute before:inset-0 before:pointer-events-none before:blur-bg"
         onDragOver={handleFolderDragOver}
         onDragLeave={handleFolderDragLeave}
         onDrop={handleFolderDrop}
@@ -636,13 +636,13 @@ function OverflowMenu({
   // ── 溢出下拉菜单 ──
   const dropdown = open && (
     <div
-      className="border-border scrollbar-hide absolute top-full right-0 z-50 mt-0.5 max-w-64 min-w-44 overflow-y-auto overscroll-y-none rounded-xl border p-1.5 shadow-lg blur-bg"
+      className="border-border scrollbar-hide absolute top-full right-0 z-50 mt-0.5 max-w-64 min-w-44 overflow-y-auto overscroll-y-none rounded-xl border p-1.5 shadow-lg before:absolute before:inset-0 before:pointer-events-none before:blur-bg"
       style={{ maxHeight: `calc(100vh - ${SIZE_HEIGHT[size]}px)` }}
     >
       {/* ── 溢出菜单拖拽放置区 ── */}
       <div
         ref={innerRef}
-        className="relative blur-bg"
+        className="relative before:absolute before:inset-0 before:pointer-events-none before:blur-bg"
         onDragOver={handleOverflowDragOver}
         onDrop={handleOverflowDrop}
       >
@@ -907,7 +907,7 @@ function BookmarksBarContent() {
     <>
       {items.length > 0 && (
         /* ── 书签栏容器 ── */
-        <div className="animate-in fade-in-0 slide-in-from-top-2 duration-300 blur-bg fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden px-4">
+        <div className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fixed top-0 z-10 w-full shadow-sm max-[960px]:hidden px-4 before:absolute before:inset-0 before:pointer-events-none before:blur-bg">
           {/* ── 书签导航 ── */}
           {/* ── 根层拖拽放置区 ── */}
           <nav

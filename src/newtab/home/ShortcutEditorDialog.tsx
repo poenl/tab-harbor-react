@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { X } from 'lucide-react'
 import { Field, FieldDescription } from '@/components/ui/field'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export interface ShortcutEditorData {
   url: string
@@ -226,30 +226,13 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
   const { t } = useTranslation()
 
   return (
-    <>
-      <div className="bg-foreground/6 fixed inset-0 z-50" onClick={onCancel} />
-      <div
-        className="border-border shadow-accent/10 fixed right-22 bottom-6 z-50 flex w-90 max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-[20px] border shadow-[0_20px_42px_var(--tw-shadow-color)] backdrop-blur-xl"
-        style={{
-          backgroundColor:
-            'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
-        }}
-      >
-        <div className="shrink-0 px-4 pt-4 pb-2">
-          <div className="flex items-start justify-between gap-4">
-            <h2 className="text-foreground font-serif text-lg leading-[1.05] font-normal">
-              {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
-            </h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onCancel}
-              className="text-muted-foreground hover:text-foreground size-8 rounded-full"
-            >
-              <X strokeWidth={2} className="size-3.5" />
-            </Button>
-          </div>
-        </div>
+    <Dialog defaultOpen onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent showCloseButton className="w-90 max-w-[calc(100vw-32px)] p-0 gap-0">
+        <DialogHeader className="px-4 pt-4 pb-2">
+          <DialogTitle className="text-foreground font-serif text-lg leading-[1.05] font-normal">
+            {shortcut?.id ? t('shortcutEditTitle') : t('shortcutAddTitle')}
+          </DialogTitle>
+        </DialogHeader>
         <ShortcutEditorForm
           shortcut={shortcut}
           onSave={(data) => {
@@ -257,7 +240,7 @@ export function ShortcutEditorDialog({ shortcut, onSave, onCancel }: ShortcutEdi
             onCancel()
           }}
         />
-      </div>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }

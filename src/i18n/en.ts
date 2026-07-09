@@ -212,7 +212,8 @@ export const en = {
   bookmarksBarSizeNormal: 'Normal',
   bookmarksBarSizeLarge: 'Large',
   bookmarkOpenModeLabel: 'Open bookmarks',
-  internalPagesLabel: 'Internal Pages'
+  internalPagesLabel: 'Internal Pages',
+  openInNewTab: 'Open in new tab'
 } as const
 
 export type TranslationKey = keyof typeof en

@@ -44,13 +44,7 @@ export function SettingsDropdown() {
         side="bottom"
         align="end"
         sideOffset={10}
-        className="border-border w-80 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl"
-        style={
-          {
-            backgroundColor:
-              'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
-          } as React.CSSProperties
-        }
+        className="border-border w-80 rounded-2xl border p-4 shadow-lg ring-0 blur-bg"
       >
         <Tabs defaultValue="appearance" className="flex flex-col">
           {/* ── 标签栏 ── */}

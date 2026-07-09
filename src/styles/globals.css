@@ -379,17 +379,18 @@
   }
 }
 
-@layer utilities {
-  .blur-bg::before {
-    content: '';
-    @apply absolute inset-0 pointer-events-none backdrop-blur-xl;
-    background: color-mix(
-      in srgb,
-      var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6),
-      transparent
-    );
-  }
+@utility blur-bg-* {
+  content: '';
+  backdrop-filter: blur(24px);
+  background: color-mix(
+    in srgb,
+    var(--blur-bg-color, var(--popover))
+      calc(20% + --value(integer, --default(0)) * 1% + var(--custom-surface-opacity, 50%) * 0.6),
+    transparent
+  );
+}
 
+@layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

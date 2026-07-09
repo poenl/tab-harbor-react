@@ -40,13 +40,7 @@ export function SessionSettingsDropdown() {
         side="bottom"
         align="end"
         sideOffset={8}
-        className="border-border w-62 rounded-2xl border bg-transparent p-4 shadow-lg ring-0 backdrop-blur-xl"
-        style={
-          {
-            backgroundColor:
-              'color-mix(in srgb, var(--card) calc(40% + var(--custom-surface-opacity, 50%) * 0.6), transparent)'
-          } as React.CSSProperties
-        }
+        className="border-border w-62 rounded-2xl border p-4 shadow-lg ring-0 blur-bg"
       >
         {/* ── 默认打开方式 ── */}
         <div className="flex items-center justify-between gap-2.5">

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Pencil, X } from 'lucide-react'
+import { Plus, Pencil, X, ExternalLink } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 import { useTheme } from '@/stores/theme'
 import type { QuickShortcut } from '@/stores/quickShortcuts'
@@ -8,6 +8,12 @@ import { ShortcutIcon } from '@/components/shortcut-icon'
 import { getFallbackLabel } from '../utils/icon-utils'
 import { TabPicker } from './TabPicker.tsx'
 import { ShortcutEditorDialog } from './ShortcutEditorDialog.tsx'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger
+} from '@/components/ui/context-menu'
 
 // ── 添加快捷卡片 ──
 function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
@@ -43,48 +49,6 @@ function AddShortcutCard({ onAdd }: { onAdd: () => void }) {
   )
 }
 
-// ── 编辑按钮 ──
-function EditButton({ shortcutId, onEdit }: { shortcutId: string; onEdit: (id: string) => void }) {
-  const { t } = useTranslation()
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation()
-        onEdit(shortcutId)
-      }}
-      aria-label={t('editQuickTab')}
-      className="border-border bg-card text-muted-foreground shadow-foreground/5 hover:border-primary hover:bg-secondary hover:text-primary pointer-events-none absolute -top-0.5 left-0 flex h-4.5 w-4.5 translate-y-0.5 scale-90 items-center justify-center rounded-full border p-0 opacity-0 shadow-[0_3px_8px_var(--tw-shadow-color)] transition-all duration-200 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
-    >
-      <Pencil strokeWidth={1.8} aria-hidden="true" className="h-2.25 w-2.25" />
-    </button>
-  )
-}
-
-// ── 删除按钮 ──
-function RemoveButton({
-  shortcutId,
-  onRemove
-}: {
-  shortcutId: string
-  onRemove: (id: string) => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation()
-        onRemove(shortcutId)
-      }}
-      aria-label={t('removeQuickTab')}
-      className="border-border bg-card text-muted-foreground shadow-foreground/5 hover:border-destructive hover:bg-destructive/10 hover:text-destructive pointer-events-none absolute -top-0.5 right-0 flex h-4.5 w-4.5 translate-y-0.5 scale-90 items-center justify-center rounded-full border p-0 opacity-0 shadow-[0_3px_8px_var(--tw-shadow-color)] transition-all duration-200 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100"
-    >
-      <X strokeWidth={1.8} aria-hidden="true" className="h-2.25 w-2.25" />
-    </button>
-  )
-}
-
 export function QuickShortcuts() {
   const { t } = useTranslation()
   const { preferences } = useTheme()
@@ -103,6 +67,10 @@ export function QuickShortcuts() {
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
       if (tab?.id) await browser.tabs.update(tab.id, { url })
     } catch {}
+  }
+
+  async function handleOpenInNewTab(url: string) {
+    await browser.tabs.create({ url })
   }
 
   function handleEdit(id: string) {
@@ -146,34 +114,50 @@ export function QuickShortcuts() {
         >
           {shortcuts.map((s) => (
             <div key={s.id} data-shortcut-id={s.id} className="group relative">
-              <button
-                type="button"
-                onClick={() => handleOpen(s.url)}
-                aria-label={s.label || s.url}
-                className="grid w-full cursor-pointer content-start justify-items-center gap-[calc(6px*var(--shortcut-scale,1))] border-none bg-none p-0 text-center transition-transform duration-300 ease-out hover:-translate-y-px"
-                style={
-                  {
-                    gridTemplateRows: `calc(40px * var(--shortcut-scale, 1)) auto`
-                  } as React.CSSProperties
-                }
-              >
-                <span
-                  className="bg-secondary group-hover:shadow-primary/10 flex items-center justify-center rounded-xl transition-shadow duration-200 group-hover:shadow-[0_4px_10px_var(--tw-shadow-color)]"
-                  style={
-                    {
-                      width: `calc(40px * var(--shortcut-scale, 1))`,
-                      height: `calc(40px * var(--shortcut-scale, 1))`
-                    } as React.CSSProperties
-                  }
-                >
-                  <ShortcutIcon shortcut={s} />
-                </span>
-                <span className="text-foreground line-clamp-2 max-w-full overflow-hidden text-xs leading-[1.45]">
-                  {s.label || getFallbackLabel('', s.url)}
-                </span>
-              </button>
-              <EditButton shortcutId={s.id} onEdit={handleEdit} />
-              <RemoveButton shortcutId={s.id} onRemove={remove} />
+              <ContextMenu>
+                <ContextMenuTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => handleOpen(s.url)}
+                    aria-label={s.label || s.url}
+                    className="grid w-full cursor-pointer content-start justify-items-center gap-[calc(6px*var(--shortcut-scale,1))] border-none bg-none p-0 text-center transition-transform duration-300 ease-out hover:-translate-y-px"
+                    style={
+                      {
+                        gridTemplateRows: `calc(40px * var(--shortcut-scale, 1)) auto`
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span
+                      className="bg-secondary group-hover:shadow-primary/10 flex items-center justify-center rounded-xl transition-shadow duration-200 group-hover:shadow-[0_4px_10px_var(--tw-shadow-color)]"
+                      style={
+                        {
+                          width: `calc(40px * var(--shortcut-scale, 1))`,
+                          height: `calc(40px * var(--shortcut-scale, 1))`
+                        } as React.CSSProperties
+                      }
+                    >
+                      <ShortcutIcon shortcut={s} />
+                    </span>
+                    <span className="text-foreground line-clamp-2 max-w-full overflow-hidden text-xs leading-[1.45]">
+                      {s.label || getFallbackLabel('', s.url)}
+                    </span>
+                  </button>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem onClick={() => handleOpenInNewTab(s.url)}>
+                    <ExternalLink />
+                    {t('openInNewTab')}
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleEdit(s.id)}>
+                    <Pencil />
+                    {t('editQuickTab')}
+                  </ContextMenuItem>
+                  <ContextMenuItem variant="destructive" onClick={() => remove(s.id)}>
+                    <X />
+                    {t('removeQuickTab')}
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             </div>
           ))}
           <AddShortcutCard onAdd={handleAddViaTabPicker} />

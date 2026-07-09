@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import type { ThemePaletteId, ThemePreferences } from '@/constants/preferences'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { resolveTone, DEFAULT_THEME_PREFERENCES } from '@/constants/preferences'
@@ -112,11 +112,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [preferences.customBackground])
 
-  const handleSystemChange = useCallback(() => {
+  const handleSystemChange = () => {
     if (preferences.mode !== 'system') return
     const newTone = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     applyTheme(preferences.paletteId, newTone, preferences.surfaceOpacity)
-  }, [preferences.paletteId, preferences.mode, preferences.surfaceOpacity])
+  }
 
   useEffect(() => {
     if (preferences.mode !== 'system') return

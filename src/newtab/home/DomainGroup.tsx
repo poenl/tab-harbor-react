@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from '@/i18n'
 import { toast } from 'sonner'
@@ -67,7 +67,7 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
   const allIds = visibleGroups.flatMap((g) => g.tabs.map((t) => t.id))
   const selectedCount = allIds.filter((id) => selectedTabIds.has(id)).length
 
-  const handleSelectSave = useCallback(async () => {
+  const handleSelectSave = async () => {
     const selectedTabs = groups.flatMap((g) => g.tabs.filter((t) => selectedTabIds.has(t.id)))
     if (selectedTabs.length === 0) return
 
@@ -104,17 +104,7 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
     }
 
     exitSelectMode()
-  }, [
-    groups,
-    selectedTabIds,
-    footerMode,
-    newSessionName,
-    targetSessionId,
-    addSession,
-    sessions,
-    setSessions,
-    exitSelectMode
-  ])
+  }
 
   async function closeGroupDuplicates(urls: string[]) {
     const currentWindow = await browser.windows.getCurrent()

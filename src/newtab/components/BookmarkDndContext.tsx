@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 
 export interface DndState {
   draggedId: string | null
@@ -19,18 +19,15 @@ export function DndProvider({ children }: { children: ReactNode }) {
     sourceParentId: null
   })
 
-  const startDrag = useCallback(
-    (id: string, sourceParentId: string | null) => (e: React.DragEvent) => {
-      e.dataTransfer.effectAllowed = 'move'
-      e.dataTransfer.setData('text/plain', id)
-      setState({ draggedId: id, sourceParentId })
-    },
-    []
-  )
+  const startDrag = (id: string, sourceParentId: string | null) => (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', id)
+    setState({ draggedId: id, sourceParentId })
+  }
 
-  const clearDrag = useCallback(() => {
+  const clearDrag = () => {
     setState({ draggedId: null, sourceParentId: null })
-  }, [])
+  }
 
   return <Ctx.Provider value={{ state, startDrag, clearDrag }}>{children}</Ctx.Provider>
 }
