@@ -213,7 +213,15 @@ export const en = {
   bookmarksBarSizeLarge: 'Large',
   bookmarkOpenModeLabel: 'Open bookmarks',
   internalPagesLabel: 'Internal Pages',
-  openInNewTab: 'Open in new tab'
+  openInNewTab: 'Open in new tab',
+  openAllInNewTabs: 'Open all in new tabs',
+  copyUrl: 'Copy URL',
+  editBookmark: 'Edit',
+  editBookmarkDialogTitle: 'Edit bookmark',
+  renameFolder: 'Rename',
+  renameFolderDialogTitle: 'Rename folder',
+  deleteBookmark: 'Delete',
+  confirmDelete: 'Delete "{{title}}"? This action cannot be undone.'
 } as const
 
 export type TranslationKey = keyof typeof en

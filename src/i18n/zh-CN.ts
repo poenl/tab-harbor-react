@@ -211,5 +211,13 @@ export const zhCN: Record<TranslationKey, string> = {
   bookmarksBarSizeLarge: '大',
   bookmarkOpenModeLabel: '打开书签',
   internalPagesLabel: '内部页面',
-  openInNewTab: '在新标签页打开'
+  openInNewTab: '在新标签页打开',
+  openAllInNewTabs: '在新标签页全部打开',
+  copyUrl: '复制 URL',
+  editBookmark: '修改',
+  editBookmarkDialogTitle: '修改书签',
+  renameFolder: '重命名',
+  renameFolderDialogTitle: '重命名文件夹',
+  deleteBookmark: '删除',
+  confirmDelete: '确认删除「{{title}}」？此操作不可撤销。'
 }
