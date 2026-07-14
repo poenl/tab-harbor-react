@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default defineConfig(
-  { ignores: ['.output', '.wxt', 'node_modules', 'src/components/ui'] },
+  { ignores: ['.output', '.wxt', 'src/components/ui'] },
   reactHooks.configs.flat['recommended-latest'],
   ...tseslint.configs.recommended,
   reactRefresh.configs.vite,

@@ -11,7 +11,7 @@
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
-    "compile": "tsc --noEmit && eslint .",
+    "compile": "concurrently -n tsc,eslint -c '#3178C6,#4B32C3' 'tsc --noEmit' 'eslint . --cache --cache-location node_modules/.cache/eslint/'",
     "format": "prettier --write .",
     "postinstall": "wxt prepare"
   },
@@ -43,6 +43,7 @@
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
     "babel-plugin-react-compiler": "^1.0.0",
+    "concurrently": "^10.0.3",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",

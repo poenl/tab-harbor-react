@@ -6,6 +6,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
   }
 }
