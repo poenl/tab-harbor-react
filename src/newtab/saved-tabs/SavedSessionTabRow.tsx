@@ -4,7 +4,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import type { SavedTabTab } from '@/stores/savedSessions'
 import { FaviconImage } from '@/components/FaviconImage'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
-import { useState } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 
 interface SavedSessionTabRowProps {

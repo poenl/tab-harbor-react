@@ -112,18 +112,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [preferences.customBackground])
 
-  const handleSystemChange = () => {
-    if (preferences.mode !== 'system') return
-    const newTone = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    applyTheme(preferences.paletteId, newTone, preferences.surfaceOpacity)
-  }
-
   useEffect(() => {
+    const handleSystemChange = () => {
+      if (preferences.mode !== 'system') return
+      const newTone = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      applyTheme(preferences.paletteId, newTone, preferences.surfaceOpacity)
+    }
     if (preferences.mode !== 'system') return
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     mq.addEventListener('change', handleSystemChange)
     return () => mq.removeEventListener('change', handleSystemChange)
-  }, [preferences.mode, handleSystemChange])
+  }, [preferences.mode, preferences.paletteId, preferences.surfaceOpacity])
 
   return children
 }

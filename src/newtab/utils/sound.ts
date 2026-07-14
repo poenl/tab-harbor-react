@@ -1,6 +1,6 @@
 export function playCloseSound() {
   try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const ctx = new AudioContext()
     const t = ctx.currentTime
 
     const duration = 0.25

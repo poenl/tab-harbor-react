@@ -6,7 +6,6 @@ import { Favicon } from '@/components/favicon'
 import { Moon, Archive, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useSelectMode } from './SelectModeContext.tsx'
 

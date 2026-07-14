@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { BackToTop } from './components/BackToTop.tsx'
 import { GroupNav } from './components/GroupNav.tsx'
 import { WorkspacePageSwitch } from './components/WorkspacePageSwitch.tsx'
@@ -17,6 +17,7 @@ export default function App() {
   const sessions = useSavedSessionsStore((s) => s.sessions)
   const { preferences } = useTheme()
   const [currentPage, setCurrentPage] = useState<'home' | 'saved-tabs'>('home')
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   function scrollToAndHighlight(selector: string) {
     const el = document.querySelector(selector)
@@ -30,7 +31,7 @@ export default function App() {
 
   return (
     <TooltipProvider disableHoverableContent>
-      <div className="flex h-screen flex-col overflow-auto">
+      <div ref={scrollRef} className="flex h-screen flex-col overflow-auto">
         {/* ── 书签栏（页面顶部全宽） ── */}
         <BookmarksBar />
 
@@ -69,7 +70,7 @@ export default function App() {
           {currentPage === 'home' ? <HomePage /> : <SavedTabsPage />}
 
           <Toaster />
-          <BackToTop />
+          <BackToTop scrollRef={scrollRef} />
         </div>
       </div>
     </TooltipProvider>

@@ -39,13 +39,11 @@ export function InlineSelect({
 }
 
 function PaletteCard({
-  paletteId,
   name,
   active,
   colors,
   onClick
 }: {
-  paletteId: string
   name: string
   active: boolean
   colors: { paper: string; accent: string }
@@ -131,7 +129,6 @@ export function AppearancePanel() {
             ([id, palette]) => (
               <PaletteCard
                 key={id}
-                paletteId={id}
                 name={palette.name}
                 active={preferences.paletteId === id}
                 colors={PALETTE_COLORS[id]}

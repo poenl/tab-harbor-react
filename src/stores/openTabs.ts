@@ -65,7 +65,7 @@ export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
       const tabs = openTabs.filter((t) => t.id != null && t.url !== newTabUrl)
       const groups = buildDomainGroups(tabs)
       set({ allTabs: openTabs, groups, tabs, loading: false })
-    } catch (error) {
+    } catch {
       set({ allTabs: [], groups: [], tabs: [], loading: false })
     }
   }

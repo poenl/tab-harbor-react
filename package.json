@@ -11,7 +11,7 @@
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
-    "compile": "tsc --noEmit",
+    "compile": "tsc --noEmit && eslint .",
     "format": "prettier --write .",
     "postinstall": "wxt prepare"
   },
@@ -44,10 +44,15 @@
     "@wxt-dev/module-react": "^1.1.5",
     "babel-plugin-react-compiler": "^1.0.0",
     "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^10.7.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
     "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "prettier-plugin-tailwindcss-canonical-classes": "^0.1.5",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.63.0",
     "wxt": "^0.20.26"
   },
   "config": {

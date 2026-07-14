@@ -102,6 +102,7 @@ export function SelectModeProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useSelectMode(): SelectModeContextValue {
   const ctx = useContext(SelectModeCtx)
   if (!ctx) throw new Error('useSelectMode must be used within a <SelectModeProvider>')

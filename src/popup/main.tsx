@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import '@/styles/globals.css'
 import '@/i18n'
-import { ThemeProvider } from '@/stores/theme.tsx'
+import { ThemeProvider } from '@/stores/theme.ts'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Popup from './Popup.tsx'
 

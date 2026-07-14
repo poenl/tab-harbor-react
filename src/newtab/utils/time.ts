@@ -23,7 +23,7 @@ const MONTHS = [
 ] as const
 
 // 首页问候语与日期
-export function getGreeting(): string {
+export function getGreeting(): 'Good morning' | 'Good afternoon' | 'Good evening' {
   const hour = new Date().getHours()
   if (hour < 12) return 'Good morning'
   if (hour < 17) return 'Good afternoon'

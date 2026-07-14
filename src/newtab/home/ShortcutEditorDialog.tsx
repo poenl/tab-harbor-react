@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useTranslation } from '@/i18n'
 import type { QuickShortcut } from '@/stores/quickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
@@ -30,6 +30,16 @@ interface ShortcutEditorDialogProps {
 
 const ICON_CHIPS = ['website', 'emoji', 'image', 'svg'] as const
 
+const ICON_LABEL_KEYS: Record<
+  (typeof ICON_CHIPS)[number],
+  'shortcutIconWebsite' | 'shortcutIconEmoji' | 'shortcutIconImage' | 'shortcutIconSvg'
+> = {
+  website: 'shortcutIconWebsite',
+  emoji: 'shortcutIconEmoji',
+  image: 'shortcutIconImage',
+  svg: 'shortcutIconSvg'
+}
+
 export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps) {
   const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -42,20 +52,14 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
   const [iconData, setIconData] = useState(shortcut?.icon || '')
   const [emojiInput, setEmojiInput] = useState(iconKind === 'emoji' ? shortcut?.icon || '' : '')
   const [svgCode, setSvgCode] = useState(iconKind === 'svg' ? shortcut?.icon || '' : '')
-  const [imgSrc, setImgSrc] = useState('')
   const [imgError, setImgError] = useState(false)
 
-  useEffect(() => {
-    if (iconKind === 'website' && url) {
-      setImgSrc(getFaviconUrl(url))
-      setImgError(false)
-    } else if (iconKind === 'image' && iconData) {
-      setImgSrc(iconData)
-      setImgError(false)
-    } else if (iconKind === 'svg' && svgCode.trim()) {
-      setImgSrc(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgCode.trim())}`)
-      setImgError(false)
-    } else setImgSrc('')
+  const imgSrc = useMemo(() => {
+    if (iconKind === 'website' && url) return getFaviconUrl(url)
+    if (iconKind === 'image' && iconData) return iconData
+    if (iconKind === 'svg' && svgCode.trim())
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgCode.trim())}`
+    return ''
   }, [iconKind, url, iconData, svgCode])
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -67,32 +71,6 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
       setIconKind('image')
     }
     reader.readAsDataURL(file)
-  }
-
-  function handlePaste(e: React.ClipboardEvent) {
-    for (const item of Array.from(e.clipboardData.items)) {
-      if (item.type.startsWith('image/')) {
-        const blob = item.getAsFile()
-        if (!blob) continue
-        const reader = new FileReader()
-        reader.onload = () => {
-          setIconData(reader.result as string)
-          setIconKind('image')
-        }
-        reader.readAsDataURL(blob)
-        return
-      }
-      if (item.type === 'text/plain') {
-        item.getAsString((text) => {
-          const trimmed = text.trim()
-          if (trimmed.startsWith('<svg') || trimmed.startsWith('<?xml')) {
-            setSvgCode(trimmed)
-            setIconKind('svg')
-          }
-        })
-        return
-      }
-    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -148,7 +126,10 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
 
         <Tabs
           value={iconKind}
-          onValueChange={(v) => setIconKind(v as QuickShortcut['iconKind'])}
+          onValueChange={(v) => {
+            setIconKind(v as QuickShortcut['iconKind'])
+            setImgError(false)
+          }}
           className="flex flex-col gap-3"
         >
           <div className="flex items-center gap-3">
@@ -175,7 +156,7 @@ export function ShortcutEditorForm({ shortcut, onSave }: ShortcutEditorFormProps
                   value={kind}
                   className="flex-1 rounded-[9px] px-2.5 py-1.75 text-xs font-semibold data-active:bg-card"
                 >
-                  {t(`shortcutIcon${kind.charAt(0).toUpperCase() + kind.slice(1)}` as any)}
+                  {t(ICON_LABEL_KEYS[kind])}
                 </TabsTrigger>
               ))}
             </TabsList>

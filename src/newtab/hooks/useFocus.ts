@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react'
 
-// 页面聚焦是重新设置值
+// 页面聚焦时重新取值
 export const useFocus = <T>(getValue: () => T | Promise<T>) => {
   const [val, setVal] = useState<T>()
 
-  const updateVal = async () => {
-    if (document.visibilityState !== 'visible') return
-    const value = await getValue()
-    value && setVal(value)
-  }
-
   useEffect(() => {
-    updateVal()
+    let cancelled = false
 
-    document.addEventListener('visibilitychange', updateVal)
-
-    return () => {
-      document.removeEventListener('visibilitychange', updateVal)
+    const handle = async () => {
+      if (document.visibilityState !== 'visible') return
+      const value = await getValue()
+      if (!cancelled && value) setVal(value)
     }
-  }, [updateVal])
 
-  return [val, updateVal] as const
+    handle()
+
+    document.addEventListener('visibilitychange', handle)
+    return () => {
+      cancelled = true
+      document.removeEventListener('visibilitychange', handle)
+    }
+  }, [getValue])
+
+  return [val] as const
 }

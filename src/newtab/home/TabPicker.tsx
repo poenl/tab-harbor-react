@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from '@/i18n'
 import { useOpenTabsStore } from '@/stores/openTabs'
 import { useQuickShortcutsStore } from '@/stores/quickShortcuts'
+import type { QuickShortcut } from '@/stores/quickShortcuts'
 import { getFallbackLabel } from '@/newtab/utils/icon-utils'
 import { FaviconImage } from '@/components/FaviconImage'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -108,7 +109,9 @@ export function TabPicker({ onClose }: TabPickerProps) {
 
   function toggleTab(id: number) {
     const next = new Set(selectedIds)
-    next.has(id) ? next.delete(id) : next.add(id)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+
     setSelectedIds(next)
   }
 
@@ -148,7 +151,7 @@ export function TabPicker({ onClose }: TabPickerProps) {
     url: string
     label: string
     icon: string
-    iconKind: any
+    iconKind: QuickShortcut['iconKind']
   }) {
     await add(data)
     handleClose()

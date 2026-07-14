@@ -6,8 +6,9 @@ import {
   ContextMenuItem,
   ContextMenuSeparator
 } from '@/components/ui/context-menu'
-import { BookmarkEditDialog } from './BookmarkEditDialog'
-import { useBrowsing, type FlatNode } from './BookmarksBar'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { BookmarkEditForm } from './BookmarkEditForm'
+import { useBrowsing, type FlatNode } from './use-browsing'
 import { useTranslation } from '@/i18n'
 
 function collectBookmarkUrls(nodes: FlatNode[]): string[] {
@@ -144,20 +145,31 @@ export function BookmarkItemContextMenu({
       <ContextMenuContent>
         {node.type === 'bookmark' ? bookmarkItems : folderItems}
       </ContextMenuContent>
-      <BookmarkEditDialog
+      <Dialog
         open={editDialogOpen}
         onOpenChange={(open) => {
           setEditDialogOpen(open)
           if (!open) setEditDialogConfig(null)
         }}
-        title={t(
-          editDialogConfig?.mode === 'edit' ? 'editBookmarkDialogTitle' : 'renameFolderDialogTitle'
-        )}
-        defaultTitle={editDialogConfig?.title}
-        defaultUrl={editDialogConfig?.url}
-        showUrl={editDialogConfig?.mode === 'edit'}
-        onConfirm={handleEditConfirm}
-      />
+      >
+        <DialogContent showCloseButton className="w-80 p-4 gap-3">
+          <BookmarkEditForm
+            title={t(
+              editDialogConfig?.mode === 'edit'
+                ? 'editBookmarkDialogTitle'
+                : 'renameFolderDialogTitle'
+            )}
+            defaultTitle={editDialogConfig?.title}
+            defaultUrl={editDialogConfig?.url}
+            showUrl={editDialogConfig?.mode === 'edit'}
+            onConfirm={handleEditConfirm}
+            onCancel={() => {
+              setEditDialogOpen(false)
+              setEditDialogConfig(null)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </ContextMenu>
   )
 }

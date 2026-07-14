@@ -1,12 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useRef,
-  useLayoutEffect,
-  createContext,
-  useContext,
-  type ReactNode
-} from 'react'
+import { useEffect, useState, useRef, useLayoutEffect, type ReactNode } from 'react'
 import { useTheme } from '@/stores/theme'
 import type { Browser } from 'wxt/browser'
 import { ChevronRight, Folder, ChevronsRight } from 'lucide-react'
@@ -14,30 +6,9 @@ import { cn } from '@/lib/utils'
 import { FaviconImage } from '@/components/FaviconImage'
 import { getFaviconUrl } from '@/utils/favicon'
 import { BookmarkItemContextMenu } from './BookmarksBarContextMenu'
+import { useBrowsing, BrowsingContext, type BrowsedItemInfo, type FlatNode } from './use-browsing'
 
 const OPEN_DELAY = 200
-
-interface BrowsedItemInfo {
-  id: string
-  parentId: string
-  index: number
-}
-
-interface BrowsingContextType {
-  browsing: boolean
-  enterBrowsing: () => void
-  exitBrowsing: () => void
-  draggedItem: BrowsedItemInfo | null
-  setDraggedItem: (item: BrowsedItemInfo | null) => void
-}
-
-const BrowsingContext = createContext<BrowsingContextType | null>(null)
-
-export function useBrowsing() {
-  const ctx = useContext(BrowsingContext)
-  if (!ctx) throw new Error('useBrowsing must be used within BrowsingProvider')
-  return ctx
-}
 
 const SIZE_CLASSES = {
   compact: {
@@ -58,10 +29,6 @@ const SIZE_CLASSES = {
   },
   large: { icon: 'w-4 h-4', text: 'text-sm', py: 'py-2', px: 'px-2.5', padPx: 10, iconWidthPx: 16 }
 }
-
-export type FlatNode =
-  | { id: string; title: string; type: 'bookmark'; url: string }
-  | { id: string; title: string; type: 'folder'; children: FlatNode[] }
 
 function toFlatNode(n: Browser.bookmarks.BookmarkTreeNode): FlatNode {
   if (n.url) return { id: n.id, title: n.title, type: 'bookmark', url: n.url }
@@ -291,7 +258,7 @@ function FolderMenu({
   const cls = SIZE_CLASSES[size]
   const folderChildren = node.children
   const triggerRef = useRef<HTMLDivElement>(null)
-  const directionRef = useRef(direction)
+  const [curDirection, setCurDirection] = useState(direction)
   const [dropdown, setDropdown] = useState<{ top: number; left: number; maxHeight: number } | null>(
     null
   )
@@ -313,20 +280,20 @@ function FolderMenu({
       left = rect.left
       if (left + 64 * 4 > viewWidth) {
         left = rect.right - 64 * 4
-        directionRef.current = 'left'
+        setCurDirection('left')
       }
     } else {
-      if (directionRef.current === 'right') {
+      if (curDirection === 'right') {
         left = rect.right + 4
         if (left + 64 * 4 > viewWidth) {
           left = rect.left - 64 * 4 - 4
-          directionRef.current = 'left'
+          setCurDirection('left')
         }
       } else {
         left = rect.left - 64 * 4 - 4
         if (left < 0) {
           left = rect.right + 4
-          directionRef.current = 'right'
+          setCurDirection('right')
         }
       }
     }
@@ -334,6 +301,8 @@ function FolderMenu({
   }
 
   const openedByDrag = useRef(false)
+
+  const { browsing, enterBrowsing, exitBrowsing, draggedItem } = useBrowsing()
   const closeDropdownImmediately = () => {
     // 手动打开的文件夹拖拽期间不关
     if (draggedItem && !openedByDrag.current) return
@@ -342,7 +311,13 @@ function FolderMenu({
     openedByDrag.current = false
   }
 
-  const { browsing, enterBrowsing, exitBrowsing, draggedItem } = useBrowsing()
+  const openDropdownRef = useRef(openDropdown)
+  const closeDropdownImmediatelyRef = useRef(closeDropdownImmediately)
+  useEffect(() => {
+    openDropdownRef.current = openDropdown
+    closeDropdownImmediatelyRef.current = closeDropdownImmediately
+  })
+
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   useEffect(
     () => () => {
@@ -384,12 +359,6 @@ function FolderMenu({
     )
   }
 
-  // ── 统一重置面板状态（关闭 dropdown + 停止 timer） ──
-  const resetFolder = () => {
-    closeDropdownImmediately()
-    clearTimeout(timer.current)
-  }
-
   // ── 父级展开的兄弟变化时关闭/展开自己 ──
   useEffect(() => {
     // ── 关闭：父级说别的兄弟是活跃的 ──
@@ -397,28 +366,39 @@ function FolderMenu({
       const isChild =
         node.type === 'folder' && node.children?.some((c) => c.id === parentOpenChildId)
       if (isChild) return
-      resetFolder()
+      closeDropdownImmediatelyRef.current()
+      clearTimeout(timer.current)
     }
     // ── 展开：父级说我是活跃的 + 面板未开 + 浏览模式 ──
     if (parentOpenChildId === node.id && !dropdown && (browsing || !!draggedItem)) {
       if (isRoot) {
-        openDropdown()
+        openDropdownRef.current()
         openedByDrag.current = true
       } else {
         const timer = setTimeout(() => {
           if (parentOpenChildId !== node.id) return
-          openDropdown()
+          openDropdownRef.current()
           openedByDrag.current = true
         }, OPEN_DELAY)
         return () => clearTimeout(timer)
       }
     }
-  }, [parentOpenChildId, node.id, dropdown, browsing, isRoot, draggedItem])
+  }, [
+    parentOpenChildId,
+    node.id,
+    dropdown,
+    browsing,
+    isRoot,
+    draggedItem,
+    node.children,
+    node.type
+  ])
 
   // ── 退出浏览状态时关闭所有面板（拖拽期间不触发） ──
   useEffect(() => {
     if (!browsing && dropdown && !draggedItem) {
-      resetFolder()
+      closeDropdownImmediatelyRef.current()
+      clearTimeout(timer.current)
     }
   }, [browsing, dropdown, draggedItem])
 
@@ -461,7 +441,7 @@ function FolderMenu({
                   key={child.id}
                   node={child}
                   depth={depth + 1}
-                  direction={directionRef.current}
+                  direction={curDirection}
                   parentOpenChildId={openChildId}
                   onChildOpen={setOpenChildId}
                   parentId={node.id}
@@ -479,6 +459,7 @@ function FolderMenu({
 export function BookmarksBar() {
   const [browsing, setBrowsing] = useState(false)
   const [draggedItem, setDraggedItem] = useState<BrowsedItemInfo | null>(null)
+  const [rootOpenedChildId, setRootOpenedChildId] = useState<string | null>(null)
 
   const enterBrowsing = () => {
     setBrowsing(true)
@@ -486,11 +467,20 @@ export function BookmarksBar() {
 
   const exitBrowsing = () => {
     setBrowsing(false)
+    setRootOpenedChildId(null)
   }
 
   return (
     <BrowsingContext.Provider
-      value={{ browsing, enterBrowsing, exitBrowsing, draggedItem, setDraggedItem }}
+      value={{
+        browsing,
+        enterBrowsing,
+        exitBrowsing,
+        draggedItem,
+        setDraggedItem,
+        rootOpenedChildId,
+        setRootOpenedChildId
+      }}
     >
       <BookmarksBarContent />
     </BrowsingContext.Provider>
@@ -501,8 +491,8 @@ function BookmarksBarContent() {
   const { preferences } = useTheme()
   const [items, setItems] = useState<FlatNode[]>([])
   const [bookmarksBarId, setBookmarksBarId] = useState<string | null>(null)
-  const { browsing, exitBrowsing, draggedItem } = useBrowsing()
-  const [rootOpenedChildId, setRootOpenedChildId] = useState<string | null>(null)
+  const { browsing, exitBrowsing, draggedItem, rootOpenedChildId, setRootOpenedChildId } =
+    useBrowsing()
   const enabled = preferences.bookmarksBarEnabled
   const size = preferences.bookmarksBarSize
   const cls = SIZE_CLASSES[size]
@@ -539,38 +529,31 @@ function BookmarksBarContent() {
     }
   }, [enabled])
 
-  // 退出浏览时同步清理根级打开记录
-  useEffect(() => {
-    if (!browsing) setRootOpenedChildId(null)
-  }, [browsing])
-
-  const recalc = () => {
-    const nav = containerRef.current
-    if (!nav || items.length === 0) return
-
-    const navWidth = nav.clientWidth
-    let used = 0
-    let count = 0
-
-    for (const item of items) {
-      const w = widthsRef.current.get(item.id)
-      if (w == null) break
-      if (used + w > navWidth - (cls.iconWidthPx + cls.padPx * 2 + 20)) break
-      used += w
-      count++
-    }
-
-    const finalCount = count < items.length ? Math.max(1, count) : items.length
-    setVisibleCount(finalCount)
-  }
-
   useLayoutEffect(() => {
     if (!enabled || items.length === 0) return
-    recalc()
-    const ro = new ResizeObserver(() => recalc())
+
+    const doRecalc = () => {
+      const nav = containerRef.current
+      if (!nav) return
+      const navWidth = nav.clientWidth
+      let used = 0
+      let count = 0
+      for (const item of items) {
+        const w = widthsRef.current.get(item.id)
+        if (w == null) break
+        if (used + w > navWidth - (cls.iconWidthPx + cls.padPx * 2 + 20)) break
+        used += w
+        count++
+      }
+      const finalCount = count < items.length ? Math.max(1, count) : items.length
+      setVisibleCount(finalCount)
+    }
+
+    doRecalc()
+    const ro = new ResizeObserver(() => doRecalc())
     if (containerRef.current) ro.observe(containerRef.current)
     return () => ro.disconnect()
-  }, [enabled, items.length, items])
+  }, [enabled, items.length, items, cls])
 
   if (!enabled) return null
 

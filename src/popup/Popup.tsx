@@ -16,18 +16,19 @@ export default function Popup() {
   const shortcuts = useQuickShortcutsStore((s) => s.shortcuts)
 
   const [view, setView] = useState<'shortcuts' | 'tabs'>('shortcuts')
-  const [ready, setReady] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(false)
+  const [animReady, setAnimReady] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
   const [refreshing, setRefreshing] = useState(false)
   const [activeGroup, setActiveGroup] = useState<string | null>(null)
 
   const groups = useOpenTabsStore((s) => s.groups)
   const loading = useOpenTabsStore((s) => s.loading)
 
-  // ── 检测 prefers-reduced-motion ──
+  // ── 监听 prefers-reduced-motion 变化 ──
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReducedMotion(mq.matches)
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
@@ -35,15 +36,14 @@ export default function Popup() {
 
   // ── 入场动画 ──
   useEffect(() => {
-    if (reducedMotion) {
-      setReady(true)
-      return
-    }
+    if (reducedMotion) return
     const raf = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setReady(true))
+      requestAnimationFrame(() => setAnimReady(true))
     })
     return () => cancelAnimationFrame(raf)
   }, [reducedMotion])
+
+  const ready = reducedMotion || animReady
 
   // ── 手动刷新 ──
   async function handleRefresh() {
@@ -96,15 +96,15 @@ export default function Popup() {
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const fadeCls = (i: number) =>
+  const fadeCls = () =>
     `transition-all duration-200 ease-out ${ready ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`
-  const fadeStyle = (i: number) => (ready ? undefined : { transitionDelay: `${i * 30}ms` })
+  const fadeStyle = (_i: number) => (ready ? undefined : { transitionDelay: `${_i * 30}ms` })
 
   return (
     <div className="bg-background text-foreground flex max-h-150 w-full max-w-105 min-w-95 flex-col font-sans text-sm select-none">
       {/* ── 顶部栏 ── */}
       <header
-        className={`flex shrink-0 items-center gap-2 p-[14px_16px_0] ${fadeCls(0)}`}
+        className={`flex shrink-0 items-center gap-2 p-[14px_16px_0] ${fadeCls}`}
         style={fadeStyle(0)}
       >
         <div className="bg-secondary flex flex-1 gap-0.5 rounded-lg p-0.75">
@@ -153,7 +153,7 @@ export default function Popup() {
       {/* ── 快捷方式面板 ── */}
       {view === 'shortcuts' && (
         <section
-          className={`min-h-0 flex-1 overflow-y-auto p-[14px_16px_16px] ${fadeCls(1)}`}
+          className={`min-h-0 flex-1 overflow-y-auto p-[14px_16px_16px] ${fadeCls}`}
           style={fadeStyle(1)}
         >
           {shortcuts.length === 0 ? (
@@ -163,7 +163,7 @@ export default function Popup() {
           ) : (
             <div className="flex flex-wrap content-start gap-2.5 pr-0.5">
               {shortcuts.map((s, i) => (
-                <div key={s.id} className={`w-19 shrink-0 ${fadeCls(i)}`} style={fadeStyle(i)}>
+                <div key={s.id} className={`w-19 shrink-0 ${fadeCls}`} style={fadeStyle(i)}>
                   <button
                     type="button"
                     onClick={() => handleOpenUrl(s.url)}
@@ -188,7 +188,7 @@ export default function Popup() {
       {/* ── 标签页面板 ── */}
       {view === 'tabs' && (
         <section
-          className={`flex min-h-0 flex-1 flex-col overflow-hidden ${fadeCls(1)}`}
+          className={`flex min-h-0 flex-1 flex-col overflow-hidden ${fadeCls}`}
           style={fadeStyle(1)}
         >
           {loading ? (
@@ -201,7 +201,7 @@ export default function Popup() {
             <>
               {/* ── 分组导航（固定顶部） ── */}
               <div
-                className={`grid shrink-0 grid-cols-[repeat(auto-fill,40px)] justify-center gap-1.5 px-4 pt-3 pb-1.5 ${fadeCls(2)}`}
+                className={`grid shrink-0 grid-cols-[repeat(auto-fill,40px)] justify-center gap-1.5 px-4 pt-3 pb-1.5 ${fadeCls}`}
                 style={fadeStyle(2)}
               >
                 {groups.map((g, i) => {
@@ -217,7 +217,7 @@ export default function Popup() {
                             activeGroup === g.domain
                               ? 'border-primary bg-card shadow-sm'
                               : 'border-border bg-card/64 hover:border-primary'
-                          } ${fadeCls(i)}`}
+                          } ${fadeCls}`}
                           style={fadeStyle(i)}
                         >
                           <FaviconImage
@@ -245,7 +245,7 @@ export default function Popup() {
                       <div
                         key={g.domain}
                         data-group-id={g.domain}
-                        className={`flex flex-col gap-1.5 ${fadeCls(gi)}`}
+                        className={`flex flex-col gap-1.5 ${fadeCls}`}
                         style={fadeStyle(gi)}
                       >
                         <h3 className="text-foreground border-secondary m-0 border-l-2 pl-1.5 text-xs font-semibold tracking-[-0.01em]">
@@ -261,7 +261,7 @@ export default function Popup() {
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleFocusTab(tab)
                               }}
-                              className={`bg-card border-border/45 hover:bg-card/88 hover:border-accent/40 flex cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-1.75 shadow-[0_1px_2px_var(--shadow)] transition-all duration-140 hover:shadow-[0_2px_5px_var(--shadow)] ${fadeCls(ti)}`}
+                              className={`bg-card border-border/45 hover:bg-card/88 hover:border-accent/40 flex cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-1.75 shadow-[0_1px_2px_var(--shadow)] transition-all duration-140 hover:shadow-[0_2px_5px_var(--shadow)] ${fadeCls}`}
                               style={fadeStyle(ti)}
                             >
                               <Favicon

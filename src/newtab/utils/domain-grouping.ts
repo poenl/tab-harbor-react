@@ -45,16 +45,6 @@ function friendlyDomain(hostname: string): string {
     .join(' ')
 }
 
-interface ChromeTab {
-  id?: number
-  url?: string
-  title?: string
-  windowId?: number
-  active?: boolean
-  discarded?: boolean
-  pinned?: boolean
-}
-
 // 提取主域名（处理 .co.uk 等双段 TLD）
 function getPrimaryDomain(hostname: string): string {
   const parts = hostname.split('.')

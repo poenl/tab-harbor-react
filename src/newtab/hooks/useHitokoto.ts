@@ -24,7 +24,7 @@ async function fetchHitokoto() {
 
 export function useHitokoto() {
   const { preferences } = useTheme()
-  const [entry, updateEntry] = useFocus(async () => {
+  const [entry] = useFocus(async () => {
     if (!preferences.hitokotoEnabled) return
     const result = await browser.storage.local.get(HITOKOTO_CACHE_KEY)
     fetchHitokoto().then((res) => {

@@ -8,7 +8,7 @@
 | 开发（Firefox） | `pnpm dev:firefox`（项目服务默认已启动，禁止重复启动服务） | |
 | 构建（Chrome） | `pnpm build` | |
 | 构建（Firefox） | `pnpm build:firefox` | |
-| 类型检查 | `pnpm compile` | `tsc --noEmit` |
+| 类型检查 + Lint | `pnpm compile` | `tsc --noEmit && eslint .` |
 | 打包 zip（Chrome） | `pnpm zip` | |
 | 打包 zip（Firefox） | `pnpm zip:firefox` | |
 | 格式化 | `pnpm format` | `npx -y prettier --write .`（仅用户可用） |
@@ -25,6 +25,7 @@
 - **严格按用户说的范围执行**：用户要求的事才做，不要扩展范围、不要附加额外任务。
 - **永远不要擅自做决定**：代码改什么、怎么改，必须由用户决定。不能自己「觉得这样更好」就擅自改代码。只能执行用户明确要求的改动。
 - **已安装 babel-plugin-react-compiler**：不要手动添加 `useCallback`/`useMemo`/`React.memo`，不写 `eslint-disable-line` 绕过 hooks 依赖检查（编译器自动处理 memoization）。
+- **ESLint 已配置**（`eslint.config.ts`，flat config）：使用 `typescript-eslint`（TS 推荐规则）、`eslint-plugin-react-hooks`（React Hooks 规则）、`eslint-plugin-react-refresh`（HMR 兼容性）、`eslint-config-prettier`（与 Prettier 兼容）。合并到 `pnpm compile` 中，与 `tsc --noEmit` 一起执行。
 
 ---
 
