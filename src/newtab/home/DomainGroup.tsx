@@ -110,7 +110,7 @@ export function DomainGroupCard({ groups }: DomainGroupCardProps) {
     const currentWindow = await browser.windows.getCurrent()
     const allTabs = useOpenTabsStore
       .getState()
-      .allTabs.filter((t) => t.windowId === currentWindow.id)
+      .allTabs.filter((t) => t.windowId === currentWindow.id && t.status !== 'loading')
     const toClose: number[] = []
     for (const url of urls) {
       const matching = allTabs.filter((t) => t.url === url)

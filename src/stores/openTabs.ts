@@ -38,7 +38,8 @@ export const useOpenTabsStore = create<OpenTabsState>()((set, get) => {
   const closeDuplicateExtras = async () => {
     const { allTabs, newTabUrl } = get()
     if (!newTabUrl) return 0
-    const tabOutTabs = allTabs.filter((t) => t.url === newTabUrl)
+    // 只考虑已加载完成的标签页，加载中的标签页 URL 尚未稳定
+    const tabOutTabs = allTabs.filter((t) => t.url === newTabUrl && t.status !== 'loading')
     if (tabOutTabs.length <= 1) return 0
     const currentWindow = await browser.windows.getCurrent()
     const keep =

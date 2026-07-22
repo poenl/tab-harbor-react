@@ -11,6 +11,7 @@ export interface OpenTab {
   active: boolean
   discarded: boolean
   pinned: boolean
+  status: string
 }
 
 // 按域名分组后的集合
@@ -68,7 +69,8 @@ export function normalizeTab(t: Browser.tabs.Tab): OpenTab {
     windowId: t.windowId ?? 0,
     active: t.active ?? false,
     discarded: t.discarded ?? false,
-    pinned: t.pinned ?? false
+    pinned: t.pinned ?? false,
+    status: t.status ?? ''
   }
 }
 

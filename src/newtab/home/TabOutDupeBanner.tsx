@@ -7,7 +7,9 @@ import { playCloseSound } from '@/newtab/utils/sound'
 
 export function TabOutDupeBanner() {
   const { t } = useTranslation()
-  const tabOutCount = useOpenTabsStore((s) => s.allTabs.filter((t) => t.url === s.newTabUrl).length)
+  const tabOutCount = useOpenTabsStore(
+    (s) => s.allTabs.filter((t) => t.url === s.newTabUrl && t.status !== 'loading').length
+  )
 
   async function handleCloseExtras() {
     const count = await useOpenTabsStore.getState().closeDuplicateExtras()
