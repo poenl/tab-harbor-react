@@ -199,7 +199,7 @@ function BookmarkItem({
                 : 'relative flex items-center gap-2 px-2 py-1.5'
             )}
           >
-            <div className="pointer-events-none">
+            <div className="pointer-events-none shrink-0">
               <FaviconImage
                 src={getFaviconUrl(node.url)}
                 fallback={node.title}
