@@ -1,5 +1,6 @@
 import { useTranslation } from '@/i18n'
 import { useOpenTabsStore } from '@/stores/openTabs'
+import { useThemeStore } from '@/stores/theme'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Copy } from 'lucide-react'
@@ -19,7 +20,10 @@ export function TabOutDupeBanner() {
     }
   }
 
-  if (tabOutCount <= 1) return null
+  const autoClose = useThemeStore((s) => s.preferences.closeDuplicateNewTabsEnabled)
+
+  // 自动关闭开启时横幅是冗余的手动入口，且会在自动关闭完成前闪现，直接不渲染
+  if (autoClose || tabOutCount <= 1) return null
 
   return (
     // ── 多余 Tab Harbor 标签页横幅 ──
