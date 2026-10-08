@@ -561,7 +561,10 @@ function BookmarksBarContent() {
     <>
       {items.length > 0 && (
         /* ── 书签栏容器 ── */
-        <div className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fixed top-0 z-1 w-full shadow-sm max-[960px]:hidden px-4 before:absolute before:inset-0 before:pointer-events-none before:blur-bg">
+        <div
+          data-bookmarks-fixed
+          className="animate-in fade-in-0 slide-in-from-top-2 duration-300 fixed top-0 z-1 w-full shadow-sm max-[960px]:hidden px-4 before:absolute before:inset-0 before:pointer-events-none before:blur-bg"
+        >
           {/* ── 书签导航 ── */}
           <nav
             ref={containerRef}

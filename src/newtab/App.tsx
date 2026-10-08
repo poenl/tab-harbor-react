@@ -21,8 +21,19 @@ export default function App() {
 
   function scrollToAndHighlight(selector: string) {
     const el = document.querySelector(selector)
-    if (!el) return
-    el.scrollIntoView({ behavior: 'smooth' })
+    const container = scrollRef.current
+    if (!el || !container) return
+    // 书签栏是 fixed 覆盖层（top-0），scrollIntoView 无法感知会遮住卡片标题，
+    // 因此基于滚动容器手动计算落点：对齐位置扣除书签栏实际高度 + 留白
+    const bar = document.querySelector('[data-bookmarks-fixed]')
+    const offset = (bar?.getBoundingClientRect().height ?? 0) + 12
+    const top =
+      el.getBoundingClientRect().top -
+      container.getBoundingClientRect().top +
+      container.scrollTop -
+      offset
+    container.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+    // 高亮目标卡片（短暂 ring），1.2s 后移除
     el.classList.add('ring-2', 'ring-accent/20', 'shadow-lg')
     setTimeout(() => {
       el.classList.remove('ring-2', 'ring-accent/20', 'shadow-lg')
